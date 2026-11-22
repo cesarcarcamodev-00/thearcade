@@ -702,6 +702,13 @@ canvas{image-rendering:pixelated;border:4px solid #000;background:#000;display:b
 .lvb b{display:block;font-size:12px;color:var(--gold)}
 .st{display:block;font-family:system-ui,sans-serif;font-size:15px;letter-spacing:2px;color:var(--gold);line-height:1.3}
 .st em{font-style:normal;color:#4a5160}
+.opt:disabled{opacity:.5}
+.opt .tag{display:block;margin-top:4px;color:var(--grey);font-size:8px}
+.opt.sold{color:var(--grey);box-shadow:0 4px 0 #000;cursor:default}
+.cash{font-size:14px;color:var(--gold);margin:4px 0}
+.row2{display:flex;gap:8px;margin:8px 0}.row2>*{flex:1}
+.own{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--panel2);border:3px solid #000;padding:6px;font-size:8px;line-height:1.7;text-align:left;margin:6px 0}
+.own .btn{flex:none}
 .intro{background:var(--panel2);border:3px solid #000;padding:8px;margin:10px 0}
 .intro b{color:var(--gold)}
 .intro i{display:inline-block;width:12px;height:12px;border:2px solid #000;vertical-align:middle;margin-right:6px}
@@ -738,7 +745,14 @@ const T={
 en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
  sub:'Defend the base across 8 levels. Every enemy type needs the right tower.',
  how:'Tap a tile to build the selected tower, tap a tower to upgrade or sell it. Each extra tower of the same type costs more. After each wave, pick 1 of 3 upgrades - some are cursed!',
- endless:'ENDLESS MODE',endless_lock:'Clear level 8 to unlock Endless mode',
+ endless:'ENDLESS RUN',endless_lock:'Clear level 3 to unlock the Endless Run',
+ run_unlocked:'Endless Run unlocked! Combine relics into a build and see how far it goes.',
+ stage:'STAGE',relics:'RELICS',stage_clear:'STAGE {0} CLEARED!',interest:'Interest +${0}',stage_bonus:'Stage bonus +${0}',
+ buy:'Buy ${0}',sold:'SOLD',full:'Relic slots full (5). Sell one first.',sellr:'Sell +${0}',reroll:'Reroll ${0}',cont:'Next stage',
+ owned:'YOUR RELICS {0}/5',none:'No relics yet.',next_boss:'NEXT STAGE IS A BOSS: {0}',boss_now:'BOSS STAGE: {0}',boss_in:'Boss in {0} stages: {1}',
+ start_pick:'CHOOSE A STARTING RELIC',run_sub:'Relics change the rules. Stack them into a build - a great build can go on forever.',
+ rar_c:'Common',rar_u:'Uncommon',rar_r:'Rare',best_stage:'Best stage: {0}',reached:'Reached stage {0} · {1} waves',dmg_by:'DAMAGE BY TOWER',
+ wave_bonus:'Wave cleared +${0}',
  lives:'LIVES',gold:'GOLD',wave:'WAVE',level:'LEVEL',
  tw_arrow:'Arrow',tw_cannon:'Cannon',tw_frost:'Frost',gnd:'ground only',
  go:'START WAVE',early:'EARLY +${0}',lvl:'Lv {0}',up:'Upgrade ${0}',sell:'Sell ${0}',maxlv:'MAX',x2:'x{0}',ups:'UPGRADES',close:'Close',
@@ -754,7 +768,7 @@ en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
  over:'BASE DESTROYED',retry:'Retry',tolevels:'Levels',
  waves_done:'Reached level {0} · {1} waves survived',killed:'Enemies defeated: {0}',
  best:'Best level: {0}',lvl_clear:'LEVEL {0} CLEARED!',new_path:'A new path awaits: +${0} gold and +1 life.',refund:'Towers on the new path refunded: +${0}',
- win_lvl:'LEVEL CLEARED!',lives_left:'Lives kept: {0}/{1}',next:'Next level',all_done:'Campaign complete! Endless mode unlocked.',
+ win_lvl:'LEVEL CLEARED!',lives_left:'Lives kept: {0}/{1}',next:'Next level',all_done:'Campaign complete!',
  lv_info:'{0} waves · start with ${1}',early_tip:'Tip: during a wave, call the next one early for bonus gold (you skip one upgrade pick).',
  new_en:'NEW ENEMY',gotit:'Go!',
  tip_mix:'Mix tower types: each new tower of the same type costs 15% more.',
@@ -769,7 +783,14 @@ en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
 es:{title:'DEFENSA DE TORRES LITE',snd:'SON',menu:'MENÚ',
  sub:'Defiende la base en 8 niveles. Cada tipo de enemigo necesita la torre adecuada.',
  how:'Toca una casilla para construir la torre elegida; toca una torre para mejorarla o venderla. Cada torre extra del mismo tipo cuesta más. Tras cada oleada, elige 1 de 3 mejoras. ¡Algunas están malditas!',
- endless:'MODO INFINITO',endless_lock:'Supera el nivel 8 para desbloquear el modo infinito',
+ endless:'PARTIDA INFINITA',endless_lock:'Supera el nivel 3 para desbloquear la partida infinita',
+ run_unlocked:'¡Partida infinita desbloqueada! Combina reliquias en una build y mira hasta dónde llegas.',
+ stage:'FASE',relics:'RELIQUIAS',stage_clear:'¡FASE {0} SUPERADA!',interest:'Interés +${0}',stage_bonus:'Bono de fase +${0}',
+ buy:'Comprar ${0}',sold:'VENDIDA',full:'No caben más reliquias (5). Vende una primero.',sellr:'Vender +${0}',reroll:'Renovar ${0}',cont:'Siguiente fase',
+ owned:'TUS RELIQUIAS {0}/5',none:'Aún no tienes reliquias.',next_boss:'LA SIGUIENTE FASE ES DE JEFE: {0}',boss_now:'FASE DE JEFE: {0}',boss_in:'Jefe en {0} fases: {1}',
+ start_pick:'ELIGE UNA RELIQUIA INICIAL',run_sub:'Las reliquias cambian las reglas. Combínalas en una build: una gran build puede durar para siempre.',
+ rar_c:'Común',rar_u:'Poco común',rar_r:'Rara',best_stage:'Mejor fase: {0}',reached:'Llegaste a la fase {0} · {1} oleadas',dmg_by:'DAÑO POR TORRE',
+ wave_bonus:'Oleada superada +${0}',
  lives:'VIDAS',gold:'ORO',wave:'OLEADA',level:'NIVEL',
  tw_arrow:'Flecha',tw_cannon:'Cañón',tw_frost:'Hielo',gnd:'solo terrestres',
  go:'INICIAR OLEADA',early:'ANTICIPAR +${0}',lvl:'Niv {0}',up:'Mejorar ${0}',sell:'Vender ${0}',maxlv:'MÁX',x2:'x{0}',ups:'MEJORAS',close:'Cerrar',
@@ -785,7 +806,7 @@ es:{title:'DEFENSA DE TORRES LITE',snd:'SON',menu:'MENÚ',
  over:'BASE DESTRUIDA',retry:'Reintentar',tolevels:'Niveles',
  waves_done:'Llegaste al nivel {0} · {1} oleadas superadas',killed:'Enemigos derrotados: {0}',
  best:'Mejor nivel: {0}',lvl_clear:'¡NIVEL {0} SUPERADO!',new_path:'Te espera un camino nuevo: +${0} de oro y +1 vida.',refund:'Torres sobre el nuevo camino reembolsadas: +${0}',
- win_lvl:'¡NIVEL SUPERADO!',lives_left:'Vidas conservadas: {0}/{1}',next:'Siguiente nivel',all_done:'¡Campaña completada! Modo infinito desbloqueado.',
+ win_lvl:'¡NIVEL SUPERADO!',lives_left:'Vidas conservadas: {0}/{1}',next:'Siguiente nivel',all_done:'¡Campaña completada!',
  lv_info:'{0} oleadas · empiezas con ${1}',early_tip:'Consejo: durante una oleada puedes anticipar la siguiente para ganar oro extra (te saltas una elección de mejora).',
  new_en:'NUEVO ENEMIGO',gotit:'¡Vamos!',
  tip_mix:'Combina tipos de torre: cada torre nueva del mismo tipo cuesta un 15% más.',
@@ -872,17 +893,67 @@ const LEVELS=[
 const lname=L=>L.name[LANG]||L.name.en;
 const hasType=(L,ty)=>L.waves.some(w=>w.some(g=>g[0]===ty));
 
+/* ---------- endless run: relics and boss rules ---------- */
+// Relics are permanent passives for the run (max 5). They are bought in the shop after every stage.
+const RAR={c:{col:'#c9d1e0',price:60,w:60},u:{col:'#5be37d',price:90,w:30},r:{col:'#ffcf3f',price:130,w:10}};
+const RELICS=[
+ {id:'sharp',r:'c',n:N('Eagle Fletching','Plumas de águila'),d:N('Arrow towers get +25% range.','Las torres de flechas tienen +25% de alcance.')},
+ {id:'heavy',r:'c',n:N('Heavy Shells','Proyectiles pesados'),d:N('Cannons deal +30% damage.','Los cañones hacen +30% de daño.')},
+ {id:'permafrost',r:'c',n:N('Permafrost','Permafrost'),d:N('Frost slows 10% more and the slow lasts twice as long.','El hielo ralentiza un 10% más y el efecto dura el doble.')},
+ {id:'bounty',r:'c',n:N('Bounty Hunter','Cazarrecompensas'),d:N('+$2 per kill, but no wave-clear bonus.','+$2 por baja, pero sin bono al superar oleadas.')},
+ {id:'lucky',r:'c',n:N('Lucky Coin','Moneda de la suerte'),d:N('Kills have a 10% chance to pay triple gold.','Las bajas tienen un 10% de probabilidad de dar el triple de oro.')},
+ {id:'piggy',r:'c',n:N('Piggy Bank','Hucha'),d:N('Interest cap rises from $25 to $50.','El límite de interés sube de $25 a $50.')},
+ {id:'landlord',r:'c',n:N('Landlord','Casero'),d:N('+$3 per tower you own each time a wave is cleared.','+$3 por cada torre que tengas al superar una oleada.')},
+ {id:'frostbite',r:'u',n:N('Frostbite','Mordedura helada'),d:N('Slowed enemies take +50% damage from arrows.','Los enemigos ralentizados reciben +50% de daño de flechas.')},
+ {id:'volley',r:'u',n:N('Volley','Ráfaga'),d:N('Every 4th arrow shot also hits 2 more enemies.','Cada 4º disparo de flecha alcanza también a 2 enemigos más.')},
+ {id:'hoarder',r:'u',n:N('Hoarder','Acaparador'),d:N('+1% damage for every $10 you hold (max +60%).','+1% de daño por cada $10 que tengas (máx. +60%).')},
+ {id:'mono',r:'u',n:N('Monoculture','Monocultivo'),d:N('+40% damage while all your towers are the same type.','+40% de daño mientras todas tus torres sean del mismo tipo.')},
+ {id:'pierce',r:'u',n:N('Bodkin Points','Puntas perforantes'),d:N('Arrows ignore armor.','Las flechas ignoran el blindaje.')},
+ {id:'exec',r:'u',n:N('Executioner','Verdugo'),d:N('Enemies under 25% HP take double damage.','Los enemigos con menos del 25% de vida reciben el doble de daño.')},
+ {id:'collector',r:'u',n:N('Collector','Coleccionista'),d:N('+8% damage for each relic you own.','+8% de daño por cada reliquia que tengas.')},
+ {id:'shrapnel',r:'r',n:N('Shrapnel','Metralla'),d:N('Enemies killed by cannons explode for 30% of their max HP. Explosions can chain.','Los enemigos eliminados por cañones explotan con el 30% de su vida máxima. Las explosiones se encadenan.')},
+ {id:'blood',r:'r',n:N('Bloodthirst','Sed de sangre'),d:N('Every kill gives that tower +1% damage for the rest of the run.','Cada baja da a esa torre +1% de daño el resto de la partida.')},
+ {id:'glass',r:'r',n:N('Glass Fortress','Fortaleza de cristal'),d:N('All towers deal double damage, but you can never have more than 3 lives.','Todas las torres hacen el doble de daño, pero nunca puedes tener más de 3 vidas.')},
+ {id:'overclock',r:'r',n:N('Overclock','Sobrecarga'),d:N('Towers fire 30% faster, but new towers cost 20% more.','Las torres disparan un 30% más rápido, pero cuestan un 20% más.')},
+ {id:'momentum',r:'r',n:N('Momentum','Impulso'),d:N('+4% fire rate per wave cleared in a row without a leak. A leak resets it.','+4% de cadencia por oleada seguida superada sin fugas. Una fuga lo reinicia.')}
+];
+const RELIC=Object.fromEntries(RELICS.map(r=>[r.id,r]));
+const rtext=(o)=>o[LANG]||o.en;
+const has=id=>S.relics.includes(id);
+// Every 3rd stage is a boss stage with one of these rules for all its waves; the next one is announced in the shop.
+const RULES=[
+ {id:'armored',n:N('Armored Horde','Horda blindada'),d:N('All enemies get +8 armor.','Todos los enemigos tienen +8 de blindaje.')},
+ {id:'swift',n:N('Stampede','Estampida'),d:N('Enemies move 40% faster.','Los enemigos se mueven un 40% más rápido.')},
+ {id:'sky',n:N('Sky Siege','Asedio aéreo'),d:N('Half of the enemies fly.','La mitad de los enemigos vuela.')},
+ {id:'leech',n:N('Leech','Sanguijuela'),d:N('Enemies regenerate 2% of their HP every second.','Los enemigos regeneran un 2% de su vida cada segundo.')},
+ {id:'thaw',n:N('Heatwave','Ola de calor'),d:N('Enemies cannot be slowed.','Los enemigos no se pueden ralentizar.')},
+ {id:'broke',n:N('Drought','Sequía'),d:N('Kills give no gold.','Las bajas no dan oro.')}
+];
+const RULE=Object.fromEntries(RULES.map(r=>[r.id,r]));
+const ruleTxt=id=>rtext(RULE[id].n)+' - '+rtext(RULE[id].d);
+// Weighted draw of n relics not owned; rares get likelier every stage.
+function rollRelics(n,noRare){
+ const out=[],pool=RELICS.filter(r=>!has(r.id)&&!(noRare&&r.r==='r'));
+ const w=r=>r.r==='r'?Math.min(30,RAR.r.w+2*S.level):RAR[r.r].w;
+ while(out.length<n&&pool.length){
+  let x=Math.random()*pool.reduce((a,r)=>a+w(r),0),i=0;
+  for(;i<pool.length-1;i++){x-=w(pool[i]);if(x<=0)break}
+  out.push(pool.splice(i,1)[0].id);
+ }
+ return out;
+}
+
 /* ---------- endless mode ---------- */
 // Each endless level is WPL generated waves; then a new map. Towers, gold and upgrades carry over.
 const WPL=3;
 function genWave(g,L,wi){
  const w=[['slime',5+g,Math.max(.35,.9-.03*g)]];
  if(g>=3)w.push(['runner',2+Math.floor(g*1.1),Math.max(.25,.6-.02*g)]);
- if(g>=5)w.push(['brute',Math.floor(g/2),Math.max(.8,2-.05*g)]);
- if(g>=7)w.push(['flyer',2+Math.floor(g/2),Math.max(.4,.9-.02*g)]);
+ if(g>=6)w.push(['brute',Math.floor(g/2)-1,Math.max(.8,2-.05*g)]);
+ if(g>=8)w.push(['flyer',1+Math.floor(g/3),Math.max(.45,1-.02*g)]);
  if(g>=9)w.push(['healer',1+Math.floor(g/5),Math.max(1,2-.04*g)]);
  for(let i=w.length-1;i>0;i--){const j=ri(0,i);[w[i],w[j]]=[w[j],w[i]]}
- if(wi===WPL&&L>=2)w.push(['boss',1+Math.floor((L-2)/3),Math.max(4,8-L*.4)]);
+ if(wi===WPL&&L%3===0)w.push(['boss',1+Math.floor((L-3)/6),Math.max(4,8-L*.3)]);   // boss enemies close each boss stage
  return w;
 }
 // Snakes in from the left or right edge and down to the base below the bottom row.
@@ -966,7 +1037,8 @@ function rollCards(){
 // state: menu | intro | build | wave | clearing | pick | over | won
 let clearT=0,S,M,state='menu',enemies=[],towers=[],projs=[],parts=[],queue=[],spawnT,sel,build,speed=1,tick=0;
 function resetRun(mode,gold,lives){
- S={mode,li:0,level:1,gold,lives,startLives:lives,wave:0,lw:0,kills:0,ups:[],rr:0};
+ S={mode,li:0,level:1,gold,lives,startLives:lives,wave:0,lw:0,kills:0,ups:[],rr:0,
+  relics:[],rule:null,nextRule:pick(RULES).id,streak:0,dmg:{},offers:[],rerolls:0};
  M={dmg:1,range:1,rate:1,hp:1,cost:1,splash:1,slow:0,interest:0};
  enemies=[];towers=[];projs=[];parts=[];queue=[];spawnT=0;sel=null;build='arrow';
 }
@@ -977,9 +1049,10 @@ function initLevel(i){
 }
 function playLevel(i){initLevel(i);state='intro';showIntro();renderHud();renderBar();beep(440,.1,'triangle')}
 function closeIntro(){hide();state='build';renderHud();renderBar()}
+// Endless run: pick a free starting relic, then stages of 3 waves with a shop after each stage.
 function playEndless(){
  resetRun('endless',160,10);setMap(LEVELS[0].paths,null,false);
- hide();state='build';renderHud();renderBar();beep(440,.1,'triangle');
+ S.offers=rollRelics(3,true);state='shop';showStart();renderHud();renderBar();beep(440,.1,'triangle');
 }
 const nWaves=()=>S.mode==='camp'?LEVELS[S.li].waves.length:WPL;
 
@@ -988,17 +1061,19 @@ const starsKey='towerLiteStars',bestKey='towerLiteBest';
 let STARS=[];try{STARS=(localStorage.getItem(starsKey)||'').split(',').map(v=>+v||0)}catch(e){}
 let best=1;try{best=+localStorage.getItem(bestKey)||1}catch(e){}
 const unlocked=i=>i===0||(STARS[i-1]||0)>0;
-const endlessOpen=()=>(STARS[LEVELS.length-1]||0)>0;
+const endlessOpen=()=>(STARS[2]||0)>0;
 function saveStars(i,n){if(n>(STARS[i]||0)){STARS[i]=n;for(let k=0;k<LEVELS.length;k++)STARS[k]=STARS[k]||0;try{localStorage.setItem(starsKey,STARS.join(','))}catch(e){}}}
 function saveBest(){if(S.mode==='endless'&&S.level>best){best=S.level;try{localStorage.setItem(bestKey,best)}catch(e){}}}
 const starStr=n=>`<span class="st">${'★'.repeat(n)}<em>${'★'.repeat(3-n)}</em></span>`;
 
-// Endless: after the last wave of a level, level bonus, +1 life and a new map.
+// Endless: after the shop, +1 life and a new map; every 3rd stage applies the announced boss rule.
 // Towers that cannot stay on the new map are refunded in full; the rest stay where they are.
 const levelBonus=L=>40+L*10;
 function nextLevel(){
- S.level++;S.lw=0;S.gold+=levelBonus(S.level);S.lives++;
- setMap(randomMap(),null,S.wave>=6);
+ S.level++;S.lw=0;
+ if(!has('glass')||S.lives<3)S.lives++;
+ if(S.level%3===0){S.rule=S.nextRule;S.nextRule=pick(RULES.filter(r=>r.id!==S.rule)).id}else S.rule=null;
+ setMap(randomMap(),null,S.wave>=6||S.rule==='sky');
  let refund=0;
  towers=towers.filter(tw=>{if(!buildable[tw.y][tw.x]){refund+=tw.inv;return false}return true});
  S.gold+=refund;sel=null;saveBest();
@@ -1006,12 +1081,27 @@ function nextLevel(){
 }
 // Every extra tower of a type costs 15% more, so spamming the best tower stops paying off.
 const tcount=ty=>towers.reduce((n,tw)=>n+(tw.type===ty),0);
-const tcost=ty=>Math.round(TW[ty].cost*M.cost*(1+.15*tcount(ty)));
+const tcost=ty=>Math.round(TW[ty].cost*M.cost*(1+.15*tcount(ty))*(has('overclock')?1.2:1));
 const upCost=tw=>Math.round(TW[tw.type].cost*(tw.lv===1?.7:1.1)*M.cost);
 function stat(tw){
- const b=TW[tw.type],l=tw.lv-1;
- return{dmg:b.dmg*(1+b.ud*l)*M.dmg,range:b.range*(1+.08*l)*M.range,cd:b.cd*(1-b.uc*l)/M.rate,
-  splash:(b.splash||0)*M.splash,slow:Math.min(.85,(b.slow||0)+M.slow)};
+ const b=TW[tw.type],l=tw.lv-1,R=relicStat(tw);
+ return{dmg:b.dmg*(1+b.ud*l)*M.dmg*R.dmg,range:b.range*(1+.08*l)*M.range*R.range,cd:b.cd*(1-b.uc*l)/M.rate/R.rate,
+  splash:(b.splash||0)*M.splash,slow:Math.min(.85,(b.slow||0)+M.slow+R.slow)};
+}
+// Tower-side relic effects (enemy-side ones live in damage()).
+function relicStat(tw){
+ const R={dmg:1,range:1,rate:1,slow:0};if(!S.relics.length)return R;
+ if(has('hoarder'))R.dmg*=1+Math.min(.6,Math.floor(S.gold/10)*.01);
+ if(has('mono')&&towers.every(q=>q.type===tw.type))R.dmg*=1.4;
+ if(has('blood'))R.dmg*=1+.01*(tw.kills||0);
+ if(has('glass'))R.dmg*=2;
+ if(has('heavy')&&tw.type==='cannon')R.dmg*=1.3;
+ if(has('collector'))R.dmg*=1+.08*S.relics.length;
+ if(has('sharp')&&tw.type==='arrow')R.range*=1.25;
+ if(has('overclock'))R.rate*=1.3;
+ if(has('momentum'))R.rate*=1+.04*S.streak;
+ if(has('permafrost')&&tw.type==='frost')R.slow+=.1;
+ return R;
 }
 function toast(msg){const e=$('#toast');e.textContent=msg;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',1100)}
 
@@ -1031,21 +1121,32 @@ function startWave(){
  renderBar();renderHud();
 }
 function spawn(ty,pi){
+ if(S.rule==='sky'&&ty!=='boss'&&Math.random()<.5)ty='flyer';
  const E=EN[ty];
  if(pi===undefined)pi=S.rr++;
  pi%=LAND.length;
  let hs,rs=1;
  if(S.mode==='camp')hs=LEVELS[S.li].hp*(1+.06*(S.lw-1));
- else{const g=S.wave-1;hs=1+.4*g+.025*g*g;rs=1+.08*g}
+ else{const g=S.wave-1;hs=1+.25*g+.03*g*g;rs=1+.08*g}
  const hp=E.hp*M.hp*hs;
  enemies.push({ty,p:E.fly?AIR[pi]:LAND[pi],hp,max:hp,rw:Math.round(E.rw*rs),d:0,slowT:0,slowA:0,dead:0,ph:Math.random()*6,healT:1});
 }
 function waveClear(){
+ if(S.mode==='endless'){runWaveClear();return}
  const bonus=20+S.lw*5,inter=Math.min(60,Math.floor(S.gold*M.interest));
  S.gold+=bonus+inter;beep(660,.15,'triangle',.05);beep(880,.25,'triangle',.05);
  const done=S.lw>=nWaves();
  if(done&&S.mode==='camp'){levelWon();return}
  state='pick';showPick(bonus+inter,done);
+}
+// Endless: wave bonus; after the 3rd wave the stage bonus, interest (10% of gold, capped) and the shop.
+function runWaveClear(){
+ let bonus=has('bounty')?0:20+S.lw*5;if(has('landlord'))bonus+=3*towers.length;
+ S.gold+=bonus;S.streak++;beep(660,.15,'triangle',.05);beep(880,.25,'triangle',.05);
+ if(S.lw<nWaves()){state='build';toast(t('wave_bonus',bonus));renderHud();renderBar();return}
+ const lb=levelBonus(S.level+1),inter=Math.min(has('piggy')?50:25,Math.floor(S.gold*.1));
+ S.gold+=lb+inter;S.si={lb,inter};S.offers=rollRelics(3);S.rerolls=0;saveBest();
+ state='shop';showShop();renderHud();renderBar();
 }
 function levelWon(){
  const k=S.lives/S.startLives;S.stars=k>=1?3:k>=.6?2:1;
@@ -1053,23 +1154,42 @@ function levelWon(){
 }
 
 /* ---------- update ---------- */
-function damage(e,d){
- if(e.dead)return;e.hp-=armorHit(d,EN[e.ty].armor);
+// tw: the tower that dealt the hit (null for effects), used by relics and the damage summary.
+function damage(e,d,tw){
+ if(e.dead)return;
+ const E=EN[e.ty];
+ if(tw&&tw.type==='arrow'&&has('frostbite')&&e.slowT>0)d*=1.5;
+ if(has('exec')&&e.hp<e.max*.25)d*=2;
+ const armor=(E.armor||0)+(S.rule==='armored'?8:0);
+ const dealt=Math.min(e.hp,tw&&tw.type==='arrow'&&has('pierce')?d:armorHit(d,armor));
+ e.hp-=dealt;
+ if(tw)S.dmg[tw.type]=(S.dmg[tw.type]||0)+dealt;
+ if(dealt>=60){const [x,y]=posAt(e.p,e.d);parts.push({x:x-6,y:y-14,vx:0,vy:-30,life:.5,txt:''+Math.round(dealt),col:'#fff'})}
  if(e.hp<=0){
-  e.dead=1;S.kills++;S.gold+=e.rw;
-  const [x,y]=posAt(e.p,e.d);for(let i=0;i<8;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:(Math.random()-.5)*90,life:.35,col:EN[e.ty].col});
-  parts.push({x:x-4,y:y-8,vx:0,vy:-25,life:.6,txt:'+'+e.rw,col:'#ffcf3f'});
+  e.dead=1;S.kills++;if(tw)tw.kills=(tw.kills||0)+1;
+  let g=S.rule==='broke'?0:e.rw;if(has('bounty'))g+=2;
+  const [x,y]=posAt(e.p,e.d);
+  if(has('lucky')&&g&&Math.random()<.1){g*=3;parts.push({x:x-6,y:y-16,vx:0,vy:-25,life:.7,txt:'x3',col:'#5be37d'})}
+  S.gold+=g;
+  for(let i=0;i<8;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:(Math.random()-.5)*90,life:.35,col:E.col});
+  if(g)parts.push({x:x-4,y:y-8,vx:0,vy:-25,life:.6,txt:'+'+g,col:'#ffcf3f'});
   beep(160,.08,'square',.03,-60);renderHud();
+  // Shrapnel: the blast is credited to the same cannon, so kills it causes can explode too (chain reactions).
+  if(tw&&tw.type==='cannon'&&has('shrapnel')){
+   for(let i=0;i<12;i++)parts.push({x,y,vx:(Math.random()-.5)*140,vy:(Math.random()-.5)*140,life:.3,col:'#ff6b3f'});
+   parts.push({x:x-10,y:y-18,vx:0,vy:-20,life:.6,txt:'BOOM',col:'#ff6b3f'});
+   for(const o of enemies){if(o.dead||EN[o.ty].fly)continue;const [ox,oy]=posAt(o.p,o.d);if(Math.hypot(ox-x,oy-y)<=30)damage(o,e.max*.3,tw)}
+  }
  }
 }
 function hit(p,x,y){
  if(p.splash>0){
-  for(const e of enemies){if(e.dead||EN[e.ty].fly)continue;const [ex,ey]=posAt(e.p,e.d);if(Math.hypot(ex-x,ey-y)<=p.splash+EN[e.ty].r)damage(e,p.dmg)}
+  for(const e of enemies){if(e.dead||EN[e.ty].fly)continue;const [ex,ey]=posAt(e.p,e.d);if(Math.hypot(ex-x,ey-y)<=p.splash+EN[e.ty].r)damage(e,p.dmg,p.src)}
   for(let i=0;i<10;i++)parts.push({x,y,vx:(Math.random()-.5)*110,vy:(Math.random()-.5)*110,life:.3,col:'#ffb347'});
   beep(90,.15,'sawtooth',.05,-30);
  }else{
-  if(p.slow>0&&p.tgt&&!p.tgt.dead){p.tgt.slowT=1.6;p.tgt.slowA=p.slow}
-  if(p.tgt)damage(p.tgt,p.dmg);
+  if(p.slow>0&&p.tgt&&!p.tgt.dead&&S.rule!=='thaw'){p.tgt.slowT=has('permafrost')?3.2:1.6;p.tgt.slowA=p.slow}
+  if(p.tgt)damage(p.tgt,p.dmg,p.src);
  }
 }
 function update(dt){
@@ -1087,7 +1207,8 @@ function update(dt){
   if(e.dead)continue;
   const E=EN[e.ty];
   if(e.slowT>0)e.slowT-=dt;
-  e.d+=E.sp*(e.slowT>0?1-e.slowA:1)*dt;
+  e.d+=E.sp*(S.rule==='swift'?1.4:1)*(e.slowT>0?1-e.slowA:1)*dt;
+  if(S.rule==='leech'&&e.hp<e.max)e.hp=Math.min(e.max,e.hp+e.max*.02*dt);
   if(E.heal&&(e.healT-=dt)<=0){
    e.healT=1;const [hx,hy]=posAt(e.p,e.d);
    for(const o of enemies){
@@ -1096,7 +1217,7 @@ function update(dt){
    }
   }
   if(e.d>=e.p.len){
-   e.dead=1;S.lives-=E.dmg||1;beep(110,.25,'sawtooth',.06,-50);vib(40);renderHud();
+   e.dead=1;S.lives-=E.dmg||1;S.streak=0;beep(110,.25,'sawtooth',.06,-50);vib(40);renderHud();
    if(S.lives<=0){S.lives=0;state='over';renderHud();showOver();return}
   }
  }
@@ -1115,7 +1236,12 @@ function update(dt){
    tw.ang=Math.atan2(by-cy,bx-cx);
    if(tw.cd<=0){
     tw.cd=st.cd;
-    projs.push({x:cx,y:cy,tgt:best,lx:bx,ly:by,dmg:st.dmg,splash:st.splash,slow:b.slow?st.slow:0,spd:b.spd,ty:tw.type,home:!b.splash});
+    const shot=(tg,tx,tyy)=>projs.push({x:cx,y:cy,tgt:tg,lx:tx,ly:tyy,dmg:st.dmg,splash:st.splash,slow:b.slow?st.slow:0,spd:b.spd,ty:tw.type,home:!b.splash,src:tw});
+    shot(best,bx,by);
+    if(tw.type==='arrow'&&has('volley')&&(tw.shots=(tw.shots||0)+1)%4===0){
+     let n=0;
+     for(const e of enemies){if(n>=2)break;if(e===best||e.dead||(EN[e.ty].fly&&!b.air))continue;const [ex,ey]=posAt(e.p,e.d);if(Math.hypot(ex-cx,ey-cy)<=st.range){shot(e,ex,ey);n++}}
+    }
     beep(tw.type==='cannon'?110:tw.type==='frost'?600:420,.04,'square',.015);
    }
   }
@@ -1222,12 +1348,13 @@ function render(){
 }
 
 /* ---------- UI ---------- */
-const inGame=()=>state==='build'||state==='wave'||state==='clearing'||state==='pick'||state==='intro';
+const inGame=()=>state==='build'||state==='wave'||state==='clearing'||state==='pick'||state==='intro'||state==='shop';
 function renderHud(){
  $('#lives').innerHTML=`${t('lives')}<b>${S.lives}</b>`;
  $('#gold').innerHTML=`${t('gold')}<b>$${S.gold}</b>`;
  const n=nWaves(),w=Math.max(1,Math.min(state==='build'||state==='intro'?S.lw+1:S.lw,n));
- $('#wave').innerHTML=`${t('level')} · ${t('wave')}<b>${S.mode==='endless'?'∞':''}${S.level} · ${w}/${n}</b>`;
+ if(S.mode==='endless')$('#wave').innerHTML=`${S.rule?'☠ ':''}${t('stage')} · ${t('wave')}<b style="${S.rule?'color:var(--red)':''}">${S.level} · ${w}/${n}</b>`;
+ else $('#wave').innerHTML=`${t('level')} · ${t('wave')}<b>${S.level} · ${w}/${n}</b>`;
 }
 function renderBar(){
  const bar=$('#bar');
@@ -1244,7 +1371,7 @@ function renderBar(){
  }
  const early=canEarly(),canGo=state==='build'||early;
  bar.innerHTML=top+`<div class="row"><button class="btn green" id="bgo" ${canGo?'':'disabled'} style="flex:2">${early?t('early',earlyBonus()):t('go')}</button>
-  <button class="btn" id="bsp">${t('x2',speed)}</button><button class="btn" id="bups">${t('ups')}</button></div>`;
+  <button class="btn" id="bsp">${t('x2',speed)}</button><button class="btn" id="bups">${S.mode==='endless'?t('relics')+' '+S.relics.length:t('ups')}</button></div>`;
  bar.querySelectorAll('.tb').forEach(b=>b.onclick=()=>{build=b.dataset.t;beep(500,.04);renderBar()});
  const g=id=>bar.querySelector(id);
  if(g('#bup'))g('#bup').onclick=()=>{
@@ -1257,7 +1384,7 @@ function renderBar(){
  if(g('#bx'))g('#bx').onclick=()=>{sel=null;renderBar()};
  g('#bgo').onclick=startWave;
  g('#bsp').onclick=()=>{speed=speed===1?2:1;renderBar()};
- g('#bups').onclick=showUps;
+ g('#bups').onclick=S.mode==='endless'?showRelics:showUps;
 }
 function show(html){$('#ov').innerHTML=`<div class="modal">${html}</div>`;$('#ov').style.display='flex'}
 function hide(){$('#ov').style.display='none';cur=null}
@@ -1266,7 +1393,7 @@ function showMenu(){
  cur=showMenu;state='menu';enemies=[];projs=[];queue=[];sel=null;renderBar();
  show(`<h2>${t('title')}</h2><p>${t('sub')}</p><div class="lv">${LEVELS.map((L,i)=>{const ok=unlocked(i);
   return`<button class="lvb" ${ok?'':'disabled'} onclick="playLevel(${i})"><b>${ok?i+1:'🔒'}</b>${lname(L)}${starStr(STARS[i]||0)}</button>`}).join('')}</div>
-  ${endlessOpen()?`<button class="btn gold" onclick="playEndless()">${t('endless')}</button><p style="color:var(--gold)">${t('best',best)}</p>`:`<p style="color:var(--grey)">${t('endless_lock')}</p>`}
+  ${endlessOpen()?`<button class="btn gold" onclick="playEndless()">${t('endless')}</button><p style="color:var(--gold)">${t('best_stage',best)}</p>`:`<p style="color:var(--grey)">${t('endless_lock')}</p>`}
   <p>${t('how')}</p>`);
 }
 function showIntro(){
@@ -1281,14 +1408,17 @@ function showOver(){
  cur=showOver;
  if(S.mode==='camp')show(`<h2 style="color:var(--red)">${t('over')}</h2><p>${t('level')} ${S.level}: ${lname(LEVELS[S.li])}</p><p>${t('wave')} ${S.lw}/${nWaves()}</p><p>${t('killed',S.kills)}</p>
   <div class="opts"><button class="btn red" onclick="playLevel(${S.li})">${t('retry')}</button><button class="btn" onclick="showMenu()">${t('tolevels')}</button></div>`);
- else{saveBest();show(`<h2 style="color:var(--red)">${t('over')}</h2><p>${t('waves_done',S.level,Math.max(0,S.wave-1))}</p><p>${t('killed',S.kills)}</p><p style="color:var(--gold)">${t('best',best)}</p>
+ else{saveBest();const dm=Object.entries(S.dmg).sort((a,b)=>b[1]-a[1]);
+  show(`<h2 style="color:var(--red)">${t('over')}</h2><p>${t('reached',S.level,Math.max(0,S.wave-1))}</p><p>${t('killed',S.kills)}</p><p style="color:var(--gold)">${t('best_stage',best)}</p>
+  ${dm.length?`<p style="color:var(--gold)">${t('dmg_by')}</p><div class="ul">${dm.map(([k,v])=>`<div>- ${t('tw_'+k)}: ${Math.round(v)}</div>`).join('')}</div>`:''}
+  ${S.relics.length?`<p style="color:var(--gold)">${t('relics')}</p><div class="ul">${S.relics.map(id=>`<div style="color:${RAR[RELIC[id].r].col}">- ${rtext(RELIC[id].n)}</div>`).join('')}</div>`:''}
   <div class="opts"><button class="btn red" onclick="playEndless()">${t('retry')}</button><button class="btn" onclick="showMenu()">${t('tolevels')}</button></div>`)}
  renderBar();
 }
 function showWon(){
  cur=showWon;const last=S.li===LEVELS.length-1;
  show(`<h2>${t('win_lvl')}</h2><p>${lname(LEVELS[S.li])}</p><p>${starStr(S.stars)}</p><p>${t('lives_left',S.lives,S.startLives)}</p><p>${t('killed',S.kills)}</p>
-  ${last?`<p style="color:var(--green)">${t('all_done')}</p>`:''}
+  ${last?`<p style="color:var(--green)">${t('all_done')}</p>`:''}${S.li===2?`<p style="color:var(--green)">${t('run_unlocked')}</p>`:''}
   <div class="opts">${last?'':`<button class="btn gold" onclick="playLevel(${S.li+1})">${t('next')}</button>`}<button class="btn" onclick="showMenu()">${t('tolevels')}</button></div>`);
  renderBar();
 }
@@ -1312,6 +1442,55 @@ function showUps(){
  const list=S.ups.length?`<div class="ul">${S.ups.map(u=>`<div style="color:${u.curse?'#ffb3bd':'#fff'}">- ${t('c_'+u.id)}: ${t('c_'+u.id+'_d',...u.a)}</div>`).join('')}</div>`:`<p>${t('noups')}</p>`;
  show(`<h2>${t('ups')}</h2>${list}<button class="btn" id="cl">${t('close')}</button>`);
  cur=showUps;$('#cl').onclick=()=>{hide();cur=null};
+}
+
+/* ---------- endless run screens ---------- */
+const relicCard=(id,price,on,dis)=>{const R=RELIC[id],c=RAR[R.r].col;
+ return`<button class="opt" style="box-shadow:0 4px 0 #000,inset 0 0 0 3px ${c}" onclick="${on}" ${dis?'disabled':''}><b style="color:${c}">${rtext(R.n)}</b>${rtext(R.d)}
+  <span class="tag">${t('rar_'+R.r)}${price?' · '+t('buy',price):''}</span></button>`};
+function bossLine(){
+ const k=Math.ceil((S.level+1)/3)*3-S.level;
+ return k===1?`<p style="color:var(--red)">${t('next_boss',ruleTxt(S.nextRule))}</p>`:`<p style="color:var(--grey)">${t('boss_in',k,rtext(RULE[S.nextRule].n))}</p>`;
+}
+function showStart(){
+ cur=showStart;
+ show(`<h2>${t('endless')}</h2><p>${t('run_sub')}</p><p style="color:var(--gold)">${t('start_pick')}</p>
+  <div class="opts">${S.offers.map((id,i)=>relicCard(id,0,'pickStart('+i+')')).join('')}</div>`);
+}
+function pickStart(i){S.relics.push(S.offers[i]);S.offers=[];hide();state='build';beep(520,.15,'triangle',.05,300);renderHud();renderBar()}
+function showShop(){
+ cur=showShop;const full=S.relics.length>=5,rc=10+5*S.rerolls;
+ show(`<h2>${t('stage_clear',S.level)}</h2><p>${t('stage_bonus',S.si.lb)} · ${t('interest',S.si.inter)}</p>
+  <p class="cash">$${S.gold}</p>${bossLine()}
+  <div class="opts">${S.offers.map((id,i)=>id?relicCard(id,RAR[RELIC[id].r].price,'buyRelic('+i+')',S.gold<RAR[RELIC[id].r].price):`<div class="opt sold">${t('sold')}</div>`).join('')}</div>
+  ${full?`<p style="color:var(--red)">${t('full')}</p>`:''}
+  <div class="row2"><button class="btn" onclick="reroll()" ${S.gold<rc?'disabled':''}>${t('reroll',rc)}</button><button class="btn green" onclick="nextStage()">${t('cont')}</button></div>
+  ${ownedList(true)}`);
+}
+function ownedList(sell){
+ return `<p style="color:var(--gold)">${t('owned',S.relics.length)}</p>${S.relics.length?S.relics.map(id=>{const R=RELIC[id];
+  return`<div class="own"><div><b style="color:${RAR[R.r].col}">${rtext(R.n)}</b><br>${rtext(R.d)}</div>${sell?`<button class="btn small red" onclick="sellRelic('${id}')">${t('sellr',RAR[R.r].price>>1)}</button>`:''}</div>`}).join(''):`<p>${t('none')}</p>`}`;
+}
+function buyRelic(i){
+ const id=S.offers[i],p=RAR[RELIC[id].r].price;
+ if(S.relics.length>=5){toast(t('full'));return}
+ if(S.gold<p){toast(t('toast_gold'));return}
+ S.gold-=p;S.relics.push(id);S.offers[i]=null;
+ if(id==='glass')S.lives=Math.min(S.lives,3);
+ beep(700,.12,'triangle',.05,300);showShop();renderHud();
+}
+function sellRelic(id){S.relics=S.relics.filter(r=>r!==id);S.gold+=RAR[RELIC[id].r].price>>1;beep(250,.1);showShop();renderHud()}
+function reroll(){const c=10+5*S.rerolls;if(S.gold<c)return;S.gold-=c;S.rerolls++;S.offers=rollRelics(3);beep(500,.06);showShop();renderHud()}
+function nextStage(){
+ hide();state='build';const refund=nextLevel();
+ if(S.rule)setTimeout(()=>toast(t('boss_now',rtext(RULE[S.rule].n))),60);
+ else if(refund)setTimeout(()=>toast(t('refund',refund)),60);
+ renderHud();renderBar();
+}
+function showRelics(){
+ const prev=cur;
+ show(`<h2>${t('relics')}</h2>${S.rule?`<p style="color:var(--red)">${t('boss_now',ruleTxt(S.rule))}</p>`:bossLine()}${ownedList(false)}<button class="btn" id="cl">${t('close')}</button>`);
+ cur=showRelics;$('#cl').onclick=()=>{hide();cur=null};
 }
 
 /* ---------- input ---------- */
@@ -3611,7 +3790,7 @@ class I18n {
       'hub.new': 'New', 'hub.summary': 'Best round {best} · ★ {stars}',
       'genre.all': 'All', 'genre.luck': 'Luck', 'genre.dice': 'Dice', 'genre.push': 'Push your luck', 'genre.strategy': 'Strategy', 'genre.action': 'Action', 'genre.cards': 'Cards', 'genre.sports': 'Sports',
       'embed.hint': 'Click inside the game to use the keyboard. It has its own sound and language buttons.', 'embed.full': 'Fullscreen',
-      'td.title': 'Tower Defense Lite', 'td.desc': 'Tower defense campaign: 8 levels with their own maps and waves. Armored, fast, flying and healing enemies each need the right tower. Endless mode after the campaign.', 'td.best': 'Best level {n}', 'td.stars': '★ {n}/24 stars',
+      'td.title': 'Tower Defense Lite', 'td.desc': 'Tower defense campaign: 8 levels with their own maps and waves. Armored, fast, flying and healing enemies each need the right tower. Then an endless run: buy relics between stages and stack them into a build.', 'td.best': 'Best level {n}', 'td.stars': '★ {n}/24 stars',
       'sm.title': 'Spider-Man Demo', 'sm.desc': 'A one-level pixel platformer: run, jump the gaps, punch the thugs and beat the boss.',
       'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly pool table. Drag back to aim and set power, then pot all nine balls in as few shots as you can. Scratches cost 2 shots.',
       'ss.title': 'Space Shooter', 'ss.desc': 'Drag to fly while the ship fires on its own. Six random waves, a boss, and power-ups (one is a trap).',
@@ -3724,7 +3903,7 @@ class I18n {
       'hub.new': 'Nuevo', 'hub.summary': 'Mejor ronda {best} · ★ {stars}',
       'genre.all': 'Todos', 'genre.luck': 'Suerte', 'genre.dice': 'Dados', 'genre.push': 'Arriesgar', 'genre.strategy': 'Estrategia', 'genre.action': 'Acción', 'genre.cards': 'Cartas', 'genre.sports': 'Deportes',
       'embed.hint': 'Haz clic dentro del juego para usar el teclado. Tiene sus propios botones de sonido e idioma.', 'embed.full': 'Pantalla completa',
-      'td.title': 'Defensa de Torres Lite', 'td.desc': 'Campaña de defensa de torres: 8 niveles con mapas y oleadas propias. Enemigos blindados, rápidos, voladores y sanadores necesitan la torre adecuada. Modo infinito al terminar la campaña.', 'td.best': 'Mejor nivel {n}', 'td.stars': '★ {n}/24 estrellas',
+      'td.title': 'Defensa de Torres Lite', 'td.desc': 'Campaña de defensa de torres: 8 niveles con mapas y oleadas propias. Enemigos blindados, rápidos, voladores y sanadores necesitan la torre adecuada. Después, una partida infinita: compra reliquias entre fases y combínalas en una build.', 'td.best': 'Mejor nivel {n}', 'td.stars': '★ {n}/24 estrellas',
       'sm.title': 'Demo de Spider-Man', 'sm.desc': 'Un plataformas pixelado de un nivel: corre, salta los huecos, golpea a los matones y derrota al jefe.',
       'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly. Arrastra hacia atrás para apuntar y dar fuerza, y mete las nueve bolas con los menos tiros posibles. Una falta cuesta 2 tiros.',
       'ss.title': 'Shooter Espacial', 'ss.desc': 'Arrastra para volar mientras la nave dispara sola. Seis oleadas aleatorias, un jefe y power-ups (uno es una trampa).',
