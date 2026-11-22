@@ -217,6 +217,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .sc-play{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
 .sc-stage{display:grid;justify-items:center;gap:16px;padding:6px 0 10px;position:relative}
 .sc-msg{font-size:1.35rem;font-weight:700;min-height:1.6em;text-align:center}
+.sc-actions{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.sc-tool{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.3);border-radius:99px;padding:6px 14px;font-weight:600;font-size:.9rem}
 .sc-msg.win{color:var(--g-accent)}
 .sc-msg.lose{color:var(--g-muted)}
 .ticket{--tc:#d4823b;--tc2:#8a4f1c;width:min(400px,100%);background:#fff8e7;color:#2a1052;border-radius:16px;position:relative;
@@ -396,10 +398,19 @@ button.die.held:hover{transform:translateY(-18px)}
 
 /* 9b. Embedded games ------------------------------------------------ */
 [hidden]{display:none!important}
-.embed{display:grid;gap:10px;margin-bottom:10px}
-.embed-bar{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.85rem;flex-wrap:wrap}
-.embed-bar span{flex:1;min-width:200px}
-.embed-frame{width:100%;height:min(880px,calc(100dvh - 180px));min-height:540px;border:1px solid var(--line);border-radius:var(--radius);background:#000;display:block}
+/* The game view becomes a full-height column: title row on top, iframe takes the rest (no page scroll). */
+body.in-game footer{display:none}
+body.embed-mode #game.active{display:flex;flex-direction:column;height:calc(100vh - 63px);height:calc(100dvh - 63px)}
+body.embed-mode #stage{flex:1;min-height:0}
+.embed{height:100%;display:flex;flex-direction:column;gap:8px;padding-bottom:12px}
+.embed-bar{color:var(--muted);font-size:.85rem}
+.embed-frame{flex:1;min-height:0;width:100%;border:1px solid var(--line);border-radius:var(--radius);background:#000;display:block}
+#gameTools:empty{display:none}
+/* scratch booth pieces (spacing kept here so the mobile block can override it) */
+.stubs{margin-top:12px}
+.left-box h3{margin:16px 0 6px}
+.paytable{margin-top:10px}
+.board-hint{font-size:.78rem;margin-top:10px;font-weight:500}
 .th svg.px{shape-rendering:crispEdges}
 .th svg.full{position:absolute;inset:0;width:100%;height:100%}
 .th-sm,.th-ss{overflow:hidden}
@@ -413,16 +424,156 @@ button.die.held:hover{transform:translateY(-18px)}
 .th-card:nth-child(3){transform:rotate(10deg) translateY(4px)}
 
 /* 10. Responsive ----------------------------------------------------- */
+/* Touch screens: no sticky hover lifts, no double-tap zoom on game buttons, no keyboard hint. */
+.g,.g button,.card,.chip{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+@media(hover:none){
+  .g-card:hover{transform:none}
+  .stub:hover:not(:disabled){transform:none}
+  button.die:not(:disabled):not(.held):hover{transform:none}
+  .card:hover{background:var(--surface)}
+}
+@media(pointer:coarse){ .embed-bar{display:none} }
+
+/* Tablets and phones: one column, top bar hidden while playing (the title row has the Menu button). */
 @media(max-width:820px){
   .hero{grid-template-columns:1fr;padding-top:28px}
   .btn .lbl{display:none}
   .sc-play,.dp-play,.dg-play{grid-template-columns:1fr}
-  .g{padding:14px;border-radius:16px}
-  .die{width:62px;height:62px;padding:10px;border-radius:14px}
-  .felt{border-width:10px;padding:24px 10px 18px}
-  .spots{gap:8px;padding:8px 16px 14px}
-  .scene{max-height:340px}
-  .sky{height:110px}
+  .g{padding:14px;border-radius:16px;min-height:0}
+  body.in-game header{display:none}
+  body.embed-mode #game.active{height:100vh;height:100dvh}
+  body.in-game .wrap{padding:0 8px}
+  .game-head{padding:8px 0;gap:8px;flex-wrap:nowrap}
+  .game-head h1{font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .game-head .btn{padding:7px 10px;flex:none}
+  .embed{padding-bottom:8px}
+}
+
+/* Phones: compact versions of every native game screen so a round fits without scrolling. */
+@media(max-width:600px){
+  .g{padding:10px;border-radius:14px}
+  .g-btn.big{font-size:1rem;padding:12px 16px}
+  /* HUD: round + goal on one line, counters + quit on the next */
+  .g-hud{gap:8px;margin-bottom:8px}
+  .g-round{padding:5px 10px}
+  .g-round b{font-size:1.3rem}
+  .g-meter{flex:1 1 60%;min-width:0}
+  .g-track{height:14px}
+  .g-res{font-size:1.05rem;padding:4px 10px 4px 6px}
+  .g-res svg{width:22px;height:22px}
+  .g-hud .g-btn.sm{margin-left:auto}
+  .g-relics{gap:6px;margin-bottom:8px}
+  .g-relic{width:32px;height:32px;font-size:1rem}
+  /* title / perk shop */
+  .g-title{gap:14px;padding:6px 0}
+  .logo-text{font-size:2.3rem}
+  .sc-logo-syms svg{width:40px;height:40px}
+  .dp-logo-dice .die{width:44px;height:44px;padding:7px}
+  .dg-logo svg{width:64px;height:64px}
+  .g-tag{font-size:.92rem}
+  .g-badge{padding:5px 10px;font-size:.8rem}
+  .g-perks{grid-template-columns:1fr;gap:10px}
+  .g-perk{padding:10px;grid-template-columns:40px 1fr auto}
+  .g-perk .ico{width:40px;height:40px;font-size:1.3rem}
+  .g-perk .g-btn{grid-column:auto}
+  /* upgrade picks become full-width rows */
+  .g-pick{gap:10px;padding:4px 0 10px}
+  .g-cards{flex-direction:column;gap:10px;width:100%;margin-top:0}
+  .g-card{width:100%;display:grid;grid-template-columns:76px 1fr;text-align:left;box-shadow:0 5px 0 var(--g-shade)}
+  .g-card-art{height:auto;min-height:86px}
+  .g-card-art span{width:52px;height:52px;font-size:1.7rem}
+  .g-card-body{justify-items:start;padding:10px 12px;gap:3px}
+  .g-card-body p{min-height:0}
+  .g-banner{padding:24px 10px;gap:12px}
+
+  /* Scratch Lotto: ticket, then a one-row booth and a compact prize board */
+  .sc-play{gap:10px}
+  .sc-stage{gap:8px;padding:0}
+  .ticket{transform:none}
+  .ticket::before,.ticket::after{top:84px}
+  .ticket-head{padding:10px 14px}
+  .ticket-head b{font-size:1.35rem}
+  .ticket-price{width:46px;height:46px;font-size:.95rem}
+  .ticket-sub{padding:8px 0 2px;font-size:.7rem}
+  .spots{gap:8px;padding:8px 14px 10px}
+  .ticket-foot{display:none}
+  .spots{padding-bottom:14px}
+  .ticket-stamp{font-size:1.9rem}
+  .sc-msg{font-size:1.1rem;min-height:1.4em}
+  .booth{gap:10px}
+  .booth .g-panel{padding:10px}
+  .stubs{grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+  .stub{grid-template-columns:1fr;text-align:center;padding:8px 4px;gap:4px}
+  .stub::before,.stub::after{display:none}
+  .stub b{font-size:.95rem}
+  .stub small,.left-box{display:none}
+  .stub .price{justify-self:center;font-size:1rem;padding:2px 10px}
+  .paytable{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+  .paytable div{padding:3px 8px 3px 4px;gap:4px}
+  .paytable svg{width:24px;height:24px}
+  .paytable span{display:none}
+  .board-hint{display:none}
+
+  /* Dice Pit: smaller dice in one row, side panel reduced to a two-column pay table */
+  .felt{border-width:8px;border-radius:22px;padding:18px 8px 12px;gap:14px;min-height:0}
+  .dice-row{gap:8px;min-height:86px;padding-top:4px}
+  .die{width:52px;height:52px;padding:8px;border-radius:12px;box-shadow:0 5px 0 #c9bc97}
+  .die.held{transform:translateY(-10px);box-shadow:0 5px 0 #c9bc97,0 0 0 4px #ffcc33}
+  button.die.held:hover{transform:translateY(-10px)}
+  .die.held::after{bottom:-26px;font-size:.55rem;padding:1px 5px}
+  .plate{min-height:74px;gap:6px}
+  .hand-name{font-size:1.2rem}
+  .hand-name.hint{font-size:.95rem}
+  .formula{gap:6px}
+  .dp-chips,.dp-mult{min-width:56px;font-size:1.2rem;padding:4px 10px}
+  .formula .total{font-size:1.5rem}
+  .felt .g-row{width:100%;flex-wrap:nowrap;gap:8px}
+  .felt .g-row .g-btn{flex:1;padding:12px 8px}
+  .dp-side{gap:10px}
+  .dp-side .g-panel{display:none}
+  .plaque{grid-template-columns:1fr 1fr;column-gap:8px;padding:10px}
+  .plaque h3{grid-column:1/-1;margin-bottom:2px}
+  .plaque div{font-size:.72rem;padding:2px 6px}
+
+  /* Dig Pit: shorter shaft view, side-by-side buttons, two-line journal */
+  .scene{max-height:min(340px,42vh)}
+  .sky{height:92px}
+  .headframe{width:96px;height:72px}
+  .rope-top{height:60px}
+  .miner{width:48px;height:48px}
+  .miner.at-surface{left:calc(50% + 40px)}
+  .stratum{height:54px}
+  .dg-side{gap:10px}
+  .dg-side .g-panel{padding:10px}
+  .side-h{margin-bottom:6px}
+  .energy{gap:4px}
+  .energy i{width:12px;height:18px}
+  .purse{gap:8px}
+  .purse div{display:grid;grid-template-columns:auto 1fr;align-items:center;text-align:left;padding:8px 10px;column-gap:8px}
+  .purse svg{width:34px;height:34px;grid-row:span 2}
+  .purse b{font-size:1.25rem}
+  .purse small{font-size:.58rem}
+  .dg-side{grid-template-columns:1fr 1fr}
+  .dg-side > .g-panel,.dg-side > .purse,.dg-side > .journal{grid-column:1/-1}
+  .dg-side .g-btn{padding:10px 6px;font-size:.9rem}
+  .journal{padding:8px 12px;font-size:.8rem;gap:3px}
+  .journal div:nth-child(n+4){display:none}
+}
+/* Short phones (e.g. 360×640): drop secondary panels so the play area still fits on one screen. */
+@media(max-width:600px) and (max-height:720px){
+  .g-hud{margin-bottom:6px}
+  .g-meter-top{margin-bottom:2px;font-size:.78rem}
+  .ticket{width:min(290px,100%)}
+  .ticket-sub,.booth h3{display:none}
+  .stubs{margin-top:0}
+  .booth .g-panel:last-child{display:none}           /* prize board; the result line under the ticket shows each win */
+  .felt{padding:14px 6px 10px;gap:10px}
+  .dice-row{min-height:70px}
+  .plate{min-height:62px}
+  .felt > .g-muted{display:none}                    /* "tap a die to hold it" hint */
+  .plaque div{padding:1px 6px}
+  .scene{max-height:34vh}
+  .journal{display:none}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -466,6 +617,7 @@ button.die.held:hover{transform:translateY(-18px)}
       <button class="btn" id="back" data-i18n="hub.menu"></button>
       <h1 id="gameTitle"></h1>
       <div class="spacer"></div>
+      <span id="gameTools"></span>
       <button class="btn danger" id="resetGame" data-i18n="hub.resetSave"></button>
     </div>
     <div id="stage"></div>
@@ -543,6 +695,16 @@ canvas{image-rendering:pixelated;border:4px solid #000;background:#000;display:b
 .opt b{display:block;color:var(--gold);margin-bottom:4px;font-size:10px}
 .opt.curse b{color:#ffb3bd}
 .ul{text-align:left;font-size:8px;line-height:2;margin:8px 0}
+.lv{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+.lvb{font:inherit;color:#fff;background:#2d3550;border:4px solid #000;box-shadow:0 4px 0 #000;padding:6px 4px;cursor:pointer;font-size:8px;line-height:1.7;min-height:64px}
+.lvb:active:not(:disabled){transform:translateY(3px)}
+.lvb:disabled{opacity:.45;cursor:default}
+.lvb b{display:block;font-size:12px;color:var(--gold)}
+.st{display:block;font-family:system-ui,sans-serif;font-size:15px;letter-spacing:2px;color:var(--gold);line-height:1.3}
+.st em{font-style:normal;color:#4a5160}
+.intro{background:var(--panel2);border:3px solid #000;padding:8px;margin:10px 0}
+.intro b{color:var(--gold)}
+.intro i{display:inline-block;width:12px;height:12px;border:2px solid #000;vertical-align:middle;margin-right:6px}
 #toast{position:fixed;left:50%;top:80px;transform:translateX(-50%);background:#000c;border:3px solid var(--red);color:#fff;padding:6px 10px;font-size:9px;z-index:30;display:none}
 </style>
 </head>
@@ -550,7 +712,7 @@ canvas{image-rendering:pixelated;border:4px solid #000;background:#000;display:b
 <div id="app">
  <header>
   <h1 data-i="title">TOWER DEFENSE LITE</h1>
-  <div class="r"><button class="btn small" id="lang">ES</button><button class="btn small" id="mute">SON</button></div>
+  <div class="r"><button class="btn small" id="menu">MENU</button><button class="btn small" id="lang">ES</button><button class="btn small" id="mute">SON</button></div>
  </header>
  <div id="hud">
   <div class="stat" id="lives"></div><div class="stat" id="gold"></div><div class="stat" id="wave"></div>
@@ -573,13 +735,14 @@ const cv=$('#c'),ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;
 const langKey='towerLiteLang';
 let LANG='es';try{LANG=localStorage.getItem(langKey)==='en'?'en':'es'}catch(e){}
 const T={
-en:{title:'TOWER DEFENSE LITE',snd:'SND',sub:'Defend the base for 5 waves.',
- how:'Tap a tile to build the selected tower. Tap a tower to upgrade or sell it. After each wave, pick 1 of 3 random upgrades - some are cursed!',
- start:'Start',lives:'LIVES',gold:'GOLD',wave:'WAVE',
- tw_arrow:'Arrow',tw_cannon:'Cannon',tw_frost:'Frost',
- d_arrow:'Fast, single target',d_cannon:'Slow, area damage',d_frost:'Slows enemies',
- go:'START WAVE',lvl:'Lv {0}',up:'Upgrade ${0}',sell:'Sell ${0}',maxlv:'MAX',x2:'x{0}',ups:'UPGRADES',close:'Close',
- noups:'No upgrades yet.',toast_gold:'Not enough gold!',toast_spot:'Cannot build on the path!',
+en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
+ sub:'Defend the base across 8 levels. Every enemy type needs the right tower.',
+ how:'Tap a tile to build the selected tower, tap a tower to upgrade or sell it. Each extra tower of the same type costs more. After each wave, pick 1 of 3 upgrades - some are cursed!',
+ endless:'ENDLESS MODE',endless_lock:'Clear level 8 to unlock Endless mode',
+ lives:'LIVES',gold:'GOLD',wave:'WAVE',level:'LEVEL',
+ tw_arrow:'Arrow',tw_cannon:'Cannon',tw_frost:'Frost',gnd:'ground only',
+ go:'START WAVE',early:'EARLY +${0}',lvl:'Lv {0}',up:'Upgrade ${0}',sell:'Sell ${0}',maxlv:'MAX',x2:'x{0}',ups:'UPGRADES',close:'Close',
+ noups:'No upgrades yet.',toast_gold:'Not enough gold!',toast_spot:'Cannot build on the path!',toast_pad:'Build only on stone pads!',
  pick:'PICK AN UPGRADE',cursed:'CURSED',cleared:'WAVE CLEARED',bonus:'Bonus: +${0}',
  c_dmg:'Damage',c_dmg_d:'+{0}% damage on all towers',c_range:'Eagle Eye',c_range_d:'+{0}% range on all towers',
  c_rate:'Quick Hands',c_rate_d:'+{0}% fire rate on all towers',c_gold:'Treasure',c_gold_d:'+${0} gold now',
@@ -588,15 +751,29 @@ en:{title:'TOWER DEFENSE LITE',snd:'SND',sub:'Defend the base for 5 waves.',
  c_cu1:'Glass Cannons',c_cu1_d:'+{0}% damage, but enemies get +{1}% HP',
  c_cu2:'Greedy Gears',c_cu2_d:'+{0}% fire rate, but towers cost +{1}%',
  c_cu3:'Blood Money',c_cu3_d:'+${0} gold now, but -{1} lives',
- over:'BASE DESTROYED',retry:'Try again',win:'VICTORY!',
- waves_done:'Waves cleared: {0}/5',killed:'Enemies defeated: {0}',again:'Play again'},
-es:{title:'DEFENSA DE TORRES LITE',snd:'SON',sub:'Defiende la base durante 5 oleadas.',
- how:'Toca una casilla para construir la torre elegida. Toca una torre para mejorarla o venderla. Tras cada oleada, elige 1 de 3 mejoras aleatorias. ¡Algunas están malditas!',
- start:'Empezar',lives:'VIDAS',gold:'ORO',wave:'OLEADA',
- tw_arrow:'Flecha',tw_cannon:'Cañón',tw_frost:'Hielo',
- d_arrow:'Rápida, un objetivo',d_cannon:'Lenta, daño en área',d_frost:'Ralentiza enemigos',
- go:'INICIAR OLEADA',lvl:'Niv {0}',up:'Mejorar ${0}',sell:'Vender ${0}',maxlv:'MÁX',x2:'x{0}',ups:'MEJORAS',close:'Cerrar',
- noups:'Aún no tienes mejoras.',toast_gold:'¡Oro insuficiente!',toast_spot:'¡No se puede construir en el camino!',
+ over:'BASE DESTROYED',retry:'Retry',tolevels:'Levels',
+ waves_done:'Reached level {0} · {1} waves survived',killed:'Enemies defeated: {0}',
+ best:'Best level: {0}',lvl_clear:'LEVEL {0} CLEARED!',new_path:'A new path awaits: +${0} gold and +1 life.',refund:'Towers on the new path refunded: +${0}',
+ win_lvl:'LEVEL CLEARED!',lives_left:'Lives kept: {0}/{1}',next:'Next level',all_done:'Campaign complete! Endless mode unlocked.',
+ lv_info:'{0} waves · start with ${1}',early_tip:'Tip: during a wave, call the next one early for bonus gold (you skip one upgrade pick).',
+ new_en:'NEW ENEMY',gotit:'Go!',
+ tip_mix:'Mix tower types: each new tower of the same type costs 15% more.',
+ tip_two:'Two entrances: enemies come from both sides and meet in the middle.',
+ tip_pads:'Rocky ground: you can only build on the grey stone pads.',
+ tip_split:'Two separate roads, two exits. Guard both!',
+ e_runner:'Runner',e_runner_d:'Very fast. Cannon shells often miss it - use Arrow and Frost.',
+ e_brute:'Brute',e_brute_d:'Armored: every hit loses {0} damage. Arrows barely scratch it - use Cannons.',
+ e_flyer:'Flyer',e_flyer_d:'Flies straight over the map to the base (dotted line). Cannons cannot hit it.',
+ e_healer:'Healer',e_healer_d:'Heals nearby enemies every second. Kill it first.',
+ e_boss:'Boss',e_boss_d:'Huge HP and armor {0}. Costs 3 lives if it reaches the base.'},
+es:{title:'DEFENSA DE TORRES LITE',snd:'SON',menu:'MENÚ',
+ sub:'Defiende la base en 8 niveles. Cada tipo de enemigo necesita la torre adecuada.',
+ how:'Toca una casilla para construir la torre elegida; toca una torre para mejorarla o venderla. Cada torre extra del mismo tipo cuesta más. Tras cada oleada, elige 1 de 3 mejoras. ¡Algunas están malditas!',
+ endless:'MODO INFINITO',endless_lock:'Supera el nivel 8 para desbloquear el modo infinito',
+ lives:'VIDAS',gold:'ORO',wave:'OLEADA',level:'NIVEL',
+ tw_arrow:'Flecha',tw_cannon:'Cañón',tw_frost:'Hielo',gnd:'solo terrestres',
+ go:'INICIAR OLEADA',early:'ANTICIPAR +${0}',lvl:'Niv {0}',up:'Mejorar ${0}',sell:'Vender ${0}',maxlv:'MÁX',x2:'x{0}',ups:'MEJORAS',close:'Cerrar',
+ noups:'Aún no tienes mejoras.',toast_gold:'¡Oro insuficiente!',toast_spot:'¡No se puede construir en el camino!',toast_pad:'¡Solo puedes construir en las losas de piedra!',
  pick:'ELIGE UNA MEJORA',cursed:'MALDITA',cleared:'OLEADA SUPERADA',bonus:'Bono: +${0}',
  c_dmg:'Daño',c_dmg_d:'+{0}% de daño en todas las torres',c_range:'Ojo de águila',c_range_d:'+{0}% de alcance en todas las torres',
  c_rate:'Manos rápidas',c_rate_d:'+{0}% de cadencia en todas las torres',c_gold:'Tesoro',c_gold_d:'+${0} de oro ahora',
@@ -605,8 +782,21 @@ es:{title:'DEFENSA DE TORRES LITE',snd:'SON',sub:'Defiende la base durante 5 ole
  c_cu1:'Cañones de cristal',c_cu1_d:'+{0}% de daño, pero los enemigos tienen +{1}% de vida',
  c_cu2:'Engranajes codiciosos',c_cu2_d:'+{0}% de cadencia, pero las torres cuestan +{1}%',
  c_cu3:'Dinero de sangre',c_cu3_d:'+${0} de oro ahora, pero -{1} vidas',
- over:'BASE DESTRUIDA',retry:'Reintentar',win:'¡VICTORIA!',
- waves_done:'Oleadas superadas: {0}/5',killed:'Enemigos derrotados: {0}',again:'Jugar de nuevo'}
+ over:'BASE DESTRUIDA',retry:'Reintentar',tolevels:'Niveles',
+ waves_done:'Llegaste al nivel {0} · {1} oleadas superadas',killed:'Enemigos derrotados: {0}',
+ best:'Mejor nivel: {0}',lvl_clear:'¡NIVEL {0} SUPERADO!',new_path:'Te espera un camino nuevo: +${0} de oro y +1 vida.',refund:'Torres sobre el nuevo camino reembolsadas: +${0}',
+ win_lvl:'¡NIVEL SUPERADO!',lives_left:'Vidas conservadas: {0}/{1}',next:'Siguiente nivel',all_done:'¡Campaña completada! Modo infinito desbloqueado.',
+ lv_info:'{0} oleadas · empiezas con ${1}',early_tip:'Consejo: durante una oleada puedes anticipar la siguiente para ganar oro extra (te saltas una elección de mejora).',
+ new_en:'NUEVO ENEMIGO',gotit:'¡Vamos!',
+ tip_mix:'Combina tipos de torre: cada torre nueva del mismo tipo cuesta un 15% más.',
+ tip_two:'Dos entradas: los enemigos llegan por ambos lados y se juntan en el centro.',
+ tip_pads:'Terreno rocoso: solo puedes construir en las losas de piedra grises.',
+ tip_split:'Dos caminos separados y dos salidas. ¡Protege ambos!',
+ e_runner:'Corredor',e_runner_d:'Muy rápido. Las balas de cañón suelen fallarle: usa Flecha y Hielo.',
+ e_brute:'Bruto',e_brute_d:'Blindado: cada golpe pierde {0} de daño. Las flechas apenas le hacen nada: usa Cañones.',
+ e_flyer:'Volador',e_flyer_d:'Vuela en línea recta hasta la base (línea punteada). Los cañones no pueden darle.',
+ e_healer:'Sanador',e_healer_d:'Cura a los enemigos cercanos cada segundo. Elimínalo primero.',
+ e_boss:'Jefe',e_boss_d:'Muchísima vida y blindaje {0}. Quita 3 vidas si llega a la base.'}
 };
 const t=(k,...a)=>{let s=T[LANG][k];if(s===undefined)s=T.en[k];if(s===undefined)return k;a.forEach((v,i)=>s=s.split('{'+i+'}').join(v));return s};
 
@@ -623,38 +813,128 @@ function beep(f,d=.06,type='square',v=.03,slide=0){
 const vib=n=>{try{navigator.vibrate&&!muted&&navigator.vibrate(n)}catch(e){}};
 
 /* ---------- data ---------- */
+// air: can the tower hit flyers. Cannon shells are not homing, so fast enemies can step out of the blast.
+// ud/uc: damage gained and cooldown lost per upgrade level. Arrows upgrade into fire rate, so armor keeps hurting them.
 const TW={
- arrow:{cost:50,dmg:8,range:62,cd:.5,col:'#c9d1e0',spd:220},
- cannon:{cost:90,dmg:28,range:54,cd:1.5,splash:26,col:'#555566',spd:110},
- frost:{cost:70,dmg:3,range:50,cd:.9,slow:.5,col:'#6ec6ff',spd:170}
+ arrow:{cost:50,dmg:8,range:62,cd:.5,col:'#c9d1e0',spd:220,air:1,ud:.3,uc:.18},
+ cannon:{cost:90,dmg:30,range:56,cd:1.5,splash:24,col:'#555566',spd:100,air:0,ud:.6,uc:.08},
+ frost:{cost:70,dmg:3,range:50,cd:.9,slow:.5,col:'#6ec6ff',spd:170,air:1,ud:.5,uc:.1}
 };
+// armor: flat damage removed from every hit (a hit always deals at least 25%). fly: straight line to the base.
+// heal: share of max HP restored to nearby enemies each second. dmg: lives lost when it reaches the base.
 const EN={
- slime:{hp:26,sp:28,rw:4,r:5,col:'#5be37d'},
- runner:{hp:16,sp:56,rw:5,r:4,col:'#ff9f43'},
- brute:{hp:110,sp:20,rw:12,r:7,col:'#a66bd6'},
- boss:{hp:650,sp:18,rw:50,r:9,col:'#e63946'}
+ slime:{hp:30,sp:28,rw:4,r:5,col:'#5be37d'},
+ runner:{hp:18,sp:58,rw:5,r:4,col:'#ff9f43'},
+ brute:{hp:110,sp:20,rw:12,r:7,col:'#a66bd6',armor:10},
+ flyer:{hp:26,sp:32,rw:6,r:4,col:'#f2e85c',fly:1},
+ healer:{hp:55,sp:24,rw:10,r:5,col:'#ff7ad9',heal:.08},
+ boss:{hp:650,sp:16,rw:60,r:9,col:'#e63946',armor:14,dmg:3}
 };
-const WAVES=[
- [['slime',8,.9]],
- [['slime',8,.8],['runner',6,.6]],
- [['runner',10,.5],['slime',8,.7]],
- [['brute',4,2],['slime',10,.6]],
- [['runner',12,.4],['brute',6,1.6],['boss',1,1]]
+const armorHit=(d,a)=>a?Math.max(d*.25,d-a):d;
+
+/* ---------- campaign levels ---------- */
+// paths: waypoint lists in tiles, entering from off the grid and ending below the bottom row (the base).
+// Enemies alternate between paths unless a wave group names one. waves: [type, count, seconds between, path?]
+// hp: enemy HP multiplier for the level (+6% per wave inside it). pads: if set, the only buildable tiles.
+const N=(en,es)=>({en,es});
+const LEVELS=[
+ {name:N('Meadow','Pradera'),gold:150,lives:15,hp:1.5,tips:['tip_mix'],
+  paths:[[[-1,1],[7,1],[7,4],[1,4],[1,7],[7,7],[7,10],[2,10],[2,12]]],
+  waves:[[['slime',6,1]],[['slime',10,.8]],[['slime',14,.6]],[['slime',18,.5]]]},
+ {name:N('Crossroads','Encrucijada'),gold:170,lives:12,hp:1.2,intro:'runner',
+  paths:[[[4,-1],[4,2],[1,2],[1,6],[7,6],[7,9],[4,9],[4,12]]],
+  waves:[[['slime',8,.8]],[['runner',8,.6]],[['slime',10,.6],['runner',8,.45]],[['runner',16,.35]],[['slime',14,.5],['runner',12,.35]]]},
+ {name:N('Iron Road','Camino de hierro'),gold:200,lives:12,hp:1.4,intro:'brute',
+  paths:[[[9,2],[1,2],[1,5],[7,5],[7,8],[1,8],[1,10],[5,10],[5,12]]],
+  waves:[[['slime',10,.7]],[['brute',3,2.2]],[['slime',10,.5],['brute',4,1.8]],[['runner',10,.4],['brute',5,1.5]],[['brute',8,1.2],['slime',12,.4]]]},
+ {name:N('Twin Gates','Puertas gemelas'),gold:230,lives:12,hp:1.8,tips:['tip_two'],
+  paths:[[[-1,1],[2,1],[2,4],[4,4],[4,7],[1,7],[1,10],[7,10],[7,12]],
+         [[9,1],[6,1],[6,4],[4,4],[4,7],[1,7],[1,10],[7,10],[7,12]]],
+  waves:[[['slime',12,.5]],[['runner',12,.4]],[['brute',6,1.2],['slime',10,.4]],[['runner',14,.3],['brute',4,1.5]],[['slime',20,.3],['brute',8,1]]]},
+ {name:N('Sky Watch','Vigía del cielo'),gold:230,lives:12,hp:1.15,intro:'flyer',
+  paths:[[[1,-1],[1,3],[7,3],[7,6],[1,6],[1,9],[7,9],[7,12]]],
+  waves:[[['slime',12,.5],['runner',6,.4]],[['flyer',8,.8]],[['brute',6,1.2],['flyer',6,.8]],[['runner',14,.3],['flyer',10,.6]],[['brute',8,1],['flyer',12,.5],['slime',12,.4]]]},
+ {name:N('Stone Garden','Jardín de piedra'),gold:260,lives:12,hp:1.2,intro:'healer',tips:['tip_pads'],
+  paths:[[[9,2],[1,2],[1,6],[7,6],[7,10],[3,10],[3,12]]],
+  pads:[[4,0],[2,4],[4,4],[6,4],[8,4],[0,8],[3,8],[5,8],[8,8],[1,11],[5,11]],
+  waves:[[['slime',14,.5]],[['healer',3,2],['slime',12,.4]],[['brute',6,1.2],['healer',3,2]],[['flyer',10,.6],['runner',10,.35]],[['brute',8,1],['healer',5,1.5],['runner',10,.3]]]},
+ {name:N('Split Valley','Valle dividido'),gold:280,lives:10,hp:.95,tips:['tip_split'],
+  paths:[[[1,-1],[1,2],[3,2],[3,5],[1,5],[1,8],[3,8],[3,12]],
+         [[7,-1],[7,2],[5,2],[5,5],[7,5],[7,8],[5,8],[5,12]]],
+  waves:[[['slime',16,.4],['runner',8,.4]],[['brute',8,1]],[['flyer',12,.5],['healer',4,1.5]],[['runner',20,.25],['brute',6,1]],[['brute',8,1],['flyer',10,.5],['healer',4,1.5]]]},
+ {name:N('Fortress','Fortaleza'),gold:320,lives:10,hp:.8,intro:'boss',tips:['tip_two'],
+  paths:[[[-1,1],[2,1],[2,4],[4,4],[4,6],[1,6],[1,9],[7,9],[7,12]],
+         [[9,1],[6,1],[6,4],[4,4],[4,6],[1,6],[1,9],[7,9],[7,12]]],
+  waves:[[['slime',20,.35],['runner',10,.3]],[['brute',10,.9],['healer',4,1.5]],[['flyer',16,.4],['runner',14,.25]],
+         [['brute',9,1],['healer',4,1.5],['flyer',10,.5]],[['boss',1,1],['brute',8,1],['runner',16,.25]],
+         [['boss',2,6],['flyer',14,.4],['healer',6,1.2],['brute',10,.8]]]}
 ];
-const WP=[[-1,1],[7,1],[7,4],[1,4],[1,7],[7,7],[7,10],[2,10],[2,12]];
-const PATH=WP.map(([x,y])=>[(x+.5)*TS,(y+.5)*TS]);
-const CUM=[0];for(let i=1;i<PATH.length;i++)CUM.push(CUM[i-1]+Math.hypot(PATH[i][0]-PATH[i-1][0],PATH[i][1]-PATH[i-1][1]));
-const PLEN=CUM[CUM.length-1];
-const blocked=Array.from({length:ROWS},()=>Array(COLS).fill(false));
-for(let i=1;i<WP.length;i++){
- const [x0,y0]=WP[i-1],[x1,y1]=WP[i];
- for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x++)for(let y=Math.min(y0,y1);y<=Math.max(y0,y1);y++)
-  if(x>=0&&x<COLS&&y>=0&&y<ROWS)blocked[y][x]=true;
+const lname=L=>L.name[LANG]||L.name.en;
+const hasType=(L,ty)=>L.waves.some(w=>w.some(g=>g[0]===ty));
+
+/* ---------- endless mode ---------- */
+// Each endless level is WPL generated waves; then a new map. Towers, gold and upgrades carry over.
+const WPL=3;
+function genWave(g,L,wi){
+ const w=[['slime',5+g,Math.max(.35,.9-.03*g)]];
+ if(g>=3)w.push(['runner',2+Math.floor(g*1.1),Math.max(.25,.6-.02*g)]);
+ if(g>=5)w.push(['brute',Math.floor(g/2),Math.max(.8,2-.05*g)]);
+ if(g>=7)w.push(['flyer',2+Math.floor(g/2),Math.max(.4,.9-.02*g)]);
+ if(g>=9)w.push(['healer',1+Math.floor(g/5),Math.max(1,2-.04*g)]);
+ for(let i=w.length-1;i>0;i--){const j=ri(0,i);[w[i],w[j]]=[w[j],w[i]]}
+ if(wi===WPL&&L>=2)w.push(['boss',1+Math.floor((L-2)/3),Math.max(4,8-L*.4)]);
+ return w;
 }
-function posAt(d){
- let i=1;while(i<CUM.length-1&&CUM[i]<d)i++;
- const f=(d-CUM[i-1])/(CUM[i]-CUM[i-1]);
- return[PATH[i-1][0]+(PATH[i][0]-PATH[i-1][0])*f,PATH[i-1][1]+(PATH[i][1]-PATH[i-1][1])*f];
+// Snakes in from the left or right edge and down to the base below the bottom row.
+function genPath(){
+ const fromLeft=Math.random()<.5,pts=[];
+ let y=ri(0,2),x=fromLeft?ri(5,7):ri(1,3);
+ pts.push([fromLeft?-1:COLS,y],[x,y]);
+ for(;;){
+  const ny=y+ri(2,3);
+  if(ny>ROWS-3)break;
+  pts.push([x,ny]);y=ny;
+  x=x>4?ri(1,3):ri(5,7);
+  pts.push([x,y]);
+ }
+ pts.push([x,ROWS]);
+ return pts;
+}
+const tiles=p=>p.slice(1).reduce((n,q,i)=>n+Math.abs(q[0]-p[i][0])+Math.abs(q[1]-p[i][1]),0);
+// A fresh random snake, or one of the campaign maps (maybe mirrored), so endless runs keep changing shape.
+function randomMap(){
+ if(Math.random()<.4){let p;do{p=genPath()}while(tiles(p)<26);return[p]}
+ const L=pick(LEVELS.slice(1)),flip=Math.random()<.5;
+ return L.paths.map(wp=>flip?wp.map(([x,y])=>[COLS-1-x,y]):wp);
+}
+
+/* ---------- map ---------- */
+let LAND,AIR,blocked,buildable,pads,showAir=false;
+function mkPath(wp){
+ const pts=wp.map(([x,y])=>[(x+.5)*TS,(y+.5)*TS]),cum=[0];
+ for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+ return{wp,pts,cum,len:cum[cum.length-1]};
+}
+function setMap(paths,padList,air){
+ LAND=paths.map(mkPath);
+ AIR=paths.map(wp=>mkPath([wp[0],wp[wp.length-1]]));   // flyers go straight from the entrance to the base
+ pads=padList||null;showAir=!!air;
+ const grid=v=>Array.from({length:ROWS},()=>Array(COLS).fill(v));
+ blocked=grid(false);
+ for(const wp of paths)for(let i=1;i<wp.length;i++){
+  const [x0,y0]=wp[i-1],[x1,y1]=wp[i];
+  for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x++)for(let y=Math.min(y0,y1);y<=Math.max(y0,y1);y++)
+   if(x>=0&&x<COLS&&y>=0&&y<ROWS)blocked[y][x]=true;
+ }
+ buildable=grid(!pads);
+ for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(blocked[y][x])buildable[y][x]=false;
+ if(pads)for(const [x,y] of pads)if(!blocked[y][x])buildable[y][x]=true;
+ drawBG();
+}
+function posAt(p,d){
+ const c=p.cum;let i=1;while(i<c.length-1&&c[i]<d)i++;
+ const f=(d-c[i-1])/(c[i]-c[i-1]),a=p.pts[i-1],b=p.pts[i];
+ return[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];
 }
 
 /* ---------- upgrade cards (random, buffs and curses) ---------- */
@@ -683,54 +963,108 @@ function rollCards(){
 }
 
 /* ---------- state ---------- */
-let clearT=0,S,M,state='title',enemies,towers,projs,parts,queue,spawnT,sel,build,speed=1,tick=0;
-function resetGame(){
- S={gold:160,lives:10,wave:0,kills:0,ups:[]};
+// state: menu | intro | build | wave | clearing | pick | over | won
+let clearT=0,S,M,state='menu',enemies=[],towers=[],projs=[],parts=[],queue=[],spawnT,sel,build,speed=1,tick=0;
+function resetRun(mode,gold,lives){
+ S={mode,li:0,level:1,gold,lives,startLives:lives,wave:0,lw:0,kills:0,ups:[],rr:0};
  M={dmg:1,range:1,rate:1,hp:1,cost:1,splash:1,slow:0,interest:0};
- enemies=[];towers=[];projs=[];parts=[];queue=[];spawnT=0;sel=null;build='arrow';speed=1;
- state='build';
+ enemies=[];towers=[];projs=[];parts=[];queue=[];spawnT=0;sel=null;build='arrow';
 }
-const tcost=ty=>Math.round(TW[ty].cost*M.cost);
+// Campaign levels start fresh: their own gold, lives and map, no towers or upgrades carried over.
+function initLevel(i){
+ const L=LEVELS[i];resetRun('camp',L.gold,L.lives);S.li=i;S.level=i+1;
+ setMap(L.paths,L.pads,hasType(L,'flyer'));
+}
+function playLevel(i){initLevel(i);state='intro';showIntro();renderHud();renderBar();beep(440,.1,'triangle')}
+function closeIntro(){hide();state='build';renderHud();renderBar()}
+function playEndless(){
+ resetRun('endless',160,10);setMap(LEVELS[0].paths,null,false);
+ hide();state='build';renderHud();renderBar();beep(440,.1,'triangle');
+}
+const nWaves=()=>S.mode==='camp'?LEVELS[S.li].waves.length:WPL;
+
+/* ---------- saves ---------- */
+const starsKey='towerLiteStars',bestKey='towerLiteBest';
+let STARS=[];try{STARS=(localStorage.getItem(starsKey)||'').split(',').map(v=>+v||0)}catch(e){}
+let best=1;try{best=+localStorage.getItem(bestKey)||1}catch(e){}
+const unlocked=i=>i===0||(STARS[i-1]||0)>0;
+const endlessOpen=()=>(STARS[LEVELS.length-1]||0)>0;
+function saveStars(i,n){if(n>(STARS[i]||0)){STARS[i]=n;for(let k=0;k<LEVELS.length;k++)STARS[k]=STARS[k]||0;try{localStorage.setItem(starsKey,STARS.join(','))}catch(e){}}}
+function saveBest(){if(S.mode==='endless'&&S.level>best){best=S.level;try{localStorage.setItem(bestKey,best)}catch(e){}}}
+const starStr=n=>`<span class="st">${'★'.repeat(n)}<em>${'★'.repeat(3-n)}</em></span>`;
+
+// Endless: after the last wave of a level, level bonus, +1 life and a new map.
+// Towers that cannot stay on the new map are refunded in full; the rest stay where they are.
+const levelBonus=L=>40+L*10;
+function nextLevel(){
+ S.level++;S.lw=0;S.gold+=levelBonus(S.level);S.lives++;
+ setMap(randomMap(),null,S.wave>=6);
+ let refund=0;
+ towers=towers.filter(tw=>{if(!buildable[tw.y][tw.x]){refund+=tw.inv;return false}return true});
+ S.gold+=refund;sel=null;saveBest();
+ return refund;
+}
+// Every extra tower of a type costs 15% more, so spamming the best tower stops paying off.
+const tcount=ty=>towers.reduce((n,tw)=>n+(tw.type===ty),0);
+const tcost=ty=>Math.round(TW[ty].cost*M.cost*(1+.15*tcount(ty)));
 const upCost=tw=>Math.round(TW[tw.type].cost*(tw.lv===1?.7:1.1)*M.cost);
 function stat(tw){
  const b=TW[tw.type],l=tw.lv-1;
- return{dmg:b.dmg*(1+.6*l)*M.dmg,range:b.range*(1+.08*l)*M.range,cd:b.cd*(1-.08*l)/M.rate,
+ return{dmg:b.dmg*(1+b.ud*l)*M.dmg,range:b.range*(1+.08*l)*M.range,cd:b.cd*(1-b.uc*l)/M.rate,
   splash:(b.splash||0)*M.splash,slow:Math.min(.85,(b.slow||0)+M.slow)};
 }
 function toast(msg){const e=$('#toast');e.textContent=msg;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',1100)}
 
 /* ---------- waves ---------- */
-function startWave(){
- if(state!=='build')return;
- const w=WAVES[S.wave];queue=[];
- w.forEach(([ty,n,iv])=>{for(let i=0;i<n;i++)queue.push({ty,dt:i===0&&queue.length?1.2:iv})});
- spawnT=.5;S.wave++;state='wave';sel=null;beep(300,.2,'triangle',.05,300);renderBar();renderHud();
+function queueWave(){
+ const w=S.mode==='camp'?LEVELS[S.li].waves[S.lw]:genWave(S.wave+1,S.level,S.lw+1);
+ w.forEach(([ty,n,iv,pi])=>{for(let i=0;i<n;i++)queue.push({ty,pi,dt:i===0&&queue.length?1.2:iv})});
+ S.wave++;S.lw++;
 }
-function spawn(ty){
- const e=EN[ty];
- const hp=e.hp*M.hp*(1+1.6*(S.wave-1));
- enemies.push({ty,hp,max:hp,d:0,slowT:0,slowA:0,dead:0,ph:Math.random()*6});
+// While a wave is still on the field, the next one can be called early once it has finished spawning.
+const canEarly=()=>state==='wave'&&!queue.length&&S.lw<nWaves();
+const earlyBonus=()=>10+5*S.lw;
+function startWave(){
+ if(state==='build'){queue=[];queueWave();spawnT=.5;state='wave';sel=null;beep(300,.2,'triangle',.05,300)}
+ else if(canEarly()){S.gold+=earlyBonus();queueWave();spawnT=.8;beep(300,.2,'triangle',.05,500)}
+ else return;
+ renderBar();renderHud();
+}
+function spawn(ty,pi){
+ const E=EN[ty];
+ if(pi===undefined)pi=S.rr++;
+ pi%=LAND.length;
+ let hs,rs=1;
+ if(S.mode==='camp')hs=LEVELS[S.li].hp*(1+.06*(S.lw-1));
+ else{const g=S.wave-1;hs=1+.4*g+.025*g*g;rs=1+.08*g}
+ const hp=E.hp*M.hp*hs;
+ enemies.push({ty,p:E.fly?AIR[pi]:LAND[pi],hp,max:hp,rw:Math.round(E.rw*rs),d:0,slowT:0,slowA:0,dead:0,ph:Math.random()*6,healT:1});
 }
 function waveClear(){
- const bonus=25+S.wave*5,inter=Math.min(60,Math.floor(S.gold*M.interest));
+ const bonus=20+S.lw*5,inter=Math.min(60,Math.floor(S.gold*M.interest));
  S.gold+=bonus+inter;beep(660,.15,'triangle',.05);beep(880,.25,'triangle',.05);
- if(S.wave>=WAVES.length){state='win';showWin();return}
- state='pick';showPick(bonus+inter);
+ const done=S.lw>=nWaves();
+ if(done&&S.mode==='camp'){levelWon();return}
+ state='pick';showPick(bonus+inter,done);
+}
+function levelWon(){
+ const k=S.lives/S.startLives;S.stars=k>=1?3:k>=.6?2:1;
+ saveStars(S.li,S.stars);state='won';showWon();renderHud();
 }
 
 /* ---------- update ---------- */
 function damage(e,d){
- if(e.dead)return;e.hp-=d;
+ if(e.dead)return;e.hp-=armorHit(d,EN[e.ty].armor);
  if(e.hp<=0){
-  e.dead=1;S.kills++;S.gold+=EN[e.ty].rw;
-  const [x,y]=posAt(e.d);for(let i=0;i<8;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:(Math.random()-.5)*90,life:.35,col:EN[e.ty].col});
-  parts.push({x:x-4,y:y-8,vx:0,vy:-25,life:.6,txt:'+'+EN[e.ty].rw,col:'#ffcf3f'});
+  e.dead=1;S.kills++;S.gold+=e.rw;
+  const [x,y]=posAt(e.p,e.d);for(let i=0;i<8;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:(Math.random()-.5)*90,life:.35,col:EN[e.ty].col});
+  parts.push({x:x-4,y:y-8,vx:0,vy:-25,life:.6,txt:'+'+e.rw,col:'#ffcf3f'});
   beep(160,.08,'square',.03,-60);renderHud();
  }
 }
 function hit(p,x,y){
  if(p.splash>0){
-  for(const e of enemies){if(e.dead)continue;const [ex,ey]=posAt(e.d);if(Math.hypot(ex-x,ey-y)<=p.splash+EN[e.ty].r)damage(e,p.dmg)}
+  for(const e of enemies){if(e.dead||EN[e.ty].fly)continue;const [ex,ey]=posAt(e.p,e.d);if(Math.hypot(ex-x,ey-y)<=p.splash+EN[e.ty].r)damage(e,p.dmg)}
   for(let i=0;i<10;i++)parts.push({x,y,vx:(Math.random()-.5)*110,vy:(Math.random()-.5)*110,life:.3,col:'#ffb347'});
   beep(90,.15,'sawtooth',.05,-30);
  }else{
@@ -744,35 +1078,51 @@ function update(dt){
  if(state==='clearing'){clearT-=dt;if(clearT<=0)waveClear();return}
  if(state!=='wave')return;
  // spawn
- if(queue.length){spawnT-=dt;while(queue.length&&spawnT<=0){const q=queue.shift();spawn(q.ty);spawnT+=queue.length?queue[0].dt:0}}
+ if(queue.length){
+  spawnT-=dt;while(queue.length&&spawnT<=0){const q=queue.shift();spawn(q.ty,q.pi);spawnT+=queue.length?queue[0].dt:0}
+  if(!queue.length)renderBar();   // the early-call button becomes available
+ }
  // enemies
  for(const e of enemies){
   if(e.dead)continue;
+  const E=EN[e.ty];
   if(e.slowT>0)e.slowT-=dt;
-  e.d+=EN[e.ty].sp*(e.slowT>0?1-e.slowA:1)*dt;
-  if(e.d>=PLEN){
-   e.dead=1;S.lives-=e.ty==='boss'?3:1;beep(110,.25,'sawtooth',.06,-50);vib(40);renderHud();
+  e.d+=E.sp*(e.slowT>0?1-e.slowA:1)*dt;
+  if(E.heal&&(e.healT-=dt)<=0){
+   e.healT=1;const [hx,hy]=posAt(e.p,e.d);
+   for(const o of enemies){
+    if(o.dead||o.hp>=o.max||tick-(o.healedAt||-9)<.9)continue;const [ox,oy]=posAt(o.p,o.d);   // heals from several healers do not stack
+    if(Math.hypot(ox-hx,oy-hy)<=34){o.hp=Math.min(o.max,o.hp+o.max*E.heal);o.healedAt=tick;parts.push({x:ox-1,y:oy-6,vx:0,vy:-18,life:.4,col:'#7dff9a'})}
+   }
+  }
+  if(e.d>=e.p.len){
+   e.dead=1;S.lives-=E.dmg||1;beep(110,.25,'sawtooth',.06,-50);vib(40);renderHud();
    if(S.lives<=0){S.lives=0;state='over';renderHud();showOver();return}
   }
  }
  enemies=enemies.filter(e=>!e.dead);
- // towers
+ // towers: shoot the enemy closest to the base that this tower can hit; anti-air towers take flyers first,
+ // since nothing else can stop them
  for(const tw of towers){
-  tw.cd-=dt;const st=stat(tw),cx=(tw.x+.5)*TS,cy=(tw.y+.5)*TS;
-  let best=null,bd=-1;
-  for(const e of enemies){const [ex,ey]=posAt(e.d);if(Math.hypot(ex-cx,ey-cy)<=st.range&&e.d>bd){bd=e.d;best=e}}
+  tw.cd-=dt;const b=TW[tw.type],st=stat(tw),cx=(tw.x+.5)*TS,cy=(tw.y+.5)*TS;
+  let best=null,br=1e9,bx=0,by=0;
+  for(const e of enemies){
+   const fly=EN[e.ty].fly;if(fly&&!b.air)continue;
+   const [ex,ey]=posAt(e.p,e.d),rem=e.p.len-e.d-(fly?1e5:0);
+   if(rem<br&&Math.hypot(ex-cx,ey-cy)<=st.range){br=rem;best=e;bx=ex;by=ey}
+  }
   if(best){
-   const [ex,ey]=posAt(best.d);tw.ang=Math.atan2(ey-cy,ex-cx);
+   tw.ang=Math.atan2(by-cy,bx-cx);
    if(tw.cd<=0){
     tw.cd=st.cd;
-    projs.push({x:cx,y:cy,tgt:best,lx:ex,ly:ey,dmg:st.dmg,splash:st.splash,slow:TW[tw.type].slow?st.slow:0,spd:TW[tw.type].spd,ty:tw.type});
+    projs.push({x:cx,y:cy,tgt:best,lx:bx,ly:by,dmg:st.dmg,splash:st.splash,slow:b.slow?st.slow:0,spd:b.spd,ty:tw.type,home:!b.splash});
     beep(tw.type==='cannon'?110:tw.type==='frost'?600:420,.04,'square',.015);
    }
   }
  }
- // projectiles
+ // projectiles (cannon shells fly to where the target was)
  for(const p of projs){
-  if(p.tgt&&!p.tgt.dead){const [ex,ey]=posAt(p.tgt.d);p.lx=ex;p.ly=ey}
+  if(p.home&&p.tgt&&!p.tgt.dead){const [ex,ey]=posAt(p.tgt.p,p.tgt.d);p.lx=ex;p.ly=ey}
   const dx=p.lx-p.x,dy=p.ly-p.y,dist=Math.hypot(dx,dy),step=p.spd*dt;
   if(dist<=step+2){p.done=1;hit(p,p.lx,p.ly)}else{p.x+=dx/dist*step;p.y+=dy/dist*step}
  }
@@ -782,15 +1132,21 @@ function update(dt){
 
 /* ---------- rendering ---------- */
 const BG=document.createElement('canvas');BG.width=VW;BG.height=VH;
-(function(){
- const g=BG.getContext('2d');let s=11;const r=()=>((s=(s*1664525+1013904223)>>>0)/4294967296);
+// Redrawn by setMap() whenever the map changes.
+function drawBG(){
+ const g=BG.getContext('2d');g.clearRect(0,0,VW,VH);let s=11;const r=()=>((s=(s*1664525+1013904223)>>>0)/4294967296);
  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
   if(blocked[y][x]){
    g.fillStyle='#b58a56';g.fillRect(x*TS,y*TS,TS,TS);
    g.fillStyle='#a37a49';for(let i=0;i<5;i++)g.fillRect(x*TS+ri(1,16),y*TS+ri(1,16),3,2);
+  }else if(pads&&!buildable[y][x]){
+   // rocky ground: cannot build here
+   g.fillStyle=(x+y)%2?'#2e6b3b':'#2b6638';g.fillRect(x*TS,y*TS,TS,TS);
+   if(r()<.6){g.fillStyle='#5d6470';const rx=x*TS+ri(3,12),ry=y*TS+ri(3,12);g.fillRect(rx,ry,5,4);g.fillStyle='#7b8390';g.fillRect(rx,ry,3,2)}
   }else{
    g.fillStyle=(x+y)%2?'#3f8f4f':'#3b8749';g.fillRect(x*TS,y*TS,TS,TS);
-   if(r()<.25){g.fillStyle=r()<.5?'#ffd86b':'#ff9fb2';g.fillRect(x*TS+ri(3,15),y*TS+ri(3,15),2,2)}
+   if(pads){g.fillStyle='#000';g.fillRect(x*TS+2,y*TS+2,TS-4,TS-4);g.fillStyle='#9aa3b0';g.fillRect(x*TS+3,y*TS+3,TS-6,TS-6);g.fillStyle='#b7bfca';g.fillRect(x*TS+3,y*TS+3,TS-6,2)}
+   else if(r()<.25){g.fillStyle=r()<.5?'#ffd86b':'#ff9fb2';g.fillRect(x*TS+ri(3,15),y*TS+ri(3,15),2,2)}
    else if(r()<.3){g.fillStyle='#2f7a3f';g.fillRect(x*TS+ri(2,14),y*TS+ri(2,14),2,3)}
   }
  }
@@ -802,9 +1158,23 @@ const BG=document.createElement('canvas');BG.width=VW;BG.height=VH;
   if(x>0&&!blocked[y][x-1])g.fillRect(x*TS,y*TS,2,TS);
   if(x<COLS-1&&!blocked[y][x+1])g.fillRect(x*TS+TS-2,y*TS,2,TS);
  }
- // base marker at the exit
- g.fillStyle='#e63946';g.fillRect(2*TS+2,VH-8,TS-4,8);g.fillStyle='#fff';g.fillRect(2*TS+6,VH-6,TS-12,4);
-})();
+ // flyer routes
+ if(showAir){
+  g.save();g.setLineDash([3,4]);g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=1;
+  for(const p of AIR){g.beginPath();g.moveTo(p.pts[0][0],p.pts[0][1]);g.lineTo(p.pts[1][0],p.pts[1][1]);g.stroke()}
+  g.restore();
+ }
+ // entrance arrows and base markers
+ const seen={};
+ for(const p of LAND){
+  const [x0,y0]=p.wp[0],[x1,y1]=p.wp[1],dx=Math.sign(x1-x0),dy=Math.sign(y1-y0);
+  const cx=(x0+dx+.5)*TS,cy=(y0+dy+.5)*TS;
+  g.fillStyle='rgba(255,255,255,.7)';g.beginPath();
+  g.moveTo(cx+dx*5,cy+dy*5);g.lineTo(cx-dx*3-dy*4,cy-dy*3+dx*4);g.lineTo(cx-dx*3+dy*4,cy-dy*3-dx*4);g.fill();
+  const ex=p.wp[p.wp.length-1][0];if(seen[ex])continue;seen[ex]=1;
+  const bx=ex*TS;g.fillStyle='#e63946';g.fillRect(bx+2,VH-8,TS-4,8);g.fillStyle='#fff';g.fillRect(bx+6,VH-6,TS-12,4);
+ }
+}
 
 function drawTower(tw,hl){
  const cx=Math.round((tw.x+.5)*TS),cy=Math.round((tw.y+.5)*TS),b=TW[tw.type];
@@ -819,11 +1189,15 @@ function drawTower(tw,hl){
  if(hl){ctx.strokeStyle='#ffcf3f';ctx.lineWidth=1;ctx.strokeRect(cx-9.5,cy-9.5,19,19)}
 }
 function drawEnemy(e){
- const [x,y]=posAt(e.d),E=EN[e.ty],r=E.r,bob=Math.sin(tick*8+e.ph)*1;
- const X=Math.round(x),Y=Math.round(y+bob);
- ctx.fillStyle='#0006';ctx.fillRect(X-r,Y+r-1,r*2,2);
+ const [x,y]=posAt(e.p,e.d),E=EN[e.ty],r=E.r,bob=Math.sin(tick*8+e.ph)*1;
+ const X=Math.round(x),Y=Math.round(y+bob)-(E.fly?5:0);
+ ctx.fillStyle='#0006';ctx.fillRect(X-r,Y+r-1+(E.fly?7:0),r*2,2);
+ if(E.fly){const f=Math.sin(tick*22+e.ph)>0?2:0;ctx.fillStyle='#000';ctx.fillRect(X-r-5,Y-3-f,5,4);ctx.fillRect(X+r,Y-3-f,5,4);
+  ctx.fillStyle='#fff';ctx.fillRect(X-r-4,Y-2-f,3,2);ctx.fillRect(X+r+1,Y-2-f,3,2)}
  ctx.fillStyle='#000';ctx.fillRect(X-r-1,Y-r-1,r*2+2,r*2+2);
  ctx.fillStyle=e.slowT>0?'#9fd8ff':E.col;ctx.fillRect(X-r,Y-r,r*2,r*2);
+ if(E.armor){ctx.fillStyle='#c0c6d0';ctx.fillRect(X-r,Y-r,r*2,2);ctx.fillRect(X-r,Y+r-3,r*2,2)}
+ if(E.heal){ctx.fillStyle='#fff';ctx.fillRect(X-1,Y,2,4);ctx.fillRect(X-2,Y+1,4,2)}
  ctx.fillStyle='#fff';ctx.fillRect(X-r+2,Y-r+2,2,2);ctx.fillRect(X+r-4,Y-r+2,2,2);
  ctx.fillStyle='#000';ctx.fillRect(X-r+3,Y-r+3,1,1);ctx.fillRect(X+r-3,Y-r+3,1,1);
  if(e.ty==='boss'){ctx.fillStyle='#ffcf3f';ctx.fillRect(X-r+1,Y-r-3,r*2-2,2);ctx.fillRect(X-r+1,Y-r-5,2,2);ctx.fillRect(X+r-3,Y-r-5,2,2)}
@@ -835,7 +1209,8 @@ function render(){
   ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(cx,cy,st.range,0,6.3);ctx.fill();
   ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1;ctx.stroke()}
  towers.forEach(tw=>drawTower(tw,tw===sel));
- enemies.forEach(drawEnemy);
+ enemies.filter(e=>!EN[e.ty].fly).forEach(drawEnemy);
+ enemies.filter(e=>EN[e.ty].fly).forEach(drawEnemy);
  for(const p of projs){
   ctx.fillStyle=p.ty==='cannon'?'#222':p.ty==='frost'?'#cfefff':'#fff';
   const s=p.ty==='cannon'?4:2;ctx.fillRect(Math.round(p.x)-s/2,Math.round(p.y)-s/2,s,s);
@@ -847,26 +1222,28 @@ function render(){
 }
 
 /* ---------- UI ---------- */
+const inGame=()=>state==='build'||state==='wave'||state==='clearing'||state==='pick'||state==='intro';
 function renderHud(){
  $('#lives').innerHTML=`${t('lives')}<b>${S.lives}</b>`;
  $('#gold').innerHTML=`${t('gold')}<b>$${S.gold}</b>`;
- $('#wave').innerHTML=`${t('wave')}<b>${Math.max(1,Math.min(S.wave+(state==='build'||state==='pick'?(state==='build'?1:0):0),5))}/5</b>`;
+ const n=nWaves(),w=Math.max(1,Math.min(state==='build'||state==='intro'?S.lw+1:S.lw,n));
+ $('#wave').innerHTML=`${t('level')} · ${t('wave')}<b>${S.mode==='endless'?'∞':''}${S.level} · ${w}/${n}</b>`;
 }
 function renderBar(){
  const bar=$('#bar');
- if(state==='title'||state==='over'||state==='win'){bar.innerHTML='';return}
+ if(!inGame()){bar.innerHTML='';return}
  let top;
  if(sel){
   const tw=sel,max=tw.lv>=3,uc=upCost(tw),val=Math.floor(tw.inv*.6);
-  top=`<div class="row"><div class="info">${t('tw_'+tw.type)} - ${t('lvl',tw.lv)}</div></div>
+  top=`<div class="row"><div class="info">${t('tw_'+tw.type)} - ${t('lvl',tw.lv)}${TW[tw.type].air?'':' · '+t('gnd')}</div></div>
    <div class="row"><button class="btn gold" id="bup" ${max||S.gold<uc?'disabled':''}>${max?t('maxlv'):t('up',uc)}</button>
    <button class="btn red" id="bsell">${t('sell',val)}</button><button class="btn" id="bx">X</button></div>`;
  }else{
   top=`<div class="row">${['arrow','cannon','frost'].map(ty=>`<button class="tb ${build===ty?'sel':''} ${S.gold<tcost(ty)?'no':''}" data-t="${ty}">
    <i style="background:${TW[ty].col}"></i>${t('tw_'+ty)}<br><span style="color:var(--gold)">$${tcost(ty)}</span></button>`).join('')}</div>`;
  }
- const canGo=state==='build';
- bar.innerHTML=top+`<div class="row"><button class="btn green" id="bgo" ${canGo?'':'disabled'} style="flex:2">${t('go')}</button>
+ const early=canEarly(),canGo=state==='build'||early;
+ bar.innerHTML=top+`<div class="row"><button class="btn green" id="bgo" ${canGo?'':'disabled'} style="flex:2">${early?t('early',earlyBonus()):t('go')}</button>
   <button class="btn" id="bsp">${t('x2',speed)}</button><button class="btn" id="bups">${t('ups')}</button></div>`;
  bar.querySelectorAll('.tb').forEach(b=>b.onclick=()=>{build=b.dataset.t;beep(500,.04);renderBar()});
  const g=id=>bar.querySelector(id);
@@ -885,26 +1262,50 @@ function renderBar(){
 function show(html){$('#ov').innerHTML=`<div class="modal">${html}</div>`;$('#ov').style.display='flex'}
 function hide(){$('#ov').style.display='none';cur=null}
 let cur=null;
-function showTitle(){cur=showTitle;
- show(`<h2>${t('title')}</h2><p>${t('sub')}</p><p>${t('how')}</p><button class="btn gold" onclick="startGame()">${t('start')}</button>`)}
-function showOver(){cur=showOver;
- show(`<h2 style="color:var(--red)">${t('over')}</h2><p>${t('waves_done',Math.max(0,S.wave-1))}</p><p>${t('killed',S.kills)}</p>
- <button class="btn red" onclick="startGame()">${t('retry')}</button>`);renderBar()}
-function showWin(){cur=showWin;
- show(`<h2>${t('win')}</h2><p>${t('waves_done',5)}</p><p>${t('killed',S.kills)}</p>
- <p>${t('lives')}: ${S.lives}</p><button class="btn gold" onclick="startGame()">${t('again')}</button>`);renderBar()}
-let pickCards=[],pickBonus=0;
-function showPick(bonus){
- pickBonus=bonus;pickCards=rollCards();cur=showPick;drawPick();renderBar();renderHud();
+function showMenu(){
+ cur=showMenu;state='menu';enemies=[];projs=[];queue=[];sel=null;renderBar();
+ show(`<h2>${t('title')}</h2><p>${t('sub')}</p><div class="lv">${LEVELS.map((L,i)=>{const ok=unlocked(i);
+  return`<button class="lvb" ${ok?'':'disabled'} onclick="playLevel(${i})"><b>${ok?i+1:'🔒'}</b>${lname(L)}${starStr(STARS[i]||0)}</button>`}).join('')}</div>
+  ${endlessOpen()?`<button class="btn gold" onclick="playEndless()">${t('endless')}</button><p style="color:var(--gold)">${t('best',best)}</p>`:`<p style="color:var(--grey)">${t('endless_lock')}</p>`}
+  <p>${t('how')}</p>`);
+}
+function showIntro(){
+ cur=showIntro;const L=LEVELS[S.li];
+ let h=`<h2>${t('level')} ${S.level}</h2><p style="color:var(--gold)">${lname(L)}</p><p>${t('lv_info',L.waves.length,L.gold)}</p>`;
+ if(L.intro){const E=EN[L.intro];h+=`<div class="intro"><b><i style="background:${E.col}"></i>${t('new_en')}: ${t('e_'+L.intro)}</b><p>${t('e_'+L.intro+'_d',E.armor)}</p></div>`}
+ (L.tips||[]).forEach(k=>h+=`<p>${t(k)}</p>`);
+ if(S.li===1)h+=`<p>${t('early_tip')}</p>`;
+ show(h+`<button class="btn gold" onclick="closeIntro()">${t('gotit')}</button>`);
+}
+function showOver(){
+ cur=showOver;
+ if(S.mode==='camp')show(`<h2 style="color:var(--red)">${t('over')}</h2><p>${t('level')} ${S.level}: ${lname(LEVELS[S.li])}</p><p>${t('wave')} ${S.lw}/${nWaves()}</p><p>${t('killed',S.kills)}</p>
+  <div class="opts"><button class="btn red" onclick="playLevel(${S.li})">${t('retry')}</button><button class="btn" onclick="showMenu()">${t('tolevels')}</button></div>`);
+ else{saveBest();show(`<h2 style="color:var(--red)">${t('over')}</h2><p>${t('waves_done',S.level,Math.max(0,S.wave-1))}</p><p>${t('killed',S.kills)}</p><p style="color:var(--gold)">${t('best',best)}</p>
+  <div class="opts"><button class="btn red" onclick="playEndless()">${t('retry')}</button><button class="btn" onclick="showMenu()">${t('tolevels')}</button></div>`)}
+ renderBar();
+}
+function showWon(){
+ cur=showWon;const last=S.li===LEVELS.length-1;
+ show(`<h2>${t('win_lvl')}</h2><p>${lname(LEVELS[S.li])}</p><p>${starStr(S.stars)}</p><p>${t('lives_left',S.lives,S.startLives)}</p><p>${t('killed',S.kills)}</p>
+  ${last?`<p style="color:var(--green)">${t('all_done')}</p>`:''}
+  <div class="opts">${last?'':`<button class="btn gold" onclick="playLevel(${S.li+1})">${t('next')}</button>`}<button class="btn" onclick="showMenu()">${t('tolevels')}</button></div>`);
+ renderBar();
+}
+let pickCards=[],pickBonus=0,pickEnds=false;   // pickEnds: this pick ends an endless level (new map after choosing)
+function showPick(bonus,levelDone){
+ pickBonus=bonus;pickEnds=!!levelDone;pickCards=rollCards();cur=showPick;drawPick();renderBar();renderHud();
 }
 function cardText(c){return{n:t('c_'+c.id),d:t('c_'+c.id+'_d',...c.a)}}
 function drawPick(){
- show(`<h2>${t('cleared')}</h2><p>${t('bonus',pickBonus)}</p><p style="color:var(--gold)">${t('pick')}</p><div class="opts">${pickCards.map((c,i)=>{
+ show(`<h2>${pickEnds?t('lvl_clear',S.level):t('cleared')}</h2><p>${t('bonus',pickBonus)}</p>${pickEnds?`<p style="color:var(--green)">${t('new_path',levelBonus(S.level+1))}</p>`:''}<p style="color:var(--gold)">${t('pick')}</p><div class="opts">${pickCards.map((c,i)=>{
   const x=cardText(c);return`<button class="opt ${c.curse?'curse':''}" onclick="choose(${i})"><b>${x.n}${c.curse?' ['+t('cursed')+']':''}</b>${x.d}</button>`}).join('')}</div>`);
 }
 function choose(i){
  const c=pickCards[i];c.ap();S.ups.push({id:c.id,a:c.a,curse:c.curse});
- beep(520,.15,'triangle',.05,300);hide();state='build';renderHud();renderBar();
+ beep(520,.15,'triangle',.05,300);hide();state='build';
+ if(pickEnds){pickEnds=false;const refund=nextLevel();if(refund)setTimeout(()=>toast(t('refund',refund)),60)}
+ renderHud();renderBar();
 }
 function showUps(){
  const prev=cur;
@@ -912,12 +1313,11 @@ function showUps(){
  show(`<h2>${t('ups')}</h2>${list}<button class="btn" id="cl">${t('close')}</button>`);
  cur=showUps;$('#cl').onclick=()=>{hide();cur=null};
 }
-function startGame(){resetGame();hide();renderHud();renderBar();beep(440,.1,'triangle')}
 
 /* ---------- input ---------- */
 cv.addEventListener('pointerdown',e=>{
  e.preventDefault();
- if(state==='title'||state==='over'||state==='win'||state==='pick')return;
+ if(state!=='build'&&state!=='wave'&&state!=='clearing')return;
  const r=cv.getBoundingClientRect(),w=cv.clientWidth,h=cv.clientHeight;
  const px=(e.clientX-r.left-cv.clientLeft)*VW/w,py=(e.clientY-r.top-cv.clientTop)*VH/h;
  const tx=Math.floor(px/TS),ty=Math.floor(py/TS);
@@ -925,7 +1325,7 @@ cv.addEventListener('pointerdown',e=>{
  const ex=towers.find(q=>q.x===tx&&q.y===ty);
  if(ex){sel=ex===sel?null:ex;beep(600,.04);renderBar();return}
  if(sel){sel=null;renderBar();return}
- if(blocked[ty][tx]){toast(t('toast_spot'));return}
+ if(!buildable[ty][tx]){toast(t(blocked[ty][tx]?'toast_spot':'toast_pad'));return}
  const c=tcost(build);
  if(S.gold<c){toast(t('toast_gold'));beep(120,.1,'sawtooth');return}
  S.gold-=c;towers.push({x:tx,y:ty,type:build,lv:1,cd:0,ang:0,inv:c});
@@ -938,6 +1338,7 @@ function applyLang(){
  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
  $('#lang').textContent=LANG.toUpperCase();
  $('#mute').textContent=t('snd');$('#mute').classList.toggle('off',muted);
+ $('#menu').textContent=t('menu');
  document.title=t('title');
 }
 $('#lang').onclick=()=>{
@@ -946,6 +1347,7 @@ $('#lang').onclick=()=>{
  if($('#ov').style.display==='flex'&&cur){if(cur===showPick)drawPick();else cur()}
 };
 $('#mute').onclick=()=>{muted=!muted;applyLang()};
+$('#menu').onclick=()=>{if(state!=='menu'){beep(300,.05);showMenu()}};
 function layout(){
  const st=$('#stage'),w=st.clientWidth,h=st.clientHeight;
  const sc=Math.max(.5,Math.min((w-8)/VW,(h-8)/VH));
@@ -961,7 +1363,7 @@ function frame(now){
  while(acc>=step){update(1/60);acc-=step}
  render();requestAnimationFrame(frame);
 }
-resetGame();state='title';applyLang();renderHud();renderBar();layout();showTitle();
+initLevel(0);applyLang();renderHud();layout();showMenu();
 requestAnimationFrame(frame);
 <\/script>
 </body>
@@ -1051,13 +1453,13 @@ en:{jump:'JUMP',punch:'PUNCH',snd:'SND',sub:'One-level demo',
  keys:'Keyboard: arrows / WASD, Space = jump, Z = punch',start:'Start',
  thugs:'THUGS',boss:'BOSS',pow:'POW!',complete:'LEVEL COMPLETE!',
  dead:'YOU WERE DEFEATED',retry:'Try again',
- final:'<b>GTA6 </b> play best on <b> PS5PRO</b>',beaten:'Thugs beaten: {0}',time:'Time: {0}s',again:'Play again'},
+ final:'CITY <b>SAVED!</b>',beaten:'Thugs beaten: {0}',time:'Time: {0}s',again:'Play again'},
 es:{jump:'SALTAR',punch:'GOLPE',snd:'SON',sub:'Demo de un nivel',
  how:'Corre, salta los huecos y golpea a los matones. ¡Derrota al jefe del final!',
  keys:'Teclado: flechas / WASD, Espacio = saltar, Z = golpear',start:'Empezar',
  thugs:'MATONES',boss:'JEFE',pow:'¡PUM!',complete:'¡NIVEL COMPLETO!',
  dead:'FUISTE DERROTADO',retry:'Reintentar',
- final:'<b>GTA6</b> se juega mejor en <b> PS5PRO</b>',beaten:'Matones derrotados: {0}',time:'Tiempo: {0}s',again:'Jugar de nuevo'}
+ final:'¡CIUDAD <b>A SALVO!</b>',beaten:'Matones derrotados: {0}',time:'Tiempo: {0}s',again:'Jugar de nuevo'}
 };
 const t=(k,...a)=>{let s=T[LANG][k];if(s===undefined)s=T.en[k];a.forEach((v,i)=>s=s.split('{'+i+'}').join(v));return s};
 
@@ -2549,6 +2951,545 @@ applyLang();render();title();
 </html>
 </script>
 
+<script type="text/plain" id="src-low-poly-pool">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Low Poly Pool</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#14171f;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+.hud{position:fixed;left:0;right:0;top:0;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;pointer-events:none;flex-wrap:wrap}
+.hud>*{pointer-events:auto}
+.stats{display:flex;gap:8px}
+.stat{background:#000a;border:1px solid #fff2;border-radius:10px;padding:5px 12px;text-align:center;min-width:64px}
+.stat small{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3b8}
+.stat b{font-size:18px}
+.btns{display:flex;gap:6px}
+button{font:inherit;font-size:13px;color:#fff;background:#2c3550;border:1px solid #fff3;border-radius:9px;padding:8px 12px;cursor:pointer}
+button:hover{background:#3a4670}
+button.off{opacity:.5;text-decoration:line-through}
+#tray{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;pointer-events:none}
+#dots{display:flex;gap:5px}
+#dots i{width:16px;height:16px;border-radius:50%;border:2px solid #0008;box-shadow:inset -2px -2px 3px #0006;transition:opacity .3s,transform .3s}
+#dots i.gone{opacity:.15;transform:scale(.6)}
+#msg{font-size:13px;color:#cdd5ea;background:#000a;border-radius:99px;padding:5px 14px;text-align:center;max-width:94vw}
+#pow{width:min(280px,70vw);height:8px;background:#0008;border-radius:9px;overflow:hidden;opacity:0;transition:opacity .15s}
+#pow i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5be37d,#ffcf3f,#ff4d5e)}
+#ov{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:14px;z-index:5}
+.modal{background:#1b2340;border:1px solid #fff3;border-radius:16px;padding:22px;max-width:360px;width:100%;text-align:center}
+.modal h2{margin:0 0 8px;font-size:26px;color:#ffcf3f}
+.modal p{margin:6px 0 14px;color:#cdd5ea;line-height:1.5}
+.modal button{background:#3a6df0;font-size:15px;padding:10px 20px}
+.modal .row{display:flex;gap:8px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
+.modal .row button{background:#2c3550;font-size:14px;padding:9px 14px}
+.modal .row button:hover{background:#3a4670}
+.modal h3{margin:14px 0 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3b8;font-weight:600}
+#menu{z-index:6}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="hud">
+  <div class="stats">
+    <div class="stat"><small id="lShots">Shots</small><b id="shots">0</b></div>
+    <div class="stat"><small id="lLeft">Left</small><b id="left">9</b></div>
+    <div class="stat"><small id="lBest">Best</small><b id="best">-</b></div>
+  </div>
+  <div class="btns">
+    <button id="view"></button><button id="newg"></button><button id="lang">ES</button><button id="mute"></button>
+  </div>
+</div>
+<div id="tray"><div id="pow"><i></i></div><div id="dots"></div><div id="msg"></div></div>
+<div id="menu" style="position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:14px"><div class="modal">
+  <h2 id="mT"></h2><p id="mP"></p>
+  <div class="row"><button id="mSolo" data-m="solo"></button></div>
+  <h3 id="mV"></h3>
+  <div class="row"><button data-m="vs" data-d="easy" id="mE"></button><button data-m="vs" data-d="normal" id="mN"></button><button data-m="vs" data-d="hard" id="mH"></button></div>
+</div></div>
+<div id="ov"><div class="modal"><h2 id="oT"></h2><p id="oP"></p><button id="oB"></button></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const LANG_KEY = 'lowPolyPoolLang', BEST_KEY = 'lowPolyPoolBest';
+const TXT = {
+  en: { shots: 'Shots', left: 'Left', best: 'Best', view: 'View', newg: 'New game', snd: 'Sound',
+    aim: 'Drag back from anywhere to aim and set power, then release to shoot.', roll: 'Balls rolling…',
+    scratch: 'Scratch! +2 shots penalty.', potted: 'Nice pot!', win: 'Table cleared!',
+    winP: 'You cleared all nine balls in {n} shots.', record: ' New best!', again: 'Play again',
+    nolib: 'Could not load the 3D engine. Check your internet connection and reopen the game.',
+    you: 'You', ai: 'AI', menuT: 'Low Poly Pool', menuP: 'Choose how you want to play.', solo: 'Solo practice', vsAi: 'Play against the AI',
+    easy: 'Easy', normal: 'Normal', hard: 'Hard', youTurn: 'Your turn. Drag back to aim, release to shoot.', aiTurn: 'AI is playing…',
+    aiPotted: 'AI potted one and shoots again…', foulTurn: 'Scratch! Turn passes.', youWin: 'You win!', aiWin: 'The AI wins',
+    scoreP: 'Final score {n}. Each ball is worth its number.' },
+  es: { shots: 'Tiros', left: 'Faltan', best: 'Mejor', view: 'Vista', newg: 'Nueva', snd: 'Sonido',
+    aim: 'Arrastra hacia atrás desde cualquier punto para apuntar y dar fuerza; suelta para tirar.', roll: 'Las bolas ruedan…',
+    scratch: '¡Falta! +2 tiros de penalización.', potted: '¡Buena entronerada!', win: '¡Mesa limpia!',
+    winP: 'Metiste las nueve bolas en {n} tiros.', record: ' ¡Nuevo récord!', again: 'Jugar otra vez',
+    nolib: 'No se pudo cargar el motor 3D. Revisa tu conexión a internet y vuelve a abrir el juego.',
+    you: 'Tú', ai: 'IA', menuT: 'Billar Low Poly', menuP: 'Elige cómo quieres jugar.', solo: 'Práctica en solitario', vsAi: 'Jugar contra la IA',
+    easy: 'Fácil', normal: 'Normal', hard: 'Difícil', youTurn: 'Tu turno. Arrastra hacia atrás y suelta para tirar.', aiTurn: 'La IA está jugando…',
+    aiPotted: 'La IA metió una y vuelve a tirar…', foulTurn: '¡Falta! Pasa el turno.', youWin: '¡Ganas!', aiWin: 'Gana la IA',
+    scoreP: 'Marcador final {n}. Cada bola vale su número.' },
+};
+let lang = 'en';
+try { lang = localStorage.getItem(LANG_KEY) === 'es' ? 'es' : 'en'; } catch (e) {}
+const tr = (k, v) => (TXT[lang][k] || k).replace('{n}', v);
+let muted = false;
+
+if (typeof THREE === 'undefined') {
+  $('#msg').textContent = tr('nolib');
+  throw new Error('THREE not loaded');
+}
+
+/* ---------- constants ---------- */
+const R = 0.26;                        // ball radius
+const HX = 10, HZ = 5;                 // playfield half sizes (cushion line)
+const LX = HX - R, LZ = HZ - R;        // limits for ball centres
+const POCKETS = [[-HX, -HZ, .66], [HX, -HZ, .66], [-HX, HZ, .66], [HX, HZ, .66], [0, -HZ, .58], [0, HZ, .58]];
+const MAXV = 26, DRAG_MAX = 5.5;
+const COLORS = [0xffffff, 0xf2c500, 0x1f5fd6, 0xd6243a, 0x6a2fb0, 0xf07a1c, 0x1f9e4a, 0x8a1f2a, 0x1a1a1a, 0xf2c500];
+
+/* ---------- renderer / scene ---------- */
+const canvas = $('#c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x14171f);
+scene.fog = new THREE.Fog(0x14171f, 30, 60);
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
+
+scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x2a2438, 0.75));
+const sun = new THREE.DirectionalLight(0xfff1d6, 0.85);
+sun.position.set(-6, 16, 8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -13, right: 13, top: 8, bottom: -8, near: 1, far: 40 });
+scene.add(sun);
+
+const mat = (color, extra) => new THREE.MeshPhongMaterial(Object.assign({ color, flatShading: true, shininess: 12 }, extra));
+const box = (w, h, d, color, x, y, z) => {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(color));
+  m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; scene.add(m); return m;
+};
+
+/* ---------- table ---------- */
+const FELT = 0x1f8a55, WOOD = 0x6b3f22, WOOD2 = 0x8a5530;
+box(HX * 2 + 0.2, 0.4, HZ * 2 + 0.2, FELT, 0, -0.2, 0).receiveShadow = true;    // felt, top at y=0
+const RW = 1.1;                                                                  // rail thickness
+box(HX * 2 + 2 * RW, 0.7, RW, WOOD, 0, 0.15, -HZ - RW / 2 - .05);
+box(HX * 2 + 2 * RW, 0.7, RW, WOOD, 0, 0.15, HZ + RW / 2 + .05);
+box(RW, 0.7, HZ * 2 + .2, WOOD, -HX - RW / 2 - .05, 0.15, 0);
+box(RW, 0.7, HZ * 2 + .2, WOOD, HX + RW / 2 + .05, 0.15, 0);
+// cushions (green wedges look: simple low boxes) with gaps at pockets
+const CUSH = 0x187044;
+const cush = (w, d, x, z) => box(w, 0.32, d, CUSH, x, 0.16, z);
+[-1, 1].forEach(s => {
+  cush(HX - 1.5, 0.35, -HX / 2 - 0.35, s * (HZ - 0.12)); cush(HX - 1.5, 0.35, HX / 2 + 0.35, s * (HZ - 0.12));
+  cush(0.35, HZ * 2 - 2.2, s * (HX - 0.12), 0);
+});
+// pockets
+POCKETS.forEach(([x, z, r]) => {
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(r + .08, r + .08, 0.1, 8), mat(0x0a0a0c));
+  p.position.set(x, 0.01, z); scene.add(p);
+  const ring = new THREE.Mesh(new THREE.CylinderGeometry(r + .28, r + .28, 0.08, 8), mat(0xc9a43a));
+  ring.position.set(x, -0.01, z); scene.add(ring);
+});
+// legs + floor
+[[-8.5, -3.5], [8.5, -3.5], [-8.5, 3.5], [8.5, 3.5]].forEach(([x, z]) => box(1, 4, 1, WOOD2, x, -2.4, z));
+const floor = new THREE.Mesh(new THREE.CylinderGeometry(26, 26, .2, 8), mat(0x2a2438));
+floor.position.y = -4.5; floor.receiveShadow = true; scene.add(floor);
+// diamonds on rails
+for (let i = -3; i <= 3; i++) if (i) {
+  box(.14, .02, .14, 0xf4ecd8, i * 2.5, .51, -HZ - RW / 2);
+  box(.14, .02, .14, 0xf4ecd8, i * 2.5, .51, HZ + RW / 2);
+}
+
+/* ---------- balls ---------- */
+function ballGeometry(num) {
+  const g = new THREE.IcosahedronGeometry(R, 1);
+  const pos = g.attributes.position, col = new Float32Array(pos.count * 3);
+  const base = new THREE.Color(COLORS[num]), white = new THREE.Color(0xf4f4ee);
+  for (let f = 0; f < pos.count; f += 3) {
+    const cy = (pos.getY(f) + pos.getY(f + 1) + pos.getY(f + 2)) / 3 / R;
+    const dot = num === 9 && Math.abs(cy) > 0.42;      // 9-ball: white caps, coloured stripe
+    const c = num === 0 ? white : dot ? white : base;
+    for (let k = 0; k < 3; k++) { col[(f + k) * 3] = c.r; col[(f + k) * 3 + 1] = c.g; col[(f + k) * 3 + 2] = c.b; }
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return g;
+}
+const geos = [...Array(10)].map((_, n) => ballGeometry(n));
+const balls = [];
+function makeBall(num) {
+  const mesh = new THREE.Mesh(geos[num], new THREE.MeshPhongMaterial({ vertexColors: true, flatShading: true, shininess: 70, specular: 0x555555 }));
+  mesh.castShadow = true; scene.add(mesh);
+  return { num, mesh, x: 0, z: 0, vx: 0, vz: 0, on: true, sink: null };
+}
+
+/* ---------- cue + aim helpers ---------- */
+const cueGeo = new THREE.CylinderGeometry(0.06, 0.13, 9, 6);
+cueGeo.rotateZ(-Math.PI / 2); cueGeo.translate(-4.5, 0, 0);
+const cueMesh = new THREE.Mesh(cueGeo, mat(0xe0b878));
+cueMesh.rotation.z = -0.13; cueMesh.castShadow = true;
+const cue = new THREE.Group(); cue.add(cueMesh); scene.add(cue);
+const tipMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.12, 6), mat(0x4aa3ff));
+tipMesh.rotation.z = Math.PI / 2; tipMesh.position.x = -0.06; cueMesh.add(tipMesh);
+
+const lineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(1, 0, 0)]);
+const aimLine = new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: .75 }));
+aimLine.frustumCulled = false; scene.add(aimLine);
+const ghost = new THREE.Mesh(new THREE.TorusGeometry(R, 0.03, 4, 10), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+ghost.rotation.x = Math.PI / 2; scene.add(ghost);
+
+/* ---------- game state ---------- */
+let state = 'aim', shots = 0, best = null, potThisShot = 0, scratched = false, cueBall;
+let mode = 'solo', diff = 'normal', turn = 'me', score = { me: 0, ai: 0 }, pottedNums = [], ai = null, aiPull = 0;
+try { const b = +localStorage.getItem(BEST_KEY); if (b) best = b; } catch (e) {}
+
+function rack() {
+  balls.forEach(b => scene.remove(b.mesh)); balls.length = 0;
+  cueBall = makeBall(0); cueBall.x = -5; cueBall.z = 0; balls.push(cueBall);
+  const rest = [2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
+  const order = [1, rest[0], rest[1], rest[2], 9, rest[3], rest[4], rest[5], rest[6]];
+  const rows = [1, 2, 3, 2, 1]; let k = 0;
+  rows.forEach((n, i) => { for (let j = 0; j < n; j++) {
+    const b = makeBall(order[k++]);
+    b.x = 5 + i * (R * 1.74 + 0.005); b.z = (j - (n - 1) / 2) * (R * 2 + 0.012); balls.push(b);
+  } });
+  shots = 0; state = 'aim'; score = { me: 0, ai: 0 }; turn = 'me'; ai = null; aiPull = 0;
+  $('#dots').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<i data-n="${n}" style="background:${n === 9 ? 'linear-gradient(#f4f4ee 25%,#f2c500 25% 75%,#f4f4ee 75%)' : '#' + COLORS[n].toString(16).padStart(6, '0')}"></i>`).join('');
+  $('#ov').style.display = 'none';
+  syncMeshes(); hud(); say('aim');
+}
+
+/* ---------- physics ---------- */
+function stepPhysics(dt) {
+  let sounds = [];
+  for (const b of balls) if (b.on && !b.sink) {
+    b.x += b.vx * dt; b.z += b.vz * dt;
+    const sp = Math.hypot(b.vx, b.vz);
+    if (sp > 0) {
+      const ns = Math.max(0, sp - (0.9 + 0.35 * sp) * dt);     // rolling friction
+      if (ns < 0.06) b.vx = b.vz = 0; else { b.vx *= ns / sp; b.vz *= ns / sp; }
+    }
+    // pockets first so balls near the mouths drop instead of bouncing
+    for (const [px, pz, pr] of POCKETS) {
+      if (Math.hypot(b.x - px, b.z - pz) < pr) { pot(b, px, pz); break; }
+    }
+    if (b.sink) continue;
+    let hit = 0;
+    if (b.x > LX) { b.x = LX; if (b.vx > 0) { hit = b.vx; b.vx *= -0.78; } }
+    if (b.x < -LX) { b.x = -LX; if (b.vx < 0) { hit = -b.vx; b.vx *= -0.78; } }
+    if (b.z > LZ) { b.z = LZ; if (b.vz > 0) { hit = b.vz; b.vz *= -0.78; } }
+    if (b.z < -LZ) { b.z = -LZ; if (b.vz < 0) { hit = -b.vz; b.vz *= -0.78; } }
+    if (hit > 1) sounds.push(['cush', hit]);
+  }
+  for (let i = 0; i < balls.length; i++) for (let j = i + 1; j < balls.length; j++) {
+    const a = balls[i], b = balls[j];
+    if (!a.on || !b.on || a.sink || b.sink) continue;
+    const dx = b.x - a.x, dz = b.z - a.z, d2 = dx * dx + dz * dz, md = 2 * R;
+    if (d2 >= md * md || d2 === 0) continue;
+    const d = Math.sqrt(d2), nx = dx / d, nz = dz / d, ov = (md - d) / 2;
+    a.x -= nx * ov; a.z -= nz * ov; b.x += nx * ov; b.z += nz * ov;
+    const vn = (b.vx - a.vx) * nx + (b.vz - a.vz) * nz;
+    if (vn < 0) {
+      const j2 = -(1 + 0.96) * vn / 2;
+      a.vx -= j2 * nx; a.vz -= j2 * nz; b.vx += j2 * nx; b.vz += j2 * nz;
+      sounds.push(['ball', -vn]);
+    }
+  }
+  sounds.forEach(([k, v]) => sfx(k, v));
+}
+
+function pot(b, px, pz) {
+  b.sink = { t: 0, px, pz, sx: b.x, sz: b.z }; b.vx = b.vz = 0;
+  sfx('pot', 1);
+  if (b === cueBall) scratched = true; else { potThisShot++; pottedNums.push(b.num); }
+  if (b !== cueBall) {
+    const d = $(`#dots i[data-n="${b.num}"]`); if (d) d.classList.add('gone');
+  }
+}
+
+/* ---------- audio ---------- */
+let ac = null;
+function sfx(kind, v) {
+  if (muted) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    const vol = Math.min(1, v / 14);
+    o.type = kind === 'pot' ? 'sine' : 'triangle';
+    o.frequency.setValueAtTime(kind === 'ball' ? 1800 : kind === 'cush' ? 260 : 150, t);
+    o.frequency.exponentialRampToValueAtTime(kind === 'ball' ? 700 : 80, t + 0.09);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.02, 0.25 * vol) * (kind === 'pot' ? 1.8 : 1), t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + (kind === 'pot' ? 0.25 : 0.1));
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + 0.3);
+  } catch (e) {}
+}
+
+/* ---------- sync visuals ---------- */
+const up = new THREE.Vector3(0, 1, 0), axis = new THREE.Vector3();
+function syncMeshes(dt) {
+  for (const b of balls) {
+    if (!b.on) { b.mesh.visible = false; continue; }
+    if (b.sink) {
+      const s = b.sink; s.t += dt || 0;
+      const k = Math.min(1, s.t / 0.32);
+      b.mesh.position.set(s.sx + (s.px - s.sx) * k, R - k * 0.9, s.sz + (s.pz - s.sz) * k);
+      b.mesh.scale.setScalar(1 - k * 0.4);
+      if (k >= 1) { b.on = false; b.mesh.visible = false; }
+      continue;
+    }
+    b.mesh.position.set(b.x, R, b.z);
+    const sp = Math.hypot(b.vx, b.vz);
+    if (dt && sp > 0.01) {
+      axis.set(b.vz, 0, -b.vx).normalize();
+      b.mesh.rotateOnWorldAxis(axis, sp * dt / R);
+    }
+  }
+}
+
+/* ---------- camera ---------- */
+let viewTop = false, camT = 0;       // camT: 0 = angled, 1 = top-down (smoothed)
+function placeCamera() {
+  const w = innerWidth, h = innerHeight, aspect = w / h;
+  renderer.setSize(w, h, false); camera.aspect = aspect;
+  const vf = camera.fov * Math.PI / 180, hf = 2 * Math.atan(Math.tan(vf / 2) * aspect);
+  const need = Math.max(7.2 / Math.tan(vf / 2) * 1.2, 12.2 / Math.tan(hf / 2));
+  const dist = Math.max(need, 17);
+  const k = camT, ang = (1 - k) * 0.95 + k * 1.5;        // elevation angle from the table plane
+  camera.position.set(0, Math.sin(ang) * dist, Math.cos(ang) * dist * (1 - k * 0.0) + (k > 0.98 ? 0.01 : 0));
+  camera.lookAt(0, 0, k > 0.5 ? 0 : 0.4);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', placeCamera);
+
+/* ---------- aiming input ---------- */
+const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -R);
+const mouse = new THREE.Vector2(), hitP = new THREE.Vector3();
+let dragging = false, dragStart = null, aimDir = { x: 1, z: 0 }, power = 0;
+function worldPoint(e) {
+  const r = canvas.getBoundingClientRect();
+  mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(mouse, camera);
+  return ray.ray.intersectPlane(plane, hitP) ? { x: hitP.x, z: hitP.z } : null;
+}
+canvas.addEventListener('pointerdown', e => {
+  if (state !== 'aim' || e.button > 0) return;
+  const p = worldPoint(e); if (!p) return;
+  canvas.setPointerCapture(e.pointerId);
+  dragging = true; dragStart = p; power = 0;
+});
+canvas.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const p = worldPoint(e); if (!p) return;
+  const dx = dragStart.x - p.x, dz = dragStart.z - p.z, len = Math.hypot(dx, dz);
+  if (len > 0.05) aimDir = { x: dx / len, z: dz / len };
+  power = Math.min(1, len / DRAG_MAX);
+});
+const endDrag = shoot => {
+  if (!dragging) return; dragging = false;
+  if (shoot && power > 0.04 && state === 'aim') fire();
+  power = 0;
+};
+canvas.addEventListener('pointerup', () => endDrag(true));
+canvas.addEventListener('pointercancel', () => endDrag(false));
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') { dragging = false; power = 0; }
+  else if (e.key === 'v' || e.key === 'V') toggleView();
+  else if (e.key === 'r' || e.key === 'R') rack();
+});
+
+function fire() {
+  const sp = MAXV * (0.12 + 0.88 * power * power);
+  cueBall.vx = aimDir.x * sp; cueBall.vz = aimDir.z * sp;
+  shots++; potThisShot = 0; pottedNums = []; scratched = false; state = 'rolling';
+  sfx('ball', 4 + 12 * power); hud(); say('roll');
+}
+
+/* first contact along the aim ray: cushion or ball */
+function aimTarget() {
+  let tMin = 1e9, hitBall = false;
+  const ox = cueBall.x, oz = cueBall.z, dx = aimDir.x, dz = aimDir.z;
+  if (dx > 1e-6) tMin = Math.min(tMin, (LX - ox) / dx); if (dx < -1e-6) tMin = Math.min(tMin, (-LX - ox) / dx);
+  if (dz > 1e-6) tMin = Math.min(tMin, (LZ - oz) / dz); if (dz < -1e-6) tMin = Math.min(tMin, (-LZ - oz) / dz);
+  for (const b of balls) if (b !== cueBall && b.on && !b.sink) {
+    const fx = b.x - ox, fz = b.z - oz, proj = fx * dx + fz * dz;
+    if (proj <= 0) continue;
+    const perp2 = fx * fx + fz * fz - proj * proj, m = 4 * R * R;
+    if (perp2 >= m) continue;
+    const t = proj - Math.sqrt(m - perp2);
+    if (t < tMin) { tMin = t; hitBall = true; }
+  }
+  return { t: Math.max(0, tMin), hitBall };
+}
+
+/* ---------- UI ---------- */
+function hud() {
+  const vs = mode === 'vs';
+  $('#lShots').textContent = tr(vs ? 'you' : 'shots'); $('#lBest').textContent = tr(vs ? 'ai' : 'best');
+  $('#shots').parentNode.style.borderColor = vs && turn === 'me' ? '#ffcf3f' : '';
+  $('#best').parentNode.style.borderColor = vs && turn === 'ai' ? '#ffcf3f' : '';
+  $('#shots').textContent = vs ? score.me : shots;
+  $('#left').textContent = balls.filter(b => b !== cueBall && b.on && !b.sink).length;
+  $('#best').textContent = vs ? score.ai : (best || '-');
+}
+function say(k) { $('#msg').textContent = tr(k); }
+function applyLang() {
+  document.documentElement.lang = lang;
+  $('#lShots').textContent = tr('shots'); $('#lLeft').textContent = tr('left'); $('#lBest').textContent = tr('best');
+  $('#view').textContent = '🎥 ' + tr('view'); $('#newg').textContent = '↺ ' + tr('newg');
+  $('#mute').textContent = '🔊 ' + tr('snd'); $('#mute').classList.toggle('off', muted);
+  $('#lang').textContent = lang === 'en' ? 'ES' : 'EN';
+  $('#mT').textContent = tr('menuT'); $('#mP').textContent = tr('menuP'); $('#mSolo').textContent = tr('solo'); $('#mV').textContent = tr('vsAi');
+  $('#mE').textContent = tr('easy'); $('#mN').textContent = tr('normal'); $('#mH').textContent = tr('hard');
+  hud();
+}
+function showMenu() { $('#ov').style.display = 'none'; $('#menu').style.display = 'flex'; }
+document.querySelectorAll('#menu button').forEach(b => b.onclick = () => {
+  mode = b.dataset.m; if (b.dataset.d) diff = b.dataset.d;
+  $('#menu').style.display = 'none'; rack(); if (mode === 'vs') say('youTurn');
+});
+function toggleView() { viewTop = !viewTop; }
+$('#view').onclick = toggleView;
+$('#newg').onclick = showMenu;
+$('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); say(state === 'rolling' ? 'roll' : state === 'aiAim' ? 'aiTurn' : mode === 'vs' ? 'youTurn' : 'aim'); };
+$('#mute').onclick = () => { muted = !muted; applyLang(); };
+$('#oB').onclick = rack;
+[$('#view'), $('#newg'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
+
+function endShot() {
+  if (scratched) {
+    if (mode === 'solo') shots += 2;
+    cueBall.sink = null; cueBall.on = true; cueBall.mesh.scale.setScalar(1);
+    let x = -5, z = 0;                      // re-spot, nudge if occupied
+    for (let i = 0; i < 40 && balls.some(b => b !== cueBall && b.on && Math.hypot(b.x - x, b.z - z) < 2 * R + .02); i++) { x = -5 + (i % 5) * 0.6 - 1; z = ((i / 5 | 0) - 3) * 0.8; }
+    Object.assign(cueBall, { x, z, vx: 0, vz: 0 });
+    say('scratch');
+  } else if (potThisShot) say('potted'); else say('aim');
+  if (mode === 'vs') {
+    const who = turn, keep = !scratched && potThisShot > 0;
+    pottedNums.forEach(n => { score[who] += n; });
+    if (!keep) turn = who === 'me' ? 'ai' : 'me';
+    say(scratched ? 'foulTurn' : keep ? (who === 'me' ? 'potted' : 'aiPotted') : (turn === 'ai' ? 'aiTurn' : 'youTurn'));
+  }
+  const left = balls.filter(b => b !== cueBall && b.on && !b.sink).length;
+  hud();
+  if (!left) return win();
+  state = (mode === 'vs' && turn === 'ai') ? 'aiAim' : 'aim';
+  // aim at the nearest ball by default
+  let nb = null, nd = 1e9; balls.forEach(b => { if (b !== cueBall && b.on) { const d = Math.hypot(b.x - cueBall.x, b.z - cueBall.z); if (d < nd) { nd = d; nb = b; } } });
+  if (nb) aimDir = { x: (nb.x - cueBall.x) / nd, z: (nb.z - cueBall.z) / nd };
+  if (state === 'aiAim') planAI();
+}
+
+/* ---------- AI opponent ---------- */
+const gauss = () => (Math.random() + Math.random() + Math.random() + Math.random() - 2) / 0.58;
+const DIFF = { easy: { ang: 0.05, pow: 0.16, pick: 0.45 }, normal: { ang: 0.02, pow: 0.07, pick: 0.12 }, hard: { ang: 0.006, pow: 0.03, pick: 0 } };
+function segClear(ax, az, bx, bz, ignore) {
+  const vx = bx - ax, vz = bz - az, L2 = vx * vx + vz * vz;
+  return balls.every(o => {
+    if (!o.on || o.sink || o === cueBall || o === ignore) return true;
+    const t = L2 ? Math.max(0, Math.min(1, ((o.x - ax) * vx + (o.z - az) * vz) / L2)) : 0;
+    return Math.hypot(o.x - (ax + vx * t), o.z - (az + vz * t)) > 2 * R * 0.99;
+  });
+}
+function planAI() {
+  const D = DIFF[diff], shotsList = [];
+  for (const b of balls) if (b !== cueBall && b.on && !b.sink) for (const [px, pz] of POCKETS) {
+    let ux = px - b.x, uz = pz - b.z; const d2 = Math.hypot(ux, uz); ux /= d2; uz /= d2;
+    const gx = b.x - ux * 2 * R, gz = b.z - uz * 2 * R;
+    if (Math.abs(gx) > LX || Math.abs(gz) > LZ) continue;
+    let cx = gx - cueBall.x, cz = gz - cueBall.z; const d1 = Math.hypot(cx, cz); if (d1 < 0.05) continue;
+    cx /= d1; cz /= d1;
+    const cos = cx * ux + cz * uz; if (cos < 0.3) continue;
+    if (!segClear(cueBall.x, cueBall.z, gx, gz, b) || !segClear(b.x, b.z, px, pz, b)) continue;
+    const vo = 3 + 0.42 * (d2 + 1.5), vc = vo / Math.max(cos, 0.5);
+    shotsList.push({ dx: cx, dz: cz, v: vc + 0.6 * d1, q: cos * 3 - (d1 + d2) * 0.08 + b.num * 0.02 });
+  }
+  let pick;
+  if (shotsList.length) {
+    shotsList.sort((a, b) => b.q - a.q);
+    pick = Math.random() < D.pick ? shotsList[Math.floor(Math.random() * shotsList.length)] : shotsList[0];
+  } else {                                 // nothing clean: tap the nearest ball
+    let nb = null, nd = 1e9; balls.forEach(b => { if (b !== cueBall && b.on && !b.sink) { const d = Math.hypot(b.x - cueBall.x, b.z - cueBall.z); if (d < nd) { nd = d; nb = b; } } });
+    pick = { dx: (nb.x - cueBall.x) / nd, dz: (nb.z - cueBall.z) / nd, v: 9 + nd * 0.4 };
+  }
+  const a1 = Math.atan2(pick.dz, pick.dx) + gauss() * D.ang;
+  const v = Math.max(6, Math.min(MAXV * 0.97, pick.v * (1 + gauss() * D.pow)));
+  const p = Math.sqrt(Math.max(0, (v / MAXV - 0.12) / 0.88));
+  ai = { t: 0, a0: Math.atan2(aimDir.z, aimDir.x), a1, p };
+}
+const ease = x => x * x * (3 - 2 * x);
+function runAI(dt) {
+  ai.t += dt;
+  let d = ai.a1 - ai.a0; d = Math.atan2(Math.sin(d), Math.cos(d));
+  const a = ai.a0 + d * ease(Math.min(1, ai.t / 0.9));
+  aimDir = { x: Math.cos(a), z: Math.sin(a) };
+  aiPull = ai.t < 0.9 ? 0 : ease(Math.min(1, (ai.t - 0.9) / 0.6)) * ai.p;
+  if (ai.t > 1.7) { power = ai.p; aiPull = 0; ai = null; fire(); power = 0; }
+}
+function win() {
+  state = 'won';
+  if (mode === 'vs') {
+    $('#oT').textContent = tr(score.me > score.ai ? 'youWin' : 'aiWin');
+    $('#oP').textContent = tr('scoreP', score.me + ' - ' + score.ai);
+    $('#oB').textContent = tr('again'); $('#ov').style.display = 'flex'; hud(); return;
+  }
+  const rec = !best || shots < best;
+  if (rec) { best = shots; try { localStorage.setItem(BEST_KEY, shots); } catch (e) {} }
+  hud();
+  $('#oT').textContent = tr('win'); $('#oP').textContent = tr('winP', shots) + (rec ? tr('record') : '');
+  $('#oB').textContent = tr('again'); $('#ov').style.display = 'flex';
+}
+
+/* ---------- main loop ---------- */
+let last = performance.now(), acc = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (state === 'aiAim' && ai) runAI(dt);
+  if (state === 'rolling') {
+    acc += dt; const h = 1 / 240;
+    while (acc >= h) { stepPhysics(h); acc -= h; }
+    const moving = balls.some(b => b.on && (b.sink || b.vx || b.vz));
+    if (!moving) endShot();
+  }
+  syncMeshes(dt);
+  camT += ((viewTop ? 1 : 0) - camT) * Math.min(1, dt * 6); placeCamera();
+
+  const showAim = state === 'aim' || state === 'aiAim';
+  cue.visible = showAim; aimLine.visible = ghost.visible = state === 'aim';
+  $('#pow').style.opacity = dragging ? 1 : 0; $('#pow i').style.width = (power * 100) + '%';
+  if (showAim) {
+    const pull = dragging ? power * 2.4 : state === 'aiAim' ? aiPull * 2.4 : 0.1 * Math.sin(now / 350) + 0.1;
+    cue.position.set(cueBall.x - aimDir.x * (R + 0.12 + pull), R + 0.02, cueBall.z - aimDir.z * (R + 0.12 + pull));
+    cue.rotation.y = Math.atan2(-aimDir.z, aimDir.x);
+    const { t, hitBall } = aimTarget();
+    const p = lineGeo.attributes.position;
+    p.setXYZ(0, cueBall.x, R, cueBall.z); p.setXYZ(1, cueBall.x + aimDir.x * t, R, cueBall.z + aimDir.z * t);
+    p.needsUpdate = true;
+    ghost.position.set(cueBall.x + aimDir.x * t, R, cueBall.z + aimDir.z * t);
+    ghost.material.color.setHex(hitBall ? 0xffcf3f : 0xffffff);
+  }
+  renderer.render(scene, camera);
+}
+
+applyLang(); rack(); placeCamera(); showMenu();
+requestAnimationFrame(frame);
+<\/script>
+</body>
+</html>
+</script>
 <script>
 /* =====================================================================
    SCRIPT
@@ -2668,13 +3609,14 @@ class I18n {
       'hub.search': 'Search games…', 'hub.allGames': 'All games', 'hub.noMatch': 'No games match your search.',
       'hub.menu': '← Menu', 'hub.resetSave': 'Reset save', 'hub.footer': "Arcade Hub · saves live in your browser's localStorage",
       'hub.new': 'New', 'hub.summary': 'Best round {best} · ★ {stars}',
-      'genre.all': 'All', 'genre.luck': 'Luck', 'genre.dice': 'Dice', 'genre.push': 'Push your luck', 'genre.strategy': 'Strategy', 'genre.action': 'Action', 'genre.cards': 'Cards',
+      'genre.all': 'All', 'genre.luck': 'Luck', 'genre.dice': 'Dice', 'genre.push': 'Push your luck', 'genre.strategy': 'Strategy', 'genre.action': 'Action', 'genre.cards': 'Cards', 'genre.sports': 'Sports',
       'embed.hint': 'Click inside the game to use the keyboard. It has its own sound and language buttons.', 'embed.full': 'Fullscreen',
-      'td.title': 'Tower Defense Lite', 'td.desc': 'Build arrow, cannon and frost towers to hold off 5 waves. Random upgrades after each wave, and some are cursed.',
+      'td.title': 'Tower Defense Lite', 'td.desc': 'Tower defense campaign: 8 levels with their own maps and waves. Armored, fast, flying and healing enemies each need the right tower. Endless mode after the campaign.', 'td.best': 'Best level {n}', 'td.stars': '★ {n}/24 stars',
       'sm.title': 'Spider-Man Demo', 'sm.desc': 'A one-level pixel platformer: run, jump the gaps, punch the thugs and beat the boss.',
+      'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly pool table. Drag back to aim and set power, then pot all nine balls in as few shots as you can. Scratches cost 2 shots.',
       'ss.title': 'Space Shooter', 'ss.desc': 'Drag to fly while the ship fires on its own. Six random waves, a boss, and power-ups (one is a trap).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Play poker hands to beat rising targets. Buy jokers, level up hands, and survive nerfs and cursed jokers.',
-      'ss.best': 'Best score {n}', 'pp.best': 'Best level {n}',
+      'bp.best': 'Best {n} shots', 'ss.best': 'Best score {n}', 'pp.best': 'Best level {n}',
       'saves.title': 'Save data', 'saves.intro': 'Everything is stored locally in this browser. Export a backup to move it elsewhere.',
       'saves.export': '⬇ Export', 'saves.import': '⬆ Import', 'saves.wipe': 'Delete all', 'saves.done': 'Done', 'saves.delete': 'Delete',
       'saves.empty': 'No saved data yet. Play a game!', 'saves.confirmWipe': 'Delete ALL save data?',
@@ -2692,7 +3634,12 @@ class I18n {
 
       'sc.title': 'Scratch Lotto', 'sc.desc': 'Scratch the foil, match symbols and hit the coin goal each round. Upgrades bend the odds.',
       'sc.logo1': 'SCRATCH', 'sc.logo2': 'LOTTO',
-      'sc.blurb': 'Buy a ticket, <b>scratch the foil</b>, and match <b>3 or more</b> of the same symbol to win. Use every ticket in the round and still hold enough coins to hit the goal.',
+      'sc.blurb': 'Buy a ticket, <b>scratch the foil by hand</b>, and match <b>3 or more</b> of the same symbol to win. You start with just a fingernail, so upgrade your scratching tool to go faster. Use every ticket in the round and still hold enough coins to hit the goal.',
+      'sc.tool.nail': 'Fingernail', 'sc.tool.coin': 'Coin', 'sc.tool.lucky': 'Lucky coin', 'sc.tool.golden': 'Golden scraper',
+      'sc.toolLabel': 'Scratching with: {tool}', 'sc.charges': '{n} left', 'sc.freeSwipe': 'Lucky! This ticket came with a free Reveal all',
+      'sc.up.tool.name': 'Better scraper', 'sc.up.tool.desc': 'Next scratching tool: a wider stroke, and less foil to clear',
+      'sc.up.swipe.name': 'Lucky swipe', 'sc.up.swipe.desc': '+1 Reveal all charge every round',
+      'sc.perk.tool.name': 'Pocket coin', 'sc.perk.tool.desc': 'Start every run scratching with a coin instead of a fingernail',
       'sc.goal': 'Coins to hold', 'sc.coins': 'Coins', 'sc.tickets': 'Tickets', 'sc.biggest': 'Biggest win', 'sc.scratched': 'Scratched',
       'sc.bonus': '+{n} coins (stipend)', 'sc.bonusInterest': '+{n} coins (stipend & interest)',
       'sc.tier.bronze': 'Bronze', 'sc.tier.silver': 'Silver', 'sc.tier.gold': 'Gold',
@@ -2775,13 +3722,14 @@ class I18n {
       'hub.search': 'Buscar juegos…', 'hub.allGames': 'Todos los juegos', 'hub.noMatch': 'Ningún juego coincide con tu búsqueda.',
       'hub.menu': '← Menú', 'hub.resetSave': 'Borrar progreso', 'hub.footer': 'Arcade Hub · las partidas se guardan en el localStorage de tu navegador',
       'hub.new': 'Nuevo', 'hub.summary': 'Mejor ronda {best} · ★ {stars}',
-      'genre.all': 'Todos', 'genre.luck': 'Suerte', 'genre.dice': 'Dados', 'genre.push': 'Arriesgar', 'genre.strategy': 'Estrategia', 'genre.action': 'Acción', 'genre.cards': 'Cartas',
+      'genre.all': 'Todos', 'genre.luck': 'Suerte', 'genre.dice': 'Dados', 'genre.push': 'Arriesgar', 'genre.strategy': 'Estrategia', 'genre.action': 'Acción', 'genre.cards': 'Cartas', 'genre.sports': 'Deportes',
       'embed.hint': 'Haz clic dentro del juego para usar el teclado. Tiene sus propios botones de sonido e idioma.', 'embed.full': 'Pantalla completa',
-      'td.title': 'Defensa de Torres Lite', 'td.desc': 'Construye torres de flechas, cañón y hielo para resistir 5 oleadas. Mejoras aleatorias tras cada oleada, y algunas están malditas.',
+      'td.title': 'Defensa de Torres Lite', 'td.desc': 'Campaña de defensa de torres: 8 niveles con mapas y oleadas propias. Enemigos blindados, rápidos, voladores y sanadores necesitan la torre adecuada. Modo infinito al terminar la campaña.', 'td.best': 'Mejor nivel {n}', 'td.stars': '★ {n}/24 estrellas',
       'sm.title': 'Demo de Spider-Man', 'sm.desc': 'Un plataformas pixelado de un nivel: corre, salta los huecos, golpea a los matones y derrota al jefe.',
+      'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly. Arrastra hacia atrás para apuntar y dar fuerza, y mete las nueve bolas con los menos tiros posibles. Una falta cuesta 2 tiros.',
       'ss.title': 'Shooter Espacial', 'ss.desc': 'Arrastra para volar mientras la nave dispara sola. Seis oleadas aleatorias, un jefe y power-ups (uno es una trampa).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Juega manos de póker para superar objetivos cada vez más altos. Compra comodines, mejora manos y sobrevive a nerfs y comodines malditos.',
-      'ss.best': 'Récord {n}', 'pp.best': 'Mejor nivel {n}',
+      'bp.best': 'Mejor {n} tiros', 'ss.best': 'Récord {n}', 'pp.best': 'Mejor nivel {n}',
       'saves.title': 'Datos guardados', 'saves.intro': 'Todo se guarda localmente en este navegador. Exporta una copia de seguridad para llevarla a otro sitio.',
       'saves.export': '⬇ Exportar', 'saves.import': '⬆ Importar', 'saves.wipe': 'Borrar todo', 'saves.done': 'Listo', 'saves.delete': 'Borrar',
       'saves.empty': 'Aún no hay datos guardados. ¡Juega una partida!', 'saves.confirmWipe': '¿Borrar TODOS los datos guardados?',
@@ -2799,7 +3747,12 @@ class I18n {
 
       'sc.title': 'Rasca y Gana', 'sc.desc': 'Rasca la lámina, combina símbolos y alcanza la meta de monedas en cada ronda. Las mejoras inclinan la suerte.',
       'sc.logo1': 'RASCA', 'sc.logo2': 'Y GANA',
-      'sc.blurb': 'Compra un boleto, <b>rasca la lámina</b> y consigue <b>3 o más</b> símbolos iguales para ganar. Usa todos los boletos de la ronda y conserva suficientes monedas para alcanzar la meta.',
+      'sc.blurb': 'Compra un boleto, <b>rasca la lámina a mano</b> y consigue <b>3 o más</b> símbolos iguales para ganar. Empiezas solo con la uña, así que mejora tu herramienta para rascar más rápido. Usa todos los boletos de la ronda y conserva suficientes monedas para alcanzar la meta.',
+      'sc.tool.nail': 'Uña', 'sc.tool.coin': 'Moneda', 'sc.tool.lucky': 'Moneda de la suerte', 'sc.tool.golden': 'Raspador dorado',
+      'sc.toolLabel': 'Rascas con: {tool}', 'sc.charges': 'quedan {n}', 'sc.freeSwipe': '¡Suerte! Este boleto trae un Destapar todo gratis',
+      'sc.up.tool.name': 'Mejor raspador', 'sc.up.tool.desc': 'Siguiente herramienta: trazo más ancho y menos lámina por quitar',
+      'sc.up.swipe.name': 'Barrido de suerte', 'sc.up.swipe.desc': '+1 carga de Destapar todo cada ronda',
+      'sc.perk.tool.name': 'Moneda de bolsillo', 'sc.perk.tool.desc': 'Empieza cada partida rascando con una moneda en vez de la uña',
       'sc.goal': 'Monedas a conservar', 'sc.coins': 'Monedas', 'sc.tickets': 'Boletos', 'sc.biggest': 'Mayor premio', 'sc.scratched': 'Rascados',
       'sc.bonus': '+{n} monedas (paga)', 'sc.bonusInterest': '+{n} monedas (paga e intereses)',
       'sc.tier.bronze': 'Bronce', 'sc.tier.silver': 'Plata', 'sc.tier.gold': 'Oro',
@@ -3016,6 +3969,7 @@ class Game {
   static saveBytes(store, id){ return store.info(id)?.bytes || 0 }
   static clearSave(store, id){ store.clear(id) }
   static rawKeys(){ return [] }
+  static embedded(){ return false }
   static summary(store, id){ return '' }
   static thumb(){ return '' }
 }
@@ -3248,7 +4202,18 @@ class ScratchLotto extends RunGame {
   static CELLS = 6;
   static GOAL_BASE = 8;
   static GOAL_GROWTH = 1.5;
-  static REVEAL_AT = 0.4;    // fraction of foil scratched before a spot counts as revealed
+  /**
+   * What you scratch with. Early runs start with a fingernail: a thin stroke, and most of the foil must
+   * come off before a spot counts as revealed. Upgrades (and a perk) move you up the list.
+   *   brush  = stroke width on the 120px foil canvas;  reveal = fraction of foil to clear
+   */
+  static TOOLS = [
+    { id: 'nail',   icon: '💅', brush: 16, reveal: 0.55 },
+    { id: 'coin',   icon: '🪙', brush: 22, reveal: 0.48 },
+    { id: 'lucky',  icon: '🏅', brush: 28, reveal: 0.42 },
+    { id: 'golden', icon: '✨', brush: 38, reveal: 0.35 },
+  ];
+  static SWIPE_CHANCE = 0.08;  // chance a bought ticket comes with a free "Reveal all" charge
 
   get key(){ return 'sc' }
   get theme(){ return 'scratch' }
@@ -3266,12 +4231,17 @@ class ScratchLotto extends RunGame {
     { id: 'luck',    icon: '🍀', max: 3, base: 3,  step: 2 },
     { id: 'silver',  icon: '🥈', max: 1, base: 4,  step: 0 },
     { id: 'gold',    icon: '🥇', max: 1, base: 10, step: 0 },
+    { id: 'tool',    icon: '🪙', max: 1, base: 3,  step: 0 },
   ] }
   upgradeDefs(){ return [
     { id: 'clover',   icon: '🍀', max: 3 }, { id: 'gem',    icon: '💎', max: 3 }, { id: 'seven',    icon: '7️⃣', max: 3 },
     { id: 'joker',    icon: '🃏', max: 3 }, { id: 'pay',    icon: '💰', max: 4 }, { id: 'ticket',   icon: '🎟️', max: 3 },
     { id: 'refund',   icon: '↩️', max: 2 }, { id: 'interest', icon: '🏦', max: 3 }, { id: 'discount', icon: '📉', max: 3 },
+    // tool tiers left after the perk, so the card never offers an upgrade past the best tool
+    { id: 'tool',     icon: '🪙', max: ScratchLotto.TOOLS.length - 1 - this.perkLevel('tool') },
+    { id: 'swipe',    icon: '🧽', max: 2 },
   ] }
+  tool(){ const T = ScratchLotto.TOOLS; return T[Math.min(T.length - 1, this.perkLevel('tool') + this.level('tool'))] }
   defaults(){ const d = super.defaults(); d.meta.biggest = 0; d.meta.scratched = 0; return d }
   extraBadges(m){ return this.badge(Art.icon('trophy'), this.tr('biggest'), Fmt.num(m.biggest)) + this.badge(Art.icon('ticket'), this.tr('scratched'), Fmt.num(m.scratched)) }
   tierName(id){ return this.tr(`tier.${id}`) }
@@ -3308,8 +4278,11 @@ class ScratchLotto extends RunGame {
   }
 
   /* ---- run rules ---- */
-  newRun(){ return { coins: 20 + 10 * this.perkLevel('coins'), tickets: 0, ticket: null, biggest: 0 } }
-  startRound(run){ run.tickets = 4 + this.perkLevel('tickets') + this.level('ticket'); run.ticket = null }
+  newRun(){ return { coins: 20 + 10 * this.perkLevel('coins'), tickets: 0, ticket: null, biggest: 0, swipes: 0 } }
+  startRound(run){
+    run.tickets = 4 + this.perkLevel('tickets') + this.level('ticket'); run.ticket = null;
+    run.swipes = (run.swipes || 0) + this.level('swipe');   // "Lucky swipe" upgrade: Reveal-all charges each round
+  }
   goal(run){
     return Math.round(ScratchLotto.GOAL_BASE * ScratchLotto.GOAL_GROWTH ** (run.round - 1) * (1 - 0.1 * this.level('discount')));
   }
@@ -3334,7 +4307,12 @@ class ScratchLotto extends RunGame {
   /* ---- actions ---- */
   playAct(name, d, run){
     if (name === 'buy') return this.buy(run, d.tier);
-    if (name === 'scratchall') return this.reveal(run, run.ticket.rev.map((r, i) => i).filter(i => !run.ticket.rev[i]));
+    if (name === 'scratchall'){   // only with a charge; otherwise every spot is scratched by hand
+      const tk = run.ticket;
+      if (!tk || tk.paid !== null || !(run.swipes > 0)) return;
+      run.swipes--;
+      return this.reveal(run, tk.rev.map((r, i) => i).filter(i => !tk.rev[i]));
+    }
     if (name === 'finish') return this.finishRound();
   }
   buy(run, tierId){
@@ -3346,7 +4324,9 @@ class ScratchLotto extends RunGame {
       tier: tier.id, paid: null, wins: [], refund: 0, serial: String(Rng.int(0, 999999)).padStart(6, '0'),
       cells: ScratchLotto.draw(tier, run.upgrades, this.perkLevel('luck')),
       rev: Array(ScratchLotto.CELLS).fill(false),
+      freeSwipe: Rng.chance(ScratchLotto.SWIPE_CHANCE),
     };
+    if (run.ticket.freeSwipe) run.swipes = (run.swipes || 0) + 1;
     this.commit();
   }
   /** Reveals spots. Partial reveals patch the DOM so other half-scratched foils survive. */
@@ -3375,9 +4355,18 @@ class ScratchLotto extends RunGame {
   }
 
   /* ---- scratch foil (canvas) ---- */
-  afterRender(){ this.root.querySelectorAll('canvas.foil').forEach(c => this.initFoil(c)) }
-  initFoil(canvas){
+  afterRender(){
+    const tool = this.tool();
+    this.root.querySelectorAll('canvas.foil').forEach(c => this.initFoil(c, tool));
+  }
+  /** Mouse cursor showing the current tool (the emoji drawn into a tiny SVG). */
+  static cursor(tool){
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text x="2" y="26" font-size="24">${tool.icon}</text></svg>`;
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}") 6 26, crosshair`;
+  }
+  initFoil(canvas, tool){
     const ctx = canvas.getContext('2d', { willReadFrequently: true }), W = canvas.width, H = canvas.height;
+    canvas.style.cursor = ScratchLotto.cursor(tool);
     ctx.fillStyle = '#c3cad5'; ctx.fillRect(0, 0, W, H);
     ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 7;
     for (let x = -H; x < W; x += 20){ ctx.beginPath(); ctx.moveTo(x, H); ctx.lineTo(x + H, 0); ctx.stroke() }
@@ -3392,12 +4381,12 @@ class ScratchLotto extends RunGame {
       return n / total;
     };
     const check = () => {
-      if (canvas.dataset.done || cleared() < ScratchLotto.REVEAL_AT) return;
+      if (canvas.dataset.done || cleared() < tool.reveal) return;
       canvas.dataset.done = '1';
       if (this.data.run?.phase === 'play') this.reveal(this.data.run, [Number(canvas.dataset.i)]);
     };
     const scratch = p => {
-      ctx.globalCompositeOperation = 'destination-out'; ctx.strokeStyle = '#000'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 30;
+      ctx.globalCompositeOperation = 'destination-out'; ctx.strokeStyle = '#000'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = tool.brush;
       ctx.beginPath(); ctx.moveTo((last || p).x, (last || p).y); ctx.lineTo(p.x + 0.01, p.y); ctx.stroke();
       last = p;
       if (++strokes % 5 === 0) check();
@@ -3434,11 +4423,17 @@ class ScratchLotto extends RunGame {
     const settled = !tk || tk.paid !== null, over = this.roundOver(run);
 
     let msg = `<div class="sc-msg">${this.tr('pick')}</div>`;
-    if (tk && !settled) msg = `<div class="sc-msg">${this.tr('drag')}</div>`;
+    if (tk && !settled) msg = tk.freeSwipe && !tk.rev.some(Boolean)
+      ? `<div class="sc-msg win">${this.tr('freeSwipe')}</div>` : `<div class="sc-msg">${this.tr('drag')}</div>`;
     else if (tk) msg = tk.paid ? `<div class="sc-msg win">${this.tr('won', { n: Fmt.num(tk.paid) })}</div>`
       : `<div class="sc-msg lose">${this.tr('noMatch')}${tk.refund ? this.tr('refunded', { n: tk.refund }) : ''}</div>`;
     let action = '';
-    if (tk && !settled) action = `<button class="g-btn alt" data-act="scratchall">${this.tr('revealAll')}</button>`;
+    if (tk && !settled){
+      // Scratching is by hand; "Reveal all" only shows while you hold a charge.
+      const tool = this.tool();
+      action = `<div class="sc-actions"><span class="sc-tool">${tool.icon} ${this.tr('toolLabel', { tool: this.tr('tool.' + tool.id) })}</span>
+        ${run.swipes > 0 ? `<button class="g-btn alt" data-act="scratchall">🧽 ${this.tr('revealAll')}<small>${this.tr('charges', { n: run.swipes })}</small></button>` : ''}</div>`;
+    }
     else if (over) action = `<button class="g-btn big" data-act="finish">${this.tr('cashIn')}</button>`;
     const pop = this.fx === 'win' ? `<div class="g-pop">${Art.icon('coin')} +${Fmt.num(tk.paid)}</div>` : '';
 
@@ -3446,7 +4441,7 @@ class ScratchLotto extends RunGame {
       const locked = !this.tierUnlocked(tier);
       const disabled = locked || !settled || over || run.coins < tier.cost;
       return `<button class="stub tier-${tier.id}" data-act="buy" data-tier="${tier.id}" ${disabled ? 'disabled' : ''}>
-        <div><b>${this.tierName(tier.id)}</b><small>${locked ? this.tr('unlock') : this.tr('pays', { mult: tier.mult })}</small></div><span class="price">${tier.cost}</span></button>`;
+        <div><b>${locked ? '🔒 ' : ''}${this.tierName(tier.id)}</b><small>${locked ? this.tr('unlock') : this.tr('pays', { mult: tier.mult })}</small></div><span class="price">${tier.cost}</span></button>`;
     }).join('');
     const left = run.tickets ? Array.from({ length: run.tickets }, () => Art.icon('ticket')).join('') : `<span class="g-muted">${this.tr('noTickets')}</span>`;
     const pays = [...S.SYMBOLS, ...(run.upgrades.joker ? [{ id: 'joker', value: this.tr('wild') }] : [])]
@@ -3455,10 +4450,10 @@ class ScratchLotto extends RunGame {
     return `<div class="sc-play">
       <div class="sc-stage">${pop}${this.viewTicket(run)}${msg}${action}</div>
       <div class="booth">
-        <div class="g-panel"><h3>${this.tr('booth')}</h3><div class="stubs" style="margin-top:12px">${stubs}</div>
-          <h3 style="margin:16px 0 6px">${this.tr('left')}</h3><div class="tickets-left">${left}</div></div>
-        <div class="g-panel"><h3>${this.tr('board')}</h3><div class="paytable" style="margin-top:10px">${pays}</div>
-          <p class="g-muted" style="font-size:.78rem;margin-top:10px;font-weight:500">${this.tr('boardHint')}</p></div>
+        <div class="g-panel"><h3>${this.tr('booth')}</h3><div class="stubs">${stubs}</div>
+          <div class="left-box"><h3>${this.tr('left')}</h3><div class="tickets-left">${left}</div></div></div>
+        <div class="g-panel"><h3>${this.tr('board')}</h3><div class="paytable">${pays}</div>
+          <p class="g-muted board-hint">${this.tr('boardHint')}</p></div>
       </div></div>`;
   }
 }
@@ -3795,16 +4790,27 @@ class EmbeddedGame extends Game {
     const cfg = this.constructor.cfg;
     try { if (cfg.langKey) localStorage.setItem(cfg.langKey, I18n.lang) } catch {}   // open in the hub's language
     this.root.innerHTML = `<div class="embed">
-      <div class="embed-bar"><span>${t('embed.hint')}</span><button class="btn" data-act="fullscreen">⛶ ${t('embed.full')}</button></div>
+      <div class="embed-bar">${t('embed.hint')}</div>
       <iframe class="embed-frame" title="${t(cfg.key + '.title')}" allow="fullscreen; autoplay"></iframe></div>`;
     this.frame = this.root.querySelector('iframe');
-    this.frame.addEventListener('load', () => this.frame.contentWindow?.focus());
+    // Fullscreen lives in the hub's title row (not offered where the browser can't do it, e.g. iPhone Safari).
+    this.tools = document.getElementById('gameTools');
+    if (this.tools && document.fullscreenEnabled){
+      this.tools.innerHTML = `<button class="btn">⛶ <span class="lbl">${t('embed.full')}</span></button>`;
+      this.tools.firstChild.onclick = () => this.frame.requestFullscreen?.().then(() => this.frame.contentWindow?.focus()).catch(() => {});
+    }
+    this.frame.addEventListener('load', () => {
+      const win = this.frame.contentWindow;
+      win?.focus();
+      // These pages size their canvas once at load; re-run that after their pixel font arrives and the layout settles.
+      const relayout = () => win?.dispatchEvent(new Event('resize'));
+      win?.document.fonts?.ready.then(relayout);
+      setTimeout(relayout, 400);
+    });
     this.frame.srcdoc = this.constructor.source();
-    this.root.addEventListener('click', this.handler);
   }
-  act(name){
-    if (name === 'fullscreen') this.frame.requestFullscreen?.().then(() => this.frame.contentWindow?.focus()).catch(() => {});
-  }
+  destroy(){ if (this.tools) this.tools.innerHTML = ''; this.root.innerHTML = '' }
+  static embedded(){ return true }
   static savesData(){ return this.cfg.saveKeys.length > 0 }
   static hasSave(store){ return this.cfg.saveKeys.some(k => store.rawGet(k) !== null) }
   static saveBytes(store){ return this.cfg.saveKeys.reduce((n, k) => n + (store.rawGet(k)?.length || 0), 0) }
@@ -3835,6 +4841,12 @@ const EMBED_THUMBS = {
       <rect x="18" y="8" width="8" height="6" fill="#5be37d" stroke="#000" stroke-width=".7"/><rect x="64" y="12" width="8" height="6" fill="#5be37d" stroke="#000" stroke-width=".7"/>
       <rect x="40" y="4" width="10" height="5" fill="#a66bd6" stroke="#000" stroke-width=".7"/><rect x="44.5" y="20" width="1" height="4" fill="#5ee7ff"/></svg>
       ${Art.pixel(Art.mirror(['....W', '...CW', '...CC', '..CCC', 'B.CCW', 'BCCCC', 'BCCRC', 'BC.RY']), { W: '#fff', C: '#5ee7ff', B: '#2457d6', R: '#d6243a', Y: '#ffcf3f' }, 'ship')}</div>`,
+  bp: `<div class="th" style="background:linear-gradient(#2a2438,#14171f)"><svg class="full" viewBox="0 0 90 56" preserveAspectRatio="xMidYMid slice">
+      <path d="M8 40L20 14H70L82 40Z" fill="#6b3f22"/><path d="M13 38L23 17H67L77 38Z" fill="#1f8a55"/><path d="M13 38L23 17H45L40 38Z" fill="#26a066"/>
+      <path d="M8 40H82V46H8Z" fill="#4a2a15"/>
+      <path d="M52 22L56 20L60 22L58 26L54 26Z" fill="#d6243a"/><path d="M58 26L62 24L66 26L64 30L60 30Z" fill="#f2c500"/><path d="M46 26L50 24L54 26L52 30L48 30Z" fill="#1f5fd6"/>
+      <path d="M26 30L30 28L34 30L32 34L28 34Z" fill="#f4f4ee"/><path d="M14 44L40 33" stroke="#e0b878" stroke-width="1.6"/>
+      <circle cx="23" cy="17" r="2.4" fill="#0a0a0c"/><circle cx="67" cy="17" r="2.4" fill="#0a0a0c"/></svg></div>`,
   pp: `<div class="th th-pp">${[['A', 'H', '#d62839'], ['K', 'S', '#2b2d42'], ['Q', 'D', '#f08a24']].map(([r, s, c]) => `<div class="th-card" style="color:${c}">${r}${Art.pixel({
         H: ['.##.##.', '#######', '#######', '#######', '.#####.', '..###..', '...#...'],
         S: ['...#...', '..###..', '.#####.', '#######', '#######', '...#...', '.#####.'],
@@ -3852,7 +4864,14 @@ const CATALOG = [
       id: 'pixel-poker', key: 'pp', langKey: 'pixelPokerLang', saveKeys: ['pixelPokerBest'], thumb: EMBED_THUMBS.pp,
       summary: get => get('pixelPokerBest') ? t('pp.best', { n: get('pixelPokerBest') }) : '' }) },
   { id: 'tower-defense', icon: '🏰', genre: 'strategy', GameClass: EmbeddedGame.define({
-      id: 'tower-defense', key: 'td', langKey: 'towerLiteLang', saveKeys: [], thumb: EMBED_THUMBS.td }) },
+      id: 'tower-defense', key: 'td', langKey: 'towerLiteLang', saveKeys: ['towerLiteStars', 'towerLiteBest'], thumb: EMBED_THUMBS.td,
+      summary: get => {
+        const stars = (get('towerLiteStars') || '').split(',').reduce((n, v) => n + (+v || 0), 0);
+        return stars ? t('td.stars', { n: stars }) : get('towerLiteBest') ? t('td.best', { n: get('towerLiteBest') }) : '';
+      } }) },
+  { id: 'low-poly-pool', icon: '🎱', genre: 'sports', GameClass: EmbeddedGame.define({
+      id: 'low-poly-pool', key: 'bp', langKey: 'lowPolyPoolLang', saveKeys: ['lowPolyPoolBest'], thumb: EMBED_THUMBS.bp,
+      summary: get => get('lowPolyPoolBest') ? t('bp.best', { n: get('lowPolyPoolBest') }) : '' }) },
   { id: 'space-shooter', icon: '🚀', genre: 'action', GameClass: EmbeddedGame.define({
       id: 'space-shooter', key: 'ss', langKey: 'spaceShooterLang', saveKeys: ['spaceShooterHi'], thumb: EMBED_THUMBS.ss,
       summary: get => +get('spaceShooterHi') ? t('ss.best', { n: Fmt.num(+get('spaceShooterHi')) }) : '' }) },
@@ -3941,6 +4960,9 @@ class Hub {
     const entry = this.catalog.find(g => g.id === id);
     this.$('menu').classList.toggle('active', !entry);
     this.$('game').classList.toggle('active', !!entry);
+    // Layout hooks: in-game hides the footer (and the top bar on phones); embed-mode makes the iframe fill the screen.
+    document.body.classList.toggle('in-game', !!entry);
+    document.body.classList.toggle('embed-mode', !!entry?.GameClass.embedded());
     if (entry) this.openGame(entry); else { this.renderGrid(); this.renderStats() }
     scrollTo(0, 0);
   }
