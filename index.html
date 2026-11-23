@@ -239,13 +239,49 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .sc-logo-syms svg{width:54px;height:54px;animation:pop .5s both}
 .sc-logo-syms svg:nth-child(2){animation-delay:.1s;transform:translateY(-8px)}
 .sc-logo-syms svg:nth-child(3){animation-delay:.2s}
-.sc-play{display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start}
+.sc-play{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
 .sc-stage{display:grid;justify-items:center;gap:16px;padding:6px 0 10px;position:relative}
 .sc-msg{font-size:1.35rem;font-weight:700;min-height:1.6em;text-align:center}
 .sc-actions{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
 .sc-tool{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.3);border-radius:99px;padding:6px 14px;font-weight:600;font-size:.9rem}
 .sc-msg.win{color:var(--g-accent)}
 .sc-msg.lose{color:var(--g-muted)}
+.sc2 .sc-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.sc-coins{display:flex;align-items:center;gap:8px;font-size:1.7rem;font-weight:700;background:rgba(0,0,0,.3);border-radius:14px;padding:6px 16px;color:var(--g-accent)}
+.sc-coins svg{width:30px;height:30px}
+.sc-goal{flex:1;min-width:220px}
+.sc-goal.done{color:var(--g-good);font-size:1.1rem}
+.sc-next{color:var(--g-muted);font-size:.9rem;margin:2px 0 12px}
+.sc-next b{color:var(--g-ink)}
+.spots.c4{grid-template-columns:repeat(4,1fr)}
+.spots.sc-winrow{grid-template-columns:repeat(2,1fr);padding:4px 22% 6px}
+.sc-label{text-align:center;font-size:.7rem;letter-spacing:.2em;font-weight:700;color:var(--tc2);padding-top:6px}
+.sc-num{display:grid;place-items:center;line-height:1}
+.sc-num b{font-size:1.5rem;color:#2a1052}
+.sc-num.big b{font-size:1.9rem;color:#e8344e}
+.sc-num small{font-size:.75rem;color:#16a34a;font-weight:700;margin-top:4px}
+.sc-mult{font-size:1.9rem;font-weight:800;color:#e8344e;text-shadow:0 2px 0 #ffd23f}
+.sc-mult.sm{font-size:1.1rem;min-width:30px;text-align:center}
+.sc-num-ico{width:30px;text-align:center;font-weight:800;color:var(--g-accent)}
+.stub.sel{outline:3px solid var(--g-accent);outline-offset:2px}
+.stub.locked{filter:saturate(.35)}
+.stub.locked.next{filter:none;animation:glow .9s ease-in-out infinite alternate}
+.stub.locked:not(button){opacity:.5}
+.stub small.ret{margin-top:2px}
+.stub small.ret.up{color:#b8ffcf}
+.stub small.ret.down{color:#ffd0d8}
+.sc-shop{display:grid;gap:8px}
+.sc-item{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;background:rgba(0,0,0,.25);border-radius:10px;padding:6px 8px}
+.sc-item .ico{font-size:1.3rem;text-align:center}
+.sc-item b{font-size:.9rem}
+.sc-item .lv{font-size:.72rem;color:var(--g-accent);font-weight:700}
+.sc-item p{margin:2px 0 0;font-size:.75rem;color:var(--g-muted);line-height:1.3}
+.sc-item .g-btn{white-space:nowrap}
+.sc-max{font-weight:700;font-size:.8rem}
+.sc-crown{background:linear-gradient(90deg,rgba(255,204,51,.28),rgba(0,0,0,.25));border:2px solid var(--g-accent)}
+.sc-stats{font-size:.78rem;text-align:center;margin:4px 0 0}
+.sc-link{background:none;border:0;color:var(--g-muted);text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+.g-pop.jackpot{color:var(--g-accent);font-size:2.2rem;text-shadow:0 3px 0 #e8344e}
 .ticket{--tc:#d4823b;--tc2:#8a4f1c;width:min(400px,100%);background:#fff8e7;color:#2a1052;border-radius:16px;position:relative;
   box-shadow:0 10px 0 rgba(0,0,0,.3);transform:rotate(-1.2deg);animation:deal .45s both}
 .ticket::before,.ticket::after{content:"";position:absolute;top:96px;width:24px;height:24px;border-radius:50%;background:var(--g-bg);z-index:2}
@@ -314,6 +350,16 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .odds-head{color:var(--g-muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
 .odds-sum{display:flex;justify-content:space-between;font-size:.85rem;padding:4px 6px;margin-top:2px;border-top:1px solid rgba(255,255,255,.1)}
 .odds-note{font-size:.72rem;margin-top:8px;font-weight:500}
+.pt{display:grid;gap:5px;margin-top:10px}
+.pt-row{display:grid;grid-template-columns:28px 1fr 48px 48px 66px;align-items:center;gap:6px;background:rgba(0,0,0,.25);border-radius:10px;padding:3px 10px 3px 6px;font-weight:600;font-size:.85rem}
+.pt-row svg{width:26px;height:26px}
+.pt-row span{color:var(--g-muted);font-size:.75rem}
+.pt-row em{font-style:normal;text-align:right;color:#8fe3ff}
+.pt-row b{text-align:right;color:var(--g-accent)}
+.pt-head{background:none;padding-top:0;padding-bottom:0}
+.pt-head span{text-align:right;font-size:.62rem;text-transform:uppercase;letter-spacing:.06em}
+.pt-sum{display:flex;justify-content:space-between;font-size:.88rem;padding:4px 6px;margin-top:2px;border-top:1px solid rgba(255,255,255,.1)}
+@media(max-width:600px){.pt-row{grid-template-columns:26px repeat(3,1fr)}.pt-row .lab{display:none}}
 .odds-strip{display:none;flex-wrap:wrap;justify-content:center;gap:5px;max-width:100%}
 .odds-strip span{display:inline-flex;align-items:center;gap:3px;background:rgba(0,0,0,.28);border-radius:99px;padding:2px 9px 2px 4px;font-size:.78rem;font-weight:700}
 .odds-strip svg{width:20px;height:20px}
@@ -4235,40 +4281,32 @@ class I18n {
       'shell.starsEarned': 'stars earned', 'shell.cleared': 'Rounds cleared', 'shell.newBest': 'NEW BEST!', 'shell.newRun': '▶ New run',
       'shell.level': 'level {n}',
 
-      'sc.title': 'Scratch Lotto', 'sc.desc': 'Scratch the foil, match symbols and hit the coin goal each round. Upgrades bend the odds.',
-      'sc.logo1': 'SCRATCH', 'sc.logo2': 'LOTTO',
-      'sc.blurb': 'Buy a ticket, <b>scratch the foil by hand</b>, and match <b>3 or more</b> of the same symbol to win. You start with just a fingernail, so upgrade your scratching tool to go faster. Use every ticket in the round and still hold enough coins to hit the goal.',
-      'sc.tool.nail': 'Fingernail', 'sc.tool.coin': 'Coin', 'sc.tool.lucky': 'Lucky coin', 'sc.tool.golden': 'Golden scraper',
-      'sc.toolLabel': 'Scratching with: {tool}', 'sc.charges': '{n} left', 'sc.freeSwipe': 'Lucky! This ticket came with a free Reveal all',
-      'sc.up.tool.name': 'Better scraper', 'sc.up.tool.desc': 'Next scratching tool: a wider stroke, and less foil to clear',
-      'sc.up.swipe.name': 'Lucky swipe', 'sc.up.swipe.desc': '+1 Reveal all charge every round',
-      'sc.perk.tool.name': 'Pocket coin', 'sc.perk.tool.desc': 'Start every run scratching with a coin instead of a fingernail',
-      'sc.goal': 'Coins to hold', 'sc.coins': 'Coins', 'sc.tickets': 'Tickets', 'sc.biggest': 'Biggest win', 'sc.scratched': 'Scratched',
-      'sc.bonus': '+{n} coins (stipend)', 'sc.bonusInterest': '+{n} coins (stipend & interest)',
-      'sc.tier.bronze': 'Bronze', 'sc.tier.silver': 'Silver', 'sc.tier.gold': 'Gold',
-      'sc.ticketOf': '{tier} TICKET', 'sc.ticketName': 'LUCKY LOTTO', 'sc.coinsShort': 'COINS', 'sc.ticketSub': 'MATCH 3 TO WIN · PAYS ×{mult}',
-      'sc.winner': 'WINNER!', 'sc.noLuck': 'NO LUCK', 'sc.empty': 'Buy a ticket from the booth to start scratching',
-      'sc.pick': 'Pick a ticket →', 'sc.drag': 'Drag across the silver to scratch!', 'sc.won': 'You won {n} coins!',
-      'sc.noMatch': 'No match', 'sc.refunded': ' · refunded {n}', 'sc.revealAll': 'Reveal all', 'sc.cashIn': 'Cash in round ▶',
-      'sc.unlock': '🔒 Unlock in perk shop', 'sc.pays': 'WINS PAY ×{mult}', 'sc.noTickets': 'No tickets left this round',
-      'sc.booth': 'Ticket booth', 'sc.left': 'Tickets left', 'sc.board': 'Prize board', 'sc.any': 'any', 'sc.wild': 'Wild',
-      'sc.odds': 'Your odds', 'sc.oddsSpot': 'Per spot', 'sc.oddsMatch': '3+ on ticket', 'sc.oddsWin': 'Ticket wins', 'sc.oddsAvg': 'Avg payout / cost',
-      'sc.oddsNote': 'Chances include your upgrades, luck perk and the ticket tier. Jokers count as wilds.',
-      'sc.boardHint': 'Each match beyond 3 pays again. Multiplied by the ticket tier.', 'sc.spot': 'Scratch spot {n}',
-      'sc.perk.coins.name': 'Deep pockets', 'sc.perk.coins.desc': 'Start each run with +10 coins',
-      'sc.perk.tickets.name': 'Bulk buyer', 'sc.perk.tickets.desc': '+1 ticket every round',
-      'sc.perk.luck.name': 'Lucky streak', 'sc.perk.luck.desc': 'Clovers, gems and sevens appear 15% more',
-      'sc.perk.silver.name': 'Silver tickets', 'sc.perk.silver.desc': 'Unlock Silver tickets (cost 12, pay ×3)',
-      'sc.perk.gold.name': 'Gold tickets', 'sc.perk.gold.desc': 'Unlock Gold tickets (cost 30, pay ×8)',
-      'sc.up.clover.name': 'Four-leaf', 'sc.up.clover.desc': 'Clovers appear much more often',
-      'sc.up.gem.name': 'Gem hunter', 'sc.up.gem.desc': 'Gems appear much more often',
-      'sc.up.seven.name': 'Lucky seven', 'sc.up.seven.desc': 'Sevens appear much more often',
-      'sc.up.joker.name': 'Wild star', 'sc.up.joker.desc': 'Adds wild stars that count as any symbol',
-      'sc.up.pay.name': 'Pay raise', 'sc.up.pay.desc': 'All payouts +25%',
-      'sc.up.ticket.name': 'Extra ticket', 'sc.up.ticket.desc': '+1 ticket each round',
-      'sc.up.refund.name': 'Refund', 'sc.up.refund.desc': 'Losing tickets refund 40% of their cost',
-      'sc.up.interest.name': 'Interest', 'sc.up.interest.desc': 'After a round: +1 coin per 5 held (max +5)',
-      'sc.up.discount.name': 'Easy goals', 'sc.up.discount.desc': 'Goals are 10% lower',
+      'sc.title': 'Scratch Lotto', 'sc.desc': 'Scratch tickets, win coins, then buy upgrades and bigger tickets. Five ticket types with huge prizes. Goal: the $1,000,000 Golden Crown.',
+      'sc.summary': '${n} coins', 'sc.summaryCrown': '👑 Crown won · ${n} coins', 'sc.confirmReset': 'Start over with $50? You lose all coins and upgrades.',
+      'sc.noCoins': 'Not enough coins', 'sc.spot': 'Scratch spot {n}', 'sc.ticketOf': 'SCRATCH TICKET',
+      'sc.t.pocket': 'Pocket Trio', 'sc.t.rush': 'Number Rush', 'sc.t.lines': 'Treasure Lines', 'sc.t.vault': 'Gem Vault', 'sc.t.royal': 'Royal Seven',
+      'sc.rule.match': 'MATCH {need} TO WIN', 'sc.rule.numbers': 'MATCH A WINNING NUMBER', 'sc.rule.lines': '3 IN A LINE WINS',
+      'sc.hint.match': 'Find {need} or more of the same symbol anywhere. Every extra copy pays again. Stars are wild and ×2/×3/×5 multiply the whole prize.',
+      'sc.hint.numbers': 'Each of your numbers that matches a winning number pays the prize printed under it.',
+      'sc.hint.lines': '3 of a kind in a row, column or diagonal pays. Stars are wild; a multiplier breaks its line but multiplies the whole prize.',
+      'sc.winNums': 'WINNING NUMBERS', 'sc.yourNums': 'YOUR NUMBERS', 'sc.underNum': 'under a number', 'sc.wild': 'Wild', 'sc.multD': 'Multiplies the prize', 'sc.inLine': '3 in a line',
+      'sc.jackpot': 'JACKPOT!', 'sc.winner': 'WINNER!', 'sc.noLuck': 'NO LUCK', 'sc.empty': 'Buy a ticket from the booth to start scratching',
+      'sc.goal': 'Goal: buy the Golden Crown', 'sc.crownOwned': 'You own the Golden Crown!', 'sc.nextUnlock': 'Next: unlock {name}', 'sc.nextCrown': 'Next: the Golden Crown',
+      'sc.canAfford': 'you can afford it!', 'sc.toGo': '{n} to go',
+      'sc.booth': 'Ticket booth', 'sc.shop': 'Upgrades', 'sc.board': 'Prizes: {name}',
+      'sc.avgReturn': 'Average return {n}%', 'sc.oSpot': 'Per spot', 'sc.oHit': 'In a win', 'sc.oPrize': 'Prize', 'sc.oWin': 'Ticket wins', 'sc.oRet': 'Average return', 'sc.oMatch': 'Number match', 'sc.unlockFirst': 'Unlock the ticket above first', 'sc.unlockFor': 'Unlock for {n}',
+      'sc.lv': 'Lv {n}/{max}', 'sc.maxed': 'MAX', 'sc.on': 'ON', 'sc.off': 'OFF',
+      'sc.tool.nail': 'Fingernail', 'sc.tool.coin': 'Coin', 'sc.tool.lucky': 'Lucky coin', 'sc.tool.golden': 'Golden scraper', 'sc.tool.diamond': 'Diamond scraper',
+      'sc.up.tool': 'Better scraper', 'sc.up.toolD': 'Scratch faster with: {tool}',
+      'sc.up.luck': 'Lucky charm', 'sc.up.luckD': 'Rare symbols, stars and multipliers show up more often',
+      'sc.up.auto': 'Auto-scratcher', 'sc.up.autoD': 'Scratches one spot for you every {s} s',
+      'sc.up.prize': 'Bigger prizes', 'sc.up.prizeD': 'Every ticket pays {n}% of its printed prize',
+      'sc.up.autobuy': 'Auto-buy', 'sc.up.autobuyD': 'Buys the same ticket again when one is finished', 'sc.up.autobuyOn': 'Re-buys {name} when a ticket ends',
+      'sc.crown': 'Golden Crown', 'sc.crownD': 'The goal. Buy it to win the game, then keep scratching.', 'sc.crownWon': 'YOU WON THE CROWN!',
+      'sc.pick': 'Pick a ticket →', 'sc.drag': 'Drag across the silver to scratch!', 'sc.dragAuto': 'Scratch, the auto-scratcher helps you out',
+      'sc.won': 'You won {n}!', 'sc.wonBig': 'JACKPOT! You won {n}!', 'sc.noWin': 'No prize this time',
+      'sc.change': '🪙 Pick up loose change (+$1)', 'sc.toolLabel': 'Scratching with: {tool}',
+      'sc.stats': '{n} tickets · biggest win {b} · total won {e}', 'sc.reset': 'Start over',
 
       'dp.title': 'Dice Pit', 'dp.desc': 'Roll, hold and reroll for the best hand. Stack multipliers and loaded dice to beat the goal.',
       'dp.logo1': 'DICE', 'dp.logo2': 'PIT',
@@ -4348,40 +4386,32 @@ class I18n {
       'shell.starsEarned': 'estrellas ganadas', 'shell.cleared': 'Rondas superadas', 'shell.newBest': '¡NUEVO RÉCORD!', 'shell.newRun': '▶ Nueva partida',
       'shell.level': 'nivel {n}',
 
-      'sc.title': 'Rasca y Gana', 'sc.desc': 'Rasca la lámina, combina símbolos y alcanza la meta de monedas en cada ronda. Las mejoras inclinan la suerte.',
-      'sc.logo1': 'RASCA', 'sc.logo2': 'Y GANA',
-      'sc.blurb': 'Compra un boleto, <b>rasca la lámina a mano</b> y consigue <b>3 o más</b> símbolos iguales para ganar. Empiezas solo con la uña, así que mejora tu herramienta para rascar más rápido. Usa todos los boletos de la ronda y conserva suficientes monedas para alcanzar la meta.',
-      'sc.tool.nail': 'Uña', 'sc.tool.coin': 'Moneda', 'sc.tool.lucky': 'Moneda de la suerte', 'sc.tool.golden': 'Raspador dorado',
-      'sc.toolLabel': 'Rascas con: {tool}', 'sc.charges': 'quedan {n}', 'sc.freeSwipe': '¡Suerte! Este boleto trae un Destapar todo gratis',
-      'sc.up.tool.name': 'Mejor raspador', 'sc.up.tool.desc': 'Siguiente herramienta: trazo más ancho y menos lámina por quitar',
-      'sc.up.swipe.name': 'Barrido de suerte', 'sc.up.swipe.desc': '+1 carga de Destapar todo cada ronda',
-      'sc.perk.tool.name': 'Moneda de bolsillo', 'sc.perk.tool.desc': 'Empieza cada partida rascando con una moneda en vez de la uña',
-      'sc.goal': 'Monedas a conservar', 'sc.coins': 'Monedas', 'sc.tickets': 'Boletos', 'sc.biggest': 'Mayor premio', 'sc.scratched': 'Rascados',
-      'sc.bonus': '+{n} monedas (paga)', 'sc.bonusInterest': '+{n} monedas (paga e intereses)',
-      'sc.tier.bronze': 'Bronce', 'sc.tier.silver': 'Plata', 'sc.tier.gold': 'Oro',
-      'sc.ticketOf': 'BOLETO DE {tier}', 'sc.ticketName': 'LOTO SUERTE', 'sc.coinsShort': 'MONEDAS', 'sc.ticketSub': '3 IGUALES GANAN · PAGA ×{mult}',
-      'sc.winner': '¡GANADOR!', 'sc.noLuck': 'SIN SUERTE', 'sc.empty': 'Compra un boleto en la taquilla para empezar a rascar',
-      'sc.pick': 'Elige un boleto →', 'sc.drag': '¡Arrastra sobre la lámina para rascar!', 'sc.won': '¡Ganaste {n} monedas!',
-      'sc.noMatch': 'Sin premio', 'sc.refunded': ' · reembolso de {n}', 'sc.revealAll': 'Destapar todo', 'sc.cashIn': 'Cobrar ronda ▶',
-      'sc.unlock': '🔒 Desbloquéalo en la tienda', 'sc.pays': 'PREMIOS ×{mult}', 'sc.noTickets': 'No quedan boletos esta ronda',
-      'sc.booth': 'Taquilla', 'sc.left': 'Boletos restantes', 'sc.board': 'Tabla de premios', 'sc.any': 'cualquiera', 'sc.wild': 'Comodín',
-      'sc.odds': 'Tus probabilidades', 'sc.oddsSpot': 'Por casilla', 'sc.oddsMatch': '3+ en el boleto', 'sc.oddsWin': 'Boleto ganador', 'sc.oddsAvg': 'Premio medio / costo',
-      'sc.oddsNote': 'Las probabilidades incluyen tus mejoras, el perk de suerte y el tipo de boleto. Los comodines cuentan como wild.',
-      'sc.boardHint': 'Cada coincidencia extra después de 3 vuelve a pagar. Se multiplica según el tipo de boleto.', 'sc.spot': 'Casilla {n} para rascar',
-      'sc.perk.coins.name': 'Bolsillos hondos', 'sc.perk.coins.desc': 'Empieza cada partida con +10 monedas',
-      'sc.perk.tickets.name': 'Compra al por mayor', 'sc.perk.tickets.desc': '+1 boleto cada ronda',
-      'sc.perk.luck.name': 'Racha de suerte', 'sc.perk.luck.desc': 'Tréboles, gemas y sietes aparecen un 15% más',
-      'sc.perk.silver.name': 'Boletos de plata', 'sc.perk.silver.desc': 'Desbloquea los boletos de plata (cuestan 12, pagan ×3)',
-      'sc.perk.gold.name': 'Boletos de oro', 'sc.perk.gold.desc': 'Desbloquea los boletos de oro (cuestan 30, pagan ×8)',
-      'sc.up.clover.name': 'Trébol de la suerte', 'sc.up.clover.desc': 'Los tréboles aparecen mucho más',
-      'sc.up.gem.name': 'Cazagemas', 'sc.up.gem.desc': 'Las gemas aparecen mucho más',
-      'sc.up.seven.name': 'Siete de la suerte', 'sc.up.seven.desc': 'Los sietes aparecen mucho más',
-      'sc.up.joker.name': 'Estrella comodín', 'sc.up.joker.desc': 'Añade estrellas comodín que cuentan como cualquier símbolo',
-      'sc.up.pay.name': 'Aumento', 'sc.up.pay.desc': 'Todos los premios +25%',
-      'sc.up.ticket.name': 'Boleto extra', 'sc.up.ticket.desc': '+1 boleto cada ronda',
-      'sc.up.refund.name': 'Reembolso', 'sc.up.refund.desc': 'Los boletos sin premio devuelven el 40% de su coste',
-      'sc.up.interest.name': 'Intereses', 'sc.up.interest.desc': 'Tras cada ronda: +1 moneda por cada 5 que tengas (máx. +5)',
-      'sc.up.discount.name': 'Metas fáciles', 'sc.up.discount.desc': 'Las metas son un 10% más bajas',
+      'sc.title': 'Rasca Lotto', 'sc.desc': 'Rasca boletos, gana monedas y compra mejoras y boletos más grandes. Cinco tipos de boleto con premios gordos. Meta: la Corona de Oro de $1.000.000.',
+      'sc.summary': '${n} monedas', 'sc.summaryCrown': '👑 Corona ganada · ${n} monedas', 'sc.confirmReset': '¿Empezar de nuevo con $50? Se pierden todas las monedas y mejoras.',
+      'sc.noCoins': 'No tienes monedas suficientes', 'sc.spot': 'Casilla para rascar {n}', 'sc.ticketOf': 'BOLETO DE RASCAR',
+      'sc.t.pocket': 'Trío de bolsillo', 'sc.t.rush': 'Fiebre de números', 'sc.t.lines': 'Líneas del tesoro', 'sc.t.vault': 'Bóveda de gemas', 'sc.t.royal': 'Siete real',
+      'sc.rule.match': 'JUNTA {need} PARA GANAR', 'sc.rule.numbers': 'ACIERTA UN NÚMERO GANADOR', 'sc.rule.lines': '3 EN LÍNEA GANAN',
+      'sc.hint.match': 'Encuentra {need} o más del mismo símbolo en cualquier lugar. Cada copia extra paga otra vez. Las estrellas son comodines y ×2/×3/×5 multiplican todo el premio.',
+      'sc.hint.numbers': 'Cada número tuyo que coincida con un número ganador paga el premio impreso debajo.',
+      'sc.hint.lines': '3 iguales en una fila, columna o diagonal pagan. Las estrellas son comodines; un multiplicador rompe su línea pero multiplica todo el premio.',
+      'sc.winNums': 'NÚMEROS GANADORES', 'sc.yourNums': 'TUS NÚMEROS', 'sc.underNum': 'bajo un número', 'sc.wild': 'Comodín', 'sc.multD': 'Multiplica el premio', 'sc.inLine': '3 en línea',
+      'sc.jackpot': '¡PREMIO GORDO!', 'sc.winner': '¡GANADOR!', 'sc.noLuck': 'SIN SUERTE', 'sc.empty': 'Compra un boleto en la taquilla para empezar a rascar',
+      'sc.goal': 'Meta: comprar la Corona de Oro', 'sc.crownOwned': '¡Tienes la Corona de Oro!', 'sc.nextUnlock': 'Siguiente: desbloquear {name}', 'sc.nextCrown': 'Siguiente: la Corona de Oro',
+      'sc.canAfford': '¡ya te alcanza!', 'sc.toGo': 'faltan {n}',
+      'sc.booth': 'Taquilla', 'sc.shop': 'Mejoras', 'sc.board': 'Premios: {name}',
+      'sc.avgReturn': 'Retorno medio {n}%', 'sc.oSpot': 'Por casilla', 'sc.oHit': 'En un premio', 'sc.oPrize': 'Premio', 'sc.oWin': 'Boleto ganador', 'sc.oRet': 'Retorno medio', 'sc.oMatch': 'Número acertado', 'sc.unlockFirst': 'Desbloquea antes el boleto de arriba', 'sc.unlockFor': 'Desbloquear por {n}',
+      'sc.lv': 'Niv {n}/{max}', 'sc.maxed': 'MÁX', 'sc.on': 'SÍ', 'sc.off': 'NO',
+      'sc.tool.nail': 'Uña', 'sc.tool.coin': 'Moneda', 'sc.tool.lucky': 'Moneda de la suerte', 'sc.tool.golden': 'Rascador dorado', 'sc.tool.diamond': 'Rascador de diamante',
+      'sc.up.tool': 'Mejor rascador', 'sc.up.toolD': 'Rasca más rápido con: {tool}',
+      'sc.up.luck': 'Amuleto', 'sc.up.luckD': 'Los símbolos raros, estrellas y multiplicadores salen más a menudo',
+      'sc.up.auto': 'Auto-rascador', 'sc.up.autoD': 'Rasca una casilla por ti cada {s} s',
+      'sc.up.prize': 'Premios mayores', 'sc.up.prizeD': 'Cada boleto paga el {n}% de su premio impreso',
+      'sc.up.autobuy': 'Auto-compra', 'sc.up.autobuyD': 'Vuelve a comprar el mismo boleto al terminar uno', 'sc.up.autobuyOn': 'Recompra {name} al terminar un boleto',
+      'sc.crown': 'Corona de Oro', 'sc.crownD': 'La meta. Cómprala para ganar el juego y sigue rascando.', 'sc.crownWon': '¡GANASTE LA CORONA!',
+      'sc.pick': 'Elige un boleto →', 'sc.drag': '¡Arrastra sobre la plata para rascar!', 'sc.dragAuto': 'Rasca, el auto-rascador te ayuda',
+      'sc.won': '¡Ganaste {n}!', 'sc.wonBig': '¡PREMIO GORDO! ¡Ganaste {n}!', 'sc.noWin': 'Esta vez no hubo premio',
+      'sc.change': '🪙 Recoger monedas sueltas (+$1)', 'sc.toolLabel': 'Rascando con: {tool}',
+      'sc.stats': '{n} boletos · mayor premio {b} · total ganado {e}', 'sc.reset': 'Empezar de nuevo',
 
       'dp.title': 'Foso de Dados', 'dp.desc': 'Tira, guarda y vuelve a tirar para lograr la mejor jugada. Acumula multiplicadores y dados cargados para superar la meta.',
       'dp.logo1': 'FOSO DE', 'dp.logo2': 'DADOS',
@@ -4790,242 +4820,256 @@ class RunGame extends Game {
 }
 
 /* ---------- 5a. Scratch Lotto ------------------------------------- */
-class ScratchLotto extends RunGame {
-  static SYMBOLS = [
-    { id: 'cherry', value: 3,  weight: 30 },
-    { id: 'lemon',  value: 5,  weight: 24 },
-    { id: 'bell',   value: 8,  weight: 18 },
-    { id: 'clover', value: 14, weight: 12, up: 'clover' },
-    { id: 'gem',    value: 30, weight: 6,  up: 'gem' },
-    { id: 'seven',  value: 80, weight: 2,  up: 'seven' },
-  ];
-  static TIERS = [
-    { id: 'bronze', cost: 5,  mult: 1, boost: 1 },
-    { id: 'silver', cost: 12, mult: 3, boost: 1.4, perk: 'silver' },
-    { id: 'gold',   cost: 30, mult: 8, boost: 1.9, perk: 'gold' },
-  ];
-  static CELLS = 6;
-  static GOAL_BASE = 8;
-  static GOAL_GROWTH = 1.5;
+/**
+ * Incremental scratch-ticket game with one currency: coins. Buy a ticket, scratch it by hand, win coins,
+ * and spend them on everything else - a better scraper, luck, prize boosts, new ticket types, an
+ * auto-scratcher and an auto-buyer - until you can afford the Golden Crown, which is the goal.
+ * Each ticket type has its own rule (match symbols, winning numbers, 3x3 lines) and rare jackpots,
+ * so single tickets swing a lot while the average return (shown in the booth) climbs with upgrades.
+ */
+class ScratchLotto extends Game {
+  static GOAL = 1000000;
+  static START = 50;
+  static SAVE_VERSION = 2;
   /**
-   * What you scratch with. Early runs start with a fingernail: a thin stroke, and most of the foil must
-   * come off before a spot counts as revealed. Upgrades (and a perk) move you up the list.
-   *   brush  = stroke width on the 120px foil canvas;  reveal = fraction of foil to clear
+   * Ticket types, in unlock order. syms: [id, weight, prize] with the prize as a multiple of the ticket price;
+   * x2/x3/x5 spots multiply a winning ticket and jokers are wild. numbers: `wins` winning numbers drawn from
+   * 1..pool, `n` of your numbers each hiding a prize [multiple, weight].
    */
-  static TOOLS = [
-    { id: 'nail',   icon: '💅', brush: 16, reveal: 0.55 },
-    { id: 'coin',   icon: '🪙', brush: 22, reveal: 0.48 },
-    { id: 'lucky',  icon: '🏅', brush: 28, reveal: 0.42 },
-    { id: 'golden', icon: '✨', brush: 38, reveal: 0.35 },
+  static TICKETS = [
+    { id: 'pocket', cost: 5, unlock: 0, rule: 'match', n: 6, need: 3, cols: 3, col: ['#d4823b', '#8a4f1c'],
+      syms: [['cherry', 22, 0.6], ['lemon', 19, 1], ['bell', 16, 2], ['clover', 11, 3.7], ['gem', 5, 13], ['seven', 1.5, 95]] },
+    { id: 'rush', cost: 25, unlock: 150, rule: 'numbers', n: 8, wins: 2, pool: 30, cols: 4, col: ['#2f9e8f', '#145c52'],
+      prizes: [[0.5, 30], [0.7, 24], [1.4, 16], [3.6, 8], [7, 4], [36, 0.8], [360, 0.08]] },
+    { id: 'lines', cost: 150, unlock: 1000, rule: 'lines', n: 9, cols: 3, col: ['#7f95ad', '#40516a'],
+      syms: [['cherry', 24, 0.9], ['lemon', 21, 1.7], ['bell', 17, 3.7], ['clover', 12, 8.6], ['gem', 5, 37], ['seven', 1.5, 220], ['x2', 3, 0]] },
+    { id: 'vault', cost: 1000, unlock: 8000, rule: 'match', n: 9, need: 4, cols: 3, col: ['#3fa7d6', '#1a5f86'],
+      syms: [['cherry', 22, 0.4], ['lemon', 20, 0.8], ['bell', 16, 1.6], ['clover', 12, 3.2], ['gem', 7, 10], ['seven', 2, 63], ['joker', 2, 0], ['x2', 3, 0], ['x3', 1, 0]] },
+    { id: 'royal', cost: 6000, unlock: 60000, rule: 'lines', n: 9, cols: 3, col: ['#f0b429', '#8f6200'],
+      syms: [['cherry', 22, 0.5], ['lemon', 19, 1], ['bell', 16, 2], ['clover', 12, 4.7], ['gem', 6, 18], ['seven', 1.6, 130], ['joker', 2, 0], ['x2', 3, 0], ['x5', 0.7, 0]] },
   ];
-  static SWIPE_CHANCE = 0.08;  // chance a bought ticket comes with a free "Reveal all" charge
+  static LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+  static MULTS = { x2: 2, x3: 3, x5: 5 };
+  /** Scraper tiers: brush = stroke width on the 120px foil, reveal = share of foil to clear before a spot counts. */
+  static TOOLS = [
+    { id: 'nail',    icon: '💅', brush: 16, reveal: 0.55 },
+    { id: 'coin',    icon: '🪙', brush: 22, reveal: 0.48 },
+    { id: 'lucky',   icon: '🏅', brush: 28, reveal: 0.42 },
+    { id: 'golden',  icon: '✨', brush: 36, reveal: 0.36 },
+    { id: 'diamond', icon: '💎', brush: 48, reveal: 0.3 },
+  ];
+  static TOOL_COST = [15, 80, 400, 2500];
+  /** Everything for sale. cost(level) is the price of the next level. */
+  static SHOP = [
+    { id: 'tool',    icon: '🪙', max: 4,  cost: l => ScratchLotto.TOOL_COST[l] },
+    { id: 'luck',    icon: '🍀', max: 10, cost: l => Math.round(25 * 2.3 ** l) },
+    { id: 'auto',    icon: '🤖', max: 10, cost: l => Math.round(60 * 2.4 ** l) },
+    { id: 'prize',   icon: '💰', max: 20, cost: l => Math.round(20 * 1.9 ** l) },
+    { id: 'autobuy', icon: '🔁', max: 1,  cost: () => 500 },
+  ];
+  static autoInterval(l){ return 2.2 * 0.78 ** (l - 1) }          // seconds per spot the auto-scratcher clears
+  static prizeMult(l){ return 1 + 0.25 * l }   // one Prize boost for every ticket, so pricier tickets always pay more
 
   get key(){ return 'sc' }
-  get theme(){ return 'scratch' }
-  get palette(){ return ['#ff4f8b', '#ffb627', '#3fd0ff', '#8b5cf6', '#34c46a'] }
-  logoHtml(){
-    return `<div class="sc-logo"><div class="sc-logo-syms">${Art.symbol('cherry')}${Art.symbol('seven')}${Art.symbol('gem')}</div>
-      <div class="logo-text">${this.tr('logo1')}<br><span>${this.tr('logo2')}</span></div></div>`;
-  }
+  tr(key, vars){ return t(`sc.${key}`, vars) }
   static thumb(){
     return `<div class="th th-scratch"><div class="th-ticket">${Art.symbol('seven')}${Art.symbol('seven')}${Art.symbol('seven')}</div></div>`;
   }
-  perkDefs(){ return [
-    { id: 'coins',   icon: '💰', max: 5, base: 2,  step: 1 },
-    { id: 'tickets', icon: '🎟️', max: 2, base: 5,  step: 5 },
-    { id: 'luck',    icon: '🍀', max: 3, base: 3,  step: 2 },
-    { id: 'silver',  icon: '🥈', max: 1, base: 4,  step: 0 },
-    { id: 'gold',    icon: '🥇', max: 1, base: 10, step: 0 },
-    { id: 'tool',    icon: '🪙', max: 1, base: 3,  step: 0 },
-  ] }
-  upgradeDefs(){ return [
-    { id: 'clover',   icon: '🍀', max: 3 }, { id: 'gem',    icon: '💎', max: 3 }, { id: 'seven',    icon: '7️⃣', max: 3 },
-    { id: 'joker',    icon: '🃏', max: 3 }, { id: 'pay',    icon: '💰', max: 4 }, { id: 'ticket',   icon: '🎟️', max: 3 },
-    { id: 'refund',   icon: '↩️', max: 2 }, { id: 'interest', icon: '🏦', max: 3 }, { id: 'discount', icon: '📉', max: 3 },
-    // tool tiers left after the perk, so the card never offers an upgrade past the best tool
-    { id: 'tool',     icon: '🪙', max: ScratchLotto.TOOLS.length - 1 - this.perkLevel('tool') },
-    { id: 'swipe',    icon: '🧽', max: 2 },
-  ] }
-  tool(){ const T = ScratchLotto.TOOLS; return T[Math.min(T.length - 1, this.perkLevel('tool') + this.level('tool'))] }
-  defaults(){ const d = super.defaults(); d.meta.biggest = 0; d.meta.scratched = 0; return d }
-  extraBadges(m){ return this.badge(Art.icon('trophy'), this.tr('biggest'), Fmt.num(m.biggest)) + this.badge(Art.icon('ticket'), this.tr('scratched'), Fmt.num(m.scratched)) }
-  tierName(id){ return this.tr(`tier.${id}`) }
+  static summary(store, id){
+    const d = store.load(id);
+    if (!d || d.v !== ScratchLotto.SAVE_VERSION) return '';
+    return d.crown ? t('sc.summaryCrown', { n: Fmt.num(d.coins) }) : t('sc.summary', { n: Fmt.num(d.coins) });
+  }
 
-  /* ---- pure rules (also used by the odds simulation) ---- */
-  static weights(tier, upgrades, luckPerk = 0){
-    const list = ScratchLotto.SYMBOLS.map(s => {
-      let w = s.weight;
-      if (s.value >= 14) w *= tier.boost * (1 + 0.15 * luckPerk);
-      if (s.up) w *= 1 + 0.8 * (upgrades[s.up] || 0);
-      return { id: s.id, w };
-    });
-    if (upgrades.joker) list.push({ id: 'joker', w: 4 * upgrades.joker });
-    return list;
+  /* ---- state ---- */
+  constructor(root, slot){ super(root, slot); this.data = this.loadData(); this.fx = null }
+  defaults(){
+    return { v: ScratchLotto.SAVE_VERSION, coins: ScratchLotto.START, earned: 0, scratched: 0, biggest: 0,
+      lv: {}, unlocked: { pocket: true }, autobuy: false, crown: false, sel: 'pocket', ticket: null };
   }
-  static draw(tier, upgrades, luckPerk){
-    const entries = ScratchLotto.weights(tier, upgrades, luckPerk);
-    return Array.from({ length: ScratchLotto.CELLS }, () => Rng.weighted(entries, e => e.w).id);
+  loadData(){
+    const saved = this.slot.load(null);   // saves from the old round-based version start fresh
+    return saved && saved.v === ScratchLotto.SAVE_VERSION ? { ...this.defaults(), ...saved } : this.defaults();
   }
-  static evaluate(cells, tier, payMult = 1){
-    const counts = {}; let wilds = 0;
-    for (const c of cells) c === 'joker' ? wilds++ : (counts[c] = (counts[c] || 0) + 1);
-    const score = target => {
-      let total = 0; const wins = [];
-      for (const s of ScratchLotto.SYMBOLS){
-        const n = (counts[s.id] || 0) + (s.id === target ? wilds : 0);
-        if (n >= 3){ total += s.value * (n - 2); wins.push(s.id) }
+  save(){ this.slot.save(this.data) }
+  commit(){ this.save(); this.render() }
+  lv(id){ return this.data.lv[id] || 0 }
+  ticketType(id){ return ScratchLotto.TICKETS.find(x => x.id === id) }
+  tool(){ return ScratchLotto.TOOLS[this.lv('tool')] }
+  cheapest(){ return Math.min(...ScratchLotto.TICKETS.filter(T => this.data.unlocked[T.id]).map(T => T.cost)) }
+
+  /* ---- pure rules (also used by the return estimate) ---- */
+  static symWeight(s, luck){ return s[1] * (s[2] >= 3 || s[0] === 'joker' || s[0] in ScratchLotto.MULTS ? 1 + 0.06 * luck : 1) }
+  static draw(T, luck){
+    if (T.rule === 'numbers'){
+      const wins = Rng.shuffle(Array.from({ length: T.pool }, (_, i) => i + 1)).slice(0, T.wins);
+      const pw = p => p[1] * (p[0] >= 5 ? 1 + 0.06 * luck : 1);
+      const mine = Array.from({ length: T.n }, () => {
+        let num = Rng.int(1, T.pool);
+        if (Rng.chance(0.003 * luck)) num = Rng.pick(wins);   // luck: a nudge toward the winning numbers
+        return { num, p: Rng.weighted(T.prizes, pw)[0] };
+      });
+      return { wins, mine };
+    }
+    return { cells: Array.from({ length: T.n }, () => Rng.weighted(T.syms, s => ScratchLotto.symWeight(s, luck))[0]) };
+  }
+  /** Returns { mult: total prize as a multiple of the ticket price, hit: indexes of winning spots }. */
+  static evaluate(T, tk){
+    if (T.rule === 'numbers'){
+      let mult = 0; const hit = [];
+      tk.mine.forEach((m, i) => { if (tk.wins.includes(m.num)){ mult += m.p; hit.push(T.wins + i) } });
+      if (hit.length) tk.wins.forEach((w, i) => { if (tk.mine.some(m => m.num === w)) hit.push(i) });
+      return { mult, hit };
+    }
+    const cells = tk.cells, prize = id => (T.syms.find(s => s[0] === id) || [0, 0, 0])[2];
+    const mults = cells.reduce((m, c) => m * (ScratchLotto.MULTS[c] || 1), 1);
+    let base = 0, hit = new Set();
+    if (T.rule === 'match'){
+      const counts = {}; let wild = 0;
+      cells.forEach(c => { if (c === 'joker') wild++; else if (!(c in ScratchLotto.MULTS)) counts[c] = (counts[c] || 0) + 1 });
+      const score = target => {
+        let total = 0; const wins = [];
+        for (const s of T.syms){
+          if (!s[2]) continue;
+          const n = (counts[s[0]] || 0) + (s[0] === target ? wild : 0);
+          if (n >= T.need){ total += s[2] * (n - T.need + 1); wins.push(s[0]) }
+        }
+        return { total, wins };
+      };
+      let best = score(null);
+      if (wild) for (const s of T.syms){ const r = score(s[0]); if (r.total > best.total) best = r }
+      base = best.total;
+      cells.forEach((c, i) => { if (best.wins.includes(c) || (c === 'joker' && best.total)) hit.add(i) });
+    } else {
+      const top = T.syms.filter(s => s[2]).reduce((a, s) => s[2] > a[2] ? s : a);
+      for (const line of ScratchLotto.LINES){
+        const ids = line.map(i => cells[i]);
+        if (ids.some(c => c in ScratchLotto.MULTS)) continue;
+        const real = [...new Set(ids.filter(c => c !== 'joker'))];
+        if (real.length > 1) continue;
+        base += real.length ? prize(real[0]) : top[2];
+        line.forEach(i => hit.add(i));
       }
-      return { total, wins };
-    };
-    let best = score(null);
-    if (wilds) for (const s of ScratchLotto.SYMBOLS){ const r = score(s.id); if (r.total > best.total) best = r }
-    return { payout: Math.round(best.total * tier.mult * payMult), wins: best.wins };
+    }
+    if (base) cells.forEach((c, i) => { if (c in ScratchLotto.MULTS) hit.add(i) });
+    return { mult: base * mults, hit: [...hit] };
   }
-
-  /**
-   * Exact odds for one ticket tier: chance a single spot shows each symbol, chance each symbol ends up in a winning
-   * set (3+ on the ticket, jokers counted), chance the ticket wins at all, and the average payout.
-   * Enumerates every way 6 spots can split across the symbols (a few hundred cases) so there is no randomness.
-   */
-  static odds(tier, upgrades, luckPerk, payMult){
-    const key = [tier.id, JSON.stringify(upgrades), luckPerk, payMult].join('|');
-    ScratchLotto._odds = ScratchLotto._odds || new Map();
-    if (ScratchLotto._odds.has(key)) return ScratchLotto._odds.get(key);
-    const entries = ScratchLotto.weights(tier, upgrades, luckPerk), n = ScratchLotto.CELLS;
-    const total = entries.reduce((a, e) => a + e.w, 0), p = entries.map(e => e.w / total);
-    const fact = [1]; for (let i = 1; i <= n; i++) fact[i] = fact[i - 1] * i;
-    const out = { spot: entries.map((e, i) => ({ id: e.id, p: p[i] })), hit: {}, win: 0, ev: 0 }, counts = Array(entries.length).fill(0);
-    const visit = () => {
-      let prob = fact[n]; const cells = [];
-      counts.forEach((c, i) => { prob *= p[i] ** c / fact[c]; for (let k = 0; k < c; k++) cells.push(entries[i].id) });
-      const r = ScratchLotto.evaluate(cells, tier, payMult);
-      if (!r.wins.length) return;
-      out.win += prob; out.ev += prob * r.payout;
-      r.wins.forEach(id => { out.hit[id] = (out.hit[id] || 0) + prob });
-    };
-    const rec = (i, left) => {
-      if (i === entries.length - 1){ counts[i] = left; return visit() }
-      for (let c = 0; c <= left; c++){ counts[i] = c; rec(i + 1, left - c) }
-    };
-    rec(0, n);
-    ScratchLotto._odds.set(key, out);
-    return out;
+  /** Estimated odds for a ticket type (cached per luck level): win chance, mean payout multiple, and how often each symbol is part of a win. */
+  static stats(T, luck){
+    const key = `${T.id}|${luck}`;
+    ScratchLotto._st = ScratchLotto._st || new Map();
+    if (!ScratchLotto._st.has(key)){
+      const N = 12000, hit = {}; let sum = 0, wins = 0;
+      for (let i = 0; i < N; i++){
+        const tk = ScratchLotto.draw(T, luck), r = ScratchLotto.evaluate(T, tk);
+        sum += r.mult; if (r.mult > 0) wins++;
+        if (tk.cells) new Set(r.hit.map(j => tk.cells[j])).forEach(id => { hit[id] = (hit[id] || 0) + 1 });
+      }
+      ScratchLotto._st.set(key, { win: wins / N, ret: sum / N, hit: Object.fromEntries(Object.entries(hit).map(([k, v]) => [k, v / N])) });
+    }
+    return ScratchLotto._st.get(key);
   }
-
-  /* ---- run rules ---- */
-  newRun(){ return { coins: 20 + 10 * this.perkLevel('coins'), tickets: 0, ticket: null, biggest: 0, swipes: 0 } }
-  startRound(run){
-    run.tickets = 4 + this.perkLevel('tickets') + this.level('ticket'); run.ticket = null;
-    run.swipes = (run.swipes || 0) + this.level('swipe');   // "Lucky swipe" upgrade: Reveal-all charges each round
+  static avgReturn(T, luck, prizeLv){ return ScratchLotto.stats(T, luck).ret * ScratchLotto.prizeMult(prizeLv) }
+  /** Exact chance that a single spot shows each symbol (or prize, on number tickets), from the same weights the draw uses. */
+  static spotOdds(T, luck){
+    if (T.rule === 'numbers'){
+      const pw = p => p[1] * (p[0] >= 5 ? 1 + 0.06 * luck : 1), tot = T.prizes.reduce((a, p) => a + pw(p), 0);
+      return T.prizes.map(p => ({ p: pw(p) / tot }));
+    }
+    const tot = T.syms.reduce((a, x) => a + ScratchLotto.symWeight(x, luck), 0);
+    return T.syms.map(x => ({ id: x[0], p: ScratchLotto.symWeight(x, luck) / tot }));
   }
-  goal(run){
-    return Math.round(ScratchLotto.GOAL_BASE * ScratchLotto.GOAL_GROWTH ** (run.round - 1) * (1 - 0.1 * this.level('discount')));
-  }
-  roundValue(run){ return run.coins }
-  hudStats(run){ return [
-    { icon: Art.icon('coin'), label: this.tr('coins'), value: Fmt.num(run.coins) },
-    { icon: Art.icon('ticket'), label: this.tr('tickets'), value: run.tickets },
-  ] }
-  roundWon(run){
-    const n = this.level('interest');
-    const gain = 8 + Math.min(Math.floor(run.coins / 5) * n, 5 * n);
-    run.coins += gain;
-    return { k: n ? 'sc.bonusInterest' : 'sc.bonus', v: { n: gain } };
-  }
-  starsFor(run){ return Math.max(0, run.round - 1) + Math.floor(run.biggest / 60) }
-  tierUnlocked(tier){ return !tier.perk || this.perkLevel(tier.perk) > 0 }
-  roundOver(run){
-    const settled = !run.ticket || run.ticket.paid !== null;
-    return settled && (run.tickets <= 0 || run.coins < ScratchLotto.TIERS[0].cost);
-  }
+  /** Chance one of your numbers is a winning number (number tickets). */
+  static numberOdds(T, luck){ const b = T.wins / T.pool; return b + 0.003 * luck * (1 - b) }
+  spotCount(T){ return T.rule === 'numbers' ? T.wins + T.n : T.n }
 
   /* ---- actions ---- */
-  playAct(name, d, run){
-    if (name === 'buy') return this.buy(run, d.tier);
-    if (name === 'scratchall'){   // only with a charge; otherwise every spot is scratched by hand
-      const tk = run.ticket;
-      if (!tk || tk.paid !== null || !(run.swipes > 0)) return;
-      run.swipes--;
-      return this.reveal(run, tk.rev.map((r, i) => i).filter(i => !tk.rev[i]));
+  act(name, d){
+    this.fx = null;
+    const D = this.data;
+    switch (name){
+      case 'buy':       return this.buy(d.tier);
+      case 'unlock':    return this.unlock(d.tier);
+      case 'up':        return this.buyUpgrade(d.id);
+      case 'crown':     return this.buyCrown();
+      case 'autobuy':   D.autobuy = !D.autobuy; return this.commit();
+      case 'change':    D.coins += 1; this.fx = 'change'; return this.commit();
+      case 'reset':     if (confirm(this.tr('confirmReset'))){ this.data = this.defaults(); this.commit() } return;
     }
-    if (name === 'finish') return this.finishRound();
   }
-  buy(run, tierId){
-    const tier = ScratchLotto.TIERS.find(x => x.id === tierId);
-    if (!tier || !this.tierUnlocked(tier) || run.coins < tier.cost || run.tickets <= 0) return;
-    if (run.ticket && run.ticket.paid === null) return;
-    run.coins -= tier.cost; run.tickets--;
-    run.ticket = {
-      tier: tier.id, paid: null, wins: [], refund: 0, serial: String(Rng.int(0, 999999)).padStart(6, '0'),
-      cells: ScratchLotto.draw(tier, run.upgrades, this.perkLevel('luck')),
-      rev: Array(ScratchLotto.CELLS).fill(false),
-      freeSwipe: Rng.chance(ScratchLotto.SWIPE_CHANCE),
-    };
-    if (run.ticket.freeSwipe) run.swipes = (run.swipes || 0) + 1;
+  pay(cost){ if (this.data.coins < cost){ Toast.show(this.tr('noCoins')); return false } this.data.coins -= cost; return true }
+  buy(id){
+    const T = this.ticketType(id), D = this.data;
+    if (!T || !D.unlocked[id] || (D.ticket && D.ticket.paid === null) || !this.pay(T.cost)) return;
+    D.sel = id;
+    D.ticket = { tier: id, paid: null, hit: [], rev: Array(this.spotCount(T)).fill(false), serial: String(Rng.int(0, 999999)).padStart(6, '0'),
+      ...ScratchLotto.draw(T, this.lv('luck')) };
+    this.settledAt = 0;
     this.commit();
   }
-  /** Reveals spots. Partial reveals patch the DOM so other half-scratched foils survive. */
-  reveal(run, indexes){
-    const tk = run.ticket;
+  unlock(id){
+    const T = this.ticketType(id);
+    if (!T || this.data.unlocked[id] || !this.pay(T.unlock)) return;
+    this.data.unlocked[id] = true; this.data.sel = id;
+    this.commit();
+  }
+  buyUpgrade(id){
+    const u = ScratchLotto.SHOP.find(x => x.id === id), l = this.lv(id);
+    if (!u || l >= u.max || !this.pay(u.cost(l))) return;
+    this.data.lv[id] = l + 1;
+    if (id === 'autobuy') this.data.autobuy = true;
+    this.commit();
+  }
+  buyCrown(){
+    if (this.data.crown || !this.pay(ScratchLotto.GOAL)) return;
+    this.data.crown = true; this.fx = 'crown';
+    this.commit();
+  }
+  /** Reveals spots. Partial reveals patch the DOM so half-scratched foils survive. */
+  reveal(indexes){
+    const tk = this.data.ticket;
     if (!tk || tk.paid !== null) return;
     indexes.forEach(i => { tk.rev[i] = true });
-    if (tk.rev.every(Boolean)){
-      this.settle(run);
-      this.fx = tk.paid ? 'win' : null;
-      return this.commit();
-    }
+    if (tk.rev.every(Boolean)){ this.settle(); return this.commit() }
     this.save();
     indexes.forEach(i => this.root.querySelector(`.spot[data-i="${i}"]`)?.classList.add('open'));
   }
-  settle(run){
-    const tk = run.ticket, tier = ScratchLotto.TIERS.find(x => x.id === tk.tier), meta = this.data.meta;
-    const res = ScratchLotto.evaluate(tk.cells, tier, 1 + 0.25 * this.level('pay'));
-    tk.wins = res.wins;
-    tk.paid = res.payout;
-    if (!tk.paid && this.level('refund')) tk.refund = Math.round(tier.cost * 0.4 * this.level('refund'));
-    run.coins += tk.paid + tk.refund;
-    run.biggest = Math.max(run.biggest, tk.paid);
-    meta.biggest = Math.max(meta.biggest, tk.paid);
-    meta.scratched++;
+  settle(){
+    const D = this.data, tk = D.ticket, T = this.ticketType(tk.tier);
+    const r = ScratchLotto.evaluate(T, tk);
+    tk.paid = Math.round(r.mult * T.cost * ScratchLotto.prizeMult(this.lv('prize')));
+    tk.hit = r.hit; tk.big = r.mult >= 50;
+    D.coins += tk.paid; D.earned += tk.paid; D.scratched++;
+    D.biggest = Math.max(D.biggest, tk.paid);
+    this.fx = tk.paid ? (tk.big ? 'jackpot' : 'win') : null;
+    this.settledAt = performance.now();
   }
 
+  /* ---- auto-scratcher and auto-buyer ---- */
+  mount(){
+    super.mount();
+    let acc = 0, last = performance.now();
+    this.timer = setInterval(() => {
+      const now = performance.now(), dt = Math.min(1, (now - last) / 1000), D = this.data, tk = D.ticket;
+      last = now;
+      if (tk && tk.paid === null && this.lv('auto')){
+        acc += dt;
+        if (acc >= ScratchLotto.autoInterval(this.lv('auto'))){
+          acc = 0;
+          const i = tk.rev.findIndex(r => !r);
+          if (i >= 0) this.reveal([i]);
+        }
+      } else acc = 0;
+      if (D.autobuy && this.lv('autobuy') && (!tk || tk.paid !== null) && now - (this.settledAt || 0) > 900){
+        const T = this.ticketType(D.sel);
+        if (T && D.unlocked[T.id] && D.coins >= T.cost) this.buy(T.id);
+      }
+    }, 100);
+  }
+  destroy(){ clearInterval(this.timer); super.destroy() }
+
   /* ---- scratch foil (canvas) ---- */
-  afterRender(){
-    const tool = this.tool();
-    this.root.querySelectorAll('canvas.foil').forEach(c => this.initFoil(c, tool));
-    // Odds tier tabs only toggle visibility, so a half-scratched ticket is never re-rendered.
-    this.root.querySelectorAll('.odds-tab').forEach(b => b.onclick = () => {
-      this.oddsTier = b.dataset.odds;
-      this.root.querySelectorAll('[data-odds]').forEach(el => {
-        const on = el.dataset.odds === this.oddsTier;
-        if (el.classList.contains('odds-tab')) el.classList.toggle('on', on); else el.hidden = !on;
-      });
-    });
-  }
-  /** One compact row of per-spot chances, shown right under the ticket on small screens (the full panel is further down). */
-  oddsStrip(run){
-    const S = ScratchLotto, tier = S.TIERS.find(x => x.id === this.oddsTier) || S.TIERS[0];
-    const o = S.odds(tier, run.upgrades, this.perkLevel('luck'), 1 + 0.25 * this.level('pay'));
-    const pct = x => (x * 100 < 10 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
-    return `<div class="odds-strip" title="${this.tr('odds')}">${o.spot.map(sp => `<span>${Art.symbol(sp.id)}${pct(sp.p)}</span>`).join('')}<span class="win">${this.tr('oddsWin')} ${pct(o.win)}</span></div>`;
-  }
-  oddsHtml(run){
-    const S = ScratchLotto, tiers = S.TIERS.filter(x => this.tierUnlocked(x));
-    if (!tiers.some(x => x.id === this.oddsTier)) this.oddsTier = tiers[0].id;
-    const payMult = 1 + 0.25 * this.level('pay'), luck = this.perkLevel('luck');
-    const pct = x => x > 0 && x < 0.001 ? '<0.1%' : (x * 100 < 10 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
-    const tabs = tiers.length > 1 ? `<div class="odds-tabs">${tiers.map(x => `<button type="button" class="odds-tab ${x.id === this.oddsTier ? 'on' : ''}" data-odds="${x.id}">${this.tierName(x.id)}</button>`).join('')}</div>` : '';
-    const tables = tiers.map(x => {
-      const o = S.odds(x, run.upgrades, luck, payMult);
-      const rows = o.spot.map(sp => `<div class="odds-row"><span>${Art.symbol(sp.id)}</span><b>${pct(sp.p)}</b><b>${sp.id === 'joker' ? '·' : pct(o.hit[sp.id] || 0)}</b></div>`).join('');
-      return `<div class="odds-table" data-odds="${x.id}" ${x.id === this.oddsTier ? '' : 'hidden'}>
-        <div class="odds-row odds-head"><span></span><span>${this.tr('oddsSpot')}</span><span>${this.tr('oddsMatch')}</span></div>${rows}
-        <div class="odds-sum"><span>${this.tr('oddsWin')}</span><b>${pct(o.win)}</b></div>
-        <div class="odds-sum"><span>${this.tr('oddsAvg')}</span><b>${o.ev.toFixed(1)} / ${x.cost}</b></div></div>`;
-    }).join('');
-    return `<div class="odds"><h3>${this.tr('odds')}</h3>${tabs}${tables}<p class="g-muted odds-note">${this.tr('oddsNote')}</p></div>`;
-  }
-  /** Mouse cursor showing the current tool (the emoji drawn into a tiny SVG). */
+  afterRender(){ const tool = this.tool(); this.root.querySelectorAll('canvas.foil').forEach(c => this.initFoil(c, tool)) }
   static cursor(tool){
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text x="2" y="26" font-size="24">${tool.icon}</text></svg>`;
     return `url("data:image/svg+xml,${encodeURIComponent(svg)}") 6 26, crosshair`;
@@ -5038,7 +5082,6 @@ class ScratchLotto extends RunGame {
     for (let x = -H; x < W; x += 20){ ctx.beginPath(); ctx.moveTo(x, H); ctx.lineTo(x + H, 0); ctx.stroke() }
     ctx.fillStyle = '#9aa3b2'; ctx.font = '700 58px Fredoka, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText('?', W / 2, H / 2 + 3);
-
     let drawing = false, last = null, strokes = 0;
     const pos = e => { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H } };
     const cleared = () => {
@@ -5049,7 +5092,7 @@ class ScratchLotto extends RunGame {
     const check = () => {
       if (canvas.dataset.done || cleared() < tool.reveal) return;
       canvas.dataset.done = '1';
-      if (this.data.run?.phase === 'play') this.reveal(this.data.run, [Number(canvas.dataset.i)]);
+      this.reveal([Number(canvas.dataset.i)]);
     };
     const scratch = p => {
       ctx.globalCompositeOperation = 'destination-out'; ctx.strokeStyle = '#000'; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = tool.brush;
@@ -5065,63 +5108,143 @@ class ScratchLotto extends RunGame {
   }
 
   /* ---- view ---- */
-  viewTicket(run){
-    const tk = run.ticket;
-    if (!tk) return `<div class="ticket-empty"><div>${Art.icon('ticket')}${this.tr('empty')}</div></div>`;
-    const tier = ScratchLotto.TIERS.find(x => x.id === tk.tier), settled = tk.paid !== null;
-    const spots = tk.cells.map((id, i) => {
-      const win = settled && tk.wins.length && (tk.wins.includes(id) || id === 'joker');
-      const cls = ['spot', tk.rev[i] ? 'open' : '', settled ? (win ? 'win' : 'lose') : ''].join(' ');
-      const foil = tk.rev[i] ? '' : `<canvas class="foil" data-i="${i}" width="120" height="120" aria-label="${this.tr('spot', { n: i + 1 })}"></canvas>`;
-      return `<div class="${cls}" data-i="${i}">${Art.symbol(id)}${foil}</div>`;
-    }).join('');
-    const stamp = settled ? (tk.paid ? `<div class="ticket-stamp win">${this.tr('winner')}</div>` : `<div class="ticket-stamp lose">${this.tr('noLuck')}</div>`) : '';
-    return `<div class="ticket tier-${tier.id}">
-      <div class="ticket-head"><div><small>${this.tr('ticketOf', { tier: this.tierName(tier.id).toUpperCase() })}</small><b>${this.tr('ticketName')}</b></div>
-        <div class="ticket-price"><div>${tier.cost}<small>${this.tr('coinsShort')}</small></div></div></div>
-      <div class="ticket-sub">${this.tr('ticketSub', { mult: tier.mult })}</div>
-      <div class="spots">${spots}</div>
-      <div class="ticket-foot"><span>No. ${tk.serial || '000000'}</span><span class="barcode"></span></div>
-      ${stamp}</div>`;
-  }
-  viewPlay(run){
-    const tk = run.ticket, S = ScratchLotto;
-    const settled = !tk || tk.paid !== null, over = this.roundOver(run);
-    if (tk) this.oddsTier = tk.tier;          // odds follow the ticket in your hands
-
-    let msg = `<div class="sc-msg">${this.tr('pick')}</div>`;
-    if (tk && !settled) msg = tk.freeSwipe && !tk.rev.some(Boolean)
-      ? `<div class="sc-msg win">${this.tr('freeSwipe')}</div>` : `<div class="sc-msg">${this.tr('drag')}</div>`;
-    else if (tk) msg = tk.paid ? `<div class="sc-msg win">${this.tr('won', { n: Fmt.num(tk.paid) })}</div>`
-      : `<div class="sc-msg lose">${this.tr('noMatch')}${tk.refund ? this.tr('refunded', { n: tk.refund }) : ''}</div>`;
-    let action = '';
-    if (tk && !settled){
-      // Scratching is by hand; "Reveal all" only shows while you hold a charge.
-      const tool = this.tool();
-      action = `<div class="sc-actions"><span class="sc-tool">${tool.icon} ${this.tr('toolLabel', { tool: this.tr('tool.' + tool.id) })}</span>
-        ${run.swipes > 0 ? `<button class="g-btn alt" data-act="scratchall">🧽 ${this.tr('revealAll')}<small>${this.tr('charges', { n: run.swipes })}</small></button>` : ''}</div>`;
+  money(n){ return '$' + Fmt.num(n) }
+  ticketName(T){ return this.tr('t.' + T.id) }
+  ruleText(T){ return this.tr('rule.' + T.rule, { need: T.need || 3 }) }
+  cellHtml(T, tk, i){
+    if (T.rule === 'numbers'){
+      if (i < T.wins) return `<div class="sc-num big"><b>${tk.wins[i]}</b></div>`;
+      const m = tk.mine[i - T.wins];
+      return `<div class="sc-num"><b>${m.num}</b><small>${this.money(Math.round(m.p * T.cost * ScratchLotto.prizeMult(this.lv('prize'))))}</small></div>`;
     }
-    else if (over) action = `<button class="g-btn big" data-act="finish">${this.tr('cashIn')}</button>`;
-    const pop = this.fx === 'win' ? `<div class="g-pop">${Art.icon('coin')} +${Fmt.num(tk.paid)}</div>` : '';
-
-    const stubs = S.TIERS.map(tier => {
-      const locked = !this.tierUnlocked(tier);
-      const disabled = locked || !settled || over || run.coins < tier.cost;
-      return `<button class="stub tier-${tier.id}" data-act="buy" data-tier="${tier.id}" ${disabled ? 'disabled' : ''}>
-        <div><b>${locked ? '🔒 ' : ''}${this.tierName(tier.id)}</b><small>${locked ? this.tr('unlock') : this.tr('pays', { mult: tier.mult })}</small></div><span class="price">${tier.cost}</span></button>`;
+    const c = tk.cells[i];
+    return c in ScratchLotto.MULTS ? `<b class="sc-mult">×${ScratchLotto.MULTS[c]}</b>` : Art.symbol(c);
+  }
+  spotHtml(T, tk, i){
+    const settled = tk.paid !== null, win = settled && tk.hit.includes(i);
+    const cls = ['spot', tk.rev[i] ? 'open' : '', settled ? (win ? 'win' : 'lose') : ''].join(' ');
+    const foil = tk.rev[i] ? '' : `<canvas class="foil" data-i="${i}" width="120" height="120" aria-label="${this.tr('spot', { n: i + 1 })}"></canvas>`;
+    return `<div class="${cls}" data-i="${i}">${this.cellHtml(T, tk, i)}${foil}</div>`;
+  }
+  viewTicket(){
+    const tk = this.data.ticket;
+    if (!tk) return `<div class="ticket-empty"><div>${Art.icon('ticket')}${this.tr('empty')}</div></div>`;
+    const T = this.ticketType(tk.tier), settled = tk.paid !== null, n = this.spotCount(T);
+    const idx = a => a.map(i => this.spotHtml(T, tk, i)).join('');
+    const all = Array.from({ length: n }, (_, i) => i);
+    const body = T.rule === 'numbers'
+      ? `<div class="sc-label">${this.tr('winNums')}</div><div class="spots sc-winrow">${idx(all.slice(0, T.wins))}</div>
+         <div class="sc-label">${this.tr('yourNums')}</div><div class="spots c${T.cols}">${idx(all.slice(T.wins))}</div>`
+      : `<div class="spots c${T.cols}">${idx(all)}</div>`;
+    const stamp = settled ? `<div class="ticket-stamp ${tk.paid ? 'win' : 'lose'}">${tk.paid ? this.tr(tk.big ? 'jackpot' : 'winner') : this.tr('noLuck')}</div>` : '';
+    return `<div class="ticket" style="--tc:${T.col[0]};--tc2:${T.col[1]}">
+      <div class="ticket-head"><div><small>${this.tr('ticketOf')}</small><b>${this.ticketName(T)}</b></div>
+        <div class="ticket-price"><div>${this.money(T.cost)}</div></div></div>
+      <div class="ticket-sub">${this.ruleText(T)}</div>${body}
+      <div class="ticket-foot"><span>No. ${tk.serial}</span><span class="barcode"></span></div>${stamp}</div>`;
+  }
+  /** The next thing worth saving up for, so there is always a clear short-term target. */
+  nextTarget(){
+    const D = this.data, next = ScratchLotto.TICKETS.find(T => !D.unlocked[T.id]);
+    if (next) return { text: this.tr('nextUnlock', { name: this.ticketName(next) }), cost: next.unlock };
+    return D.crown ? null : { text: this.tr('nextCrown'), cost: ScratchLotto.GOAL };
+  }
+  viewTop(){
+    const D = this.data, goal = ScratchLotto.GOAL, nt = this.nextTarget();
+    const goalHtml = D.crown ? `<div class="sc-goal done"><b>👑 ${this.tr('crownOwned')}</b></div>`
+      : `<div class="sc-goal"><div class="g-meter-top"><span>👑 ${this.tr('goal')}</span><span><b>${this.money(D.coins)}</b> / ${this.money(goal)}</span></div>
+          <div class="g-track"><i style="width:${Math.min(100, D.coins / goal * 100)}%"></i></div></div>`;
+    const next = nt ? `<div class="sc-next">🎯 ${nt.text}: <b>${this.money(nt.cost)}</b>${D.coins >= nt.cost ? ` · ${this.tr('canAfford')}` : ` · ${this.tr('toGo', { n: this.money(nt.cost - D.coins) })}`}</div>` : '';
+    return `<div class="sc-top"><div class="sc-coins">${Art.icon('coin')}<b>${this.money(D.coins)}</b></div>${goalHtml}</div>${next}`;
+  }
+  viewBooth(){
+    const D = this.data, busy = D.ticket && D.ticket.paid === null, luck = this.lv('luck');
+    const firstLocked = ScratchLotto.TICKETS.find(T => !D.unlocked[T.id]);
+    return ScratchLotto.TICKETS.map(T => {
+      const style = `style="--tc:${T.col[0]};--tc2:${T.col[1]}"`;
+      if (D.unlocked[T.id]){
+        const ret = ScratchLotto.avgReturn(T, luck, this.lv('prize'));
+        return `<button class="stub ${D.sel === T.id ? 'sel' : ''}" ${style} data-act="buy" data-tier="${T.id}" ${busy || D.coins < T.cost ? 'disabled' : ''}>
+          <div><b>${this.ticketName(T)}</b><small>${this.ruleText(T)}</small><small class="ret ${ret >= 1 ? 'up' : 'down'}">${this.tr('avgReturn', { n: Math.round(ret * 100) })}</small></div>
+          <span class="price">${this.money(T.cost)}</span></button>`;
+      }
+      if (T !== firstLocked) return `<div class="stub locked" ${style}><div><b>🔒 ${this.ticketName(T)}</b><small>${this.tr('unlockFirst')}</small></div><span class="price">${this.money(T.unlock)}</span></div>`;
+      return `<button class="stub locked next" ${style} data-act="unlock" data-tier="${T.id}" ${D.coins < T.unlock ? 'disabled' : ''}>
+        <div><b>🔓 ${this.ticketName(T)}</b><small>${this.ruleText(T)}</small><small>${this.tr('unlockFor', { n: this.money(T.unlock) })}</small></div><span class="price">${this.money(T.cost)}</span></button>`;
     }).join('');
-    const left = run.tickets ? Array.from({ length: run.tickets }, () => Art.icon('ticket')).join('') : `<span class="g-muted">${this.tr('noTickets')}</span>`;
-    const pays = [...S.SYMBOLS, ...(run.upgrades.joker ? [{ id: 'joker', value: this.tr('wild') }] : [])]
-      .map(s => `<div>${Art.symbol(s.id)}<span>${s.id === 'joker' ? this.tr('any') : '×3'}</span><b>${s.value}</b></div>`).join('');
-
-    return `<div class="sc-play">
-      <div class="sc-stage">${pop}${this.viewTicket(run)}${msg}${action}${this.oddsStrip(run)}</div>
-      <div class="booth">
-        <div class="g-panel"><h3>${this.tr('booth')}</h3><div class="stubs">${stubs}</div>
-          <div class="left-box"><h3>${this.tr('left')}</h3><div class="tickets-left">${left}</div></div></div>
-        <div class="g-panel"><h3>${this.tr('board')}</h3><div class="paytable">${pays}</div>${this.oddsHtml(run)}
-          <p class="g-muted board-hint">${this.tr('boardHint')}</p></div>
-      </div></div>`;
+  }
+  shopRow(icon, name, desc, lvl, max, cost, act, extra = ''){
+    const maxed = lvl >= max, poor = this.data.coins < cost;
+    return `<div class="sc-item"><span class="ico">${icon}</span><div><b>${name}</b>${max > 1 ? ` <span class="lv">${this.tr('lv', { n: lvl, max })}</span>` : ''}<p>${desc}</p></div>
+      ${maxed ? `<span class="g-muted sc-max">${this.tr('maxed')}</span>` : `<button class="g-btn sm" ${act} ${poor ? 'disabled' : ''}>${this.money(cost)}</button>`}${extra}</div>`;
+  }
+  viewShop(){
+    const D = this.data, rows = [];
+    for (const u of ScratchLotto.SHOP){
+      const l = this.lv(u.id);
+      if (u.id === 'autobuy' && l){
+        rows.push(`<div class="sc-item"><span class="ico">${u.icon}</span><div><b>${this.tr('up.autobuy')}</b><p>${this.tr('up.autobuyOn', { name: this.ticketName(this.ticketType(D.sel)) })}</p></div>
+          <button class="g-btn sm ${D.autobuy ? '' : 'alt'}" data-act="autobuy">${D.autobuy ? this.tr('on') : this.tr('off')}</button></div>`);
+        continue;
+      }
+      const desc = u.id === 'tool' ? this.tr('up.toolD', { tool: this.tr('tool.' + ScratchLotto.TOOLS[Math.min(4, l + 1)].id) })
+        : u.id === 'auto' ? this.tr('up.autoD', { s: ScratchLotto.autoInterval(l + 1).toFixed(1) })
+        : u.id === 'prize' ? this.tr('up.prizeD', { n: Math.round(ScratchLotto.prizeMult(l + 1) * 100) }) : this.tr(`up.${u.id}D`);
+      rows.push(this.shopRow(u.icon, this.tr('up.' + u.id), desc, l, u.max, u.max > l ? u.cost(l) : 0, `data-act="up" data-id="${u.id}"`));
+    }
+    if (!D.crown) rows.push(`<div class="sc-item sc-crown"><span class="ico">👑</span><div><b>${this.tr('crown')}</b><p>${this.tr('crownD')}</p></div>
+      <button class="g-btn sm" data-act="crown" ${D.coins < ScratchLotto.GOAL ? 'disabled' : ''}>${this.money(ScratchLotto.GOAL)}</button></div>`);
+    return rows.join('');
+  }
+  pct(x){ return x <= 0 ? '0%' : x < 0.001 ? '<0.1%' : (x * 100 < 10 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%' }
+  viewBoard(){
+    const T = this.ticketType(this.data.ticket?.tier || this.data.sel), pm = ScratchLotto.prizeMult(this.lv('prize')), luck = this.lv('luck');
+    const st = ScratchLotto.stats(T, luck), so = ScratchLotto.spotOdds(T, luck), pct = x => this.pct(x);
+    const amt = x => this.money(Math.round(x * T.cost * pm));
+    const head = `<div class="pt-row pt-head"><span></span><span class="lab"></span><span>${this.tr('oSpot')}</span><span>${this.tr('oHit')}</span><span>${this.tr('oPrize')}</span></div>`;
+    let rows;
+    if (T.rule === 'numbers') rows = T.prizes.map((x, i) => `<div class="pt-row"><span style="font-weight:700">#</span><span class="lab">${this.tr('underNum')}</span><em>${pct(so[i].p)}</em><em></em><b>${amt(x[0])}</b></div>`).join('');
+    else rows = T.syms.map((x, i) => {
+      const id = x[0], ico = id in ScratchLotto.MULTS ? `<b class="sc-mult sm">×${ScratchLotto.MULTS[id]}</b>` : Art.symbol(id);
+      const label = id === 'joker' ? this.tr('wild') : id in ScratchLotto.MULTS ? this.tr('multD') : T.rule === 'lines' ? this.tr('inLine') : '×' + T.need;
+      return `<div class="pt-row">${ico}<span class="lab">${label}</span><em>${pct(so[i].p)}</em><em>${pct(st.hit[id] || 0)}</em><b>${x[2] ? amt(x[2]) : ''}</b></div>`;
+    }).join('');
+    const match = T.rule === 'numbers' ? `<div class="pt-sum"><span>${this.tr('oMatch')}</span><b>${pct(ScratchLotto.numberOdds(T, luck))}</b></div>` : '';
+    return `<h3>${this.tr('board', { name: this.ticketName(T) })}</h3><p class="g-muted board-hint">${this.tr('hint.' + T.rule, { need: T.need || 3 })}</p>
+      <div class="pt">${head}${rows}</div>${match}
+      <div class="pt-sum"><span>${this.tr('oWin')}</span><b>${pct(st.win)}</b></div>
+      <div class="pt-sum"><span>${this.tr('oRet')}</span><b>${Math.round(st.ret * pm * 100)}%</b></div>`;
+  }
+  /** One compact row of per-spot chances right under the ticket (small screens, where the board is far below). */
+  viewStrip(){
+    const T = this.ticketType(this.data.ticket?.tier || this.data.sel), luck = this.lv('luck'), st = ScratchLotto.stats(T, luck), pct = x => this.pct(x);
+    const chips = T.rule === 'numbers' ? `<span>${this.tr('oMatch')} ${pct(ScratchLotto.numberOdds(T, luck))}</span>`
+      : ScratchLotto.spotOdds(T, luck).map(x => `<span>${x.id in ScratchLotto.MULTS ? '<b>×' + ScratchLotto.MULTS[x.id] + '</b>&nbsp;' : Art.symbol(x.id)}${pct(x.p)}</span>`).join('');
+    return `<div class="odds-strip">${chips}<span class="win">${this.tr('oWin')} ${pct(st.win)}</span></div>`;
+  }
+  render(){
+    const D = this.data, tk = D.ticket, settled = !tk || tk.paid !== null;
+    let msg = `<div class="sc-msg">${this.tr('pick')}</div>`;
+    if (tk && !settled) msg = `<div class="sc-msg">${this.tr(this.lv('auto') ? 'dragAuto' : 'drag')}</div>`;
+    else if (tk) msg = tk.paid ? `<div class="sc-msg win">${this.tr(tk.big ? 'wonBig' : 'won', { n: this.money(tk.paid) })}</div>` : `<div class="sc-msg lose">${this.tr('noWin')}</div>`;
+    const tool = this.tool();
+    const broke = settled && D.coins < this.cheapest();
+    const action = broke ? `<button class="g-btn big" data-act="change">${this.tr('change')}</button>`
+      : tk && !settled ? `<div class="sc-actions"><span class="sc-tool">${tool.icon} ${this.tr('toolLabel', { tool: this.tr('tool.' + tool.id) })}</span></div>` : '';
+    const pop = this.fx === 'win' || this.fx === 'jackpot' ? `<div class="g-pop ${this.fx}">${Art.icon('coin')} +${this.money(tk.paid)}</div>`
+      : this.fx === 'crown' ? `<div class="g-pop jackpot">👑 ${this.tr('crownWon')}</div>` : '';
+    this.root.innerHTML = `<div class="g g-scratch sc2">
+      ${this.viewTop()}
+      <div class="sc-play">
+        <div class="sc-stage">${pop}${this.viewTicket()}${msg}${action}${this.viewStrip()}</div>
+        <div class="booth">
+          <div class="g-panel"><h3>${this.tr('booth')}</h3><div class="stubs">${this.viewBooth()}</div></div>
+          <div class="g-panel">${this.viewBoard()}</div>
+          <div class="g-panel"><h3>${this.tr('shop')}</h3><div class="sc-shop">${this.viewShop()}</div></div>
+          <p class="g-muted sc-stats">${this.tr('stats', { n: Fmt.num(D.scratched), b: this.money(D.biggest), e: this.money(D.earned) })}
+            · <button class="sc-link" data-act="reset">${this.tr('reset')}</button></p>
+        </div></div></div>`;
+    this.afterRender();
   }
 }
 
