@@ -4301,6 +4301,963 @@ requestAnimationFrame(frame);
 </body>
 </html>
 </script>
+<script type="text/plain" id="src-mini-golf">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Low Poly Mini Golf</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#15241c;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+#top{position:fixed;left:6px;right:6px;top:6px;display:flex;gap:6px;align-items:stretch;pointer-events:none;z-index:2}
+.hc{flex:none;background:#0b1020d9;border:2px solid #fff2;border-radius:12px;padding:4px 10px;display:flex;flex-direction:column;justify-content:center;line-height:1.15}
+.hc b{font-size:15px;white-space:nowrap}
+.hc small{font-size:10px;color:#9aa3b8;text-transform:uppercase;letter-spacing:.06em;font-weight:700;white-space:nowrap}
+#pl{display:flex;gap:5px;flex:1;min-width:0;flex-wrap:wrap;align-content:flex-start}
+.pc{background:#0b1020d9;border:2px solid #fff2;border-radius:12px;padding:3px 8px;display:flex;align-items:center;gap:6px;font-size:12px;min-width:0;max-width:160px;height:28px}
+.pc i{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:inset -2px -2px 2px #0006}
+.pc span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;min-width:0}
+.pc em{font-style:normal;color:#cdd5ea;padding-left:2px;white-space:nowrap}
+.pc.me{border-color:#ffcf3faa}
+.pc.done em{color:#5be37d;font-weight:800}
+.btns{position:fixed;left:6px;top:calc(var(--th,52px) + 12px);display:flex;flex-direction:column;gap:6px;z-index:2}
+.btns button{width:46px;height:46px;padding:0;border-radius:11px;background:#0b1020cc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1}
+.btns button span{font-size:18px}
+.btns button small{font-size:9px;color:#cdd5ea}
+button{font:inherit;font-size:13px;color:#fff;background:#2c3550;border:1px solid #fff3;border-radius:9px;padding:8px 12px;cursor:pointer}
+button:hover{background:#3a4670}
+button:disabled{opacity:.45;cursor:default}
+button.off{opacity:.5;text-decoration:line-through}
+#tags{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.tag{position:absolute;left:0;top:0;font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:#000b;white-space:nowrap;border:1px solid currentColor;will-change:transform}
+#tray{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;pointer-events:none;z-index:2}
+#msg{font-size:13px;color:#e6ebf7;background:#000b;border-radius:99px;padding:5px 14px;text-align:center;max-width:94vw}
+#msg:empty{display:none}
+#pow{width:min(280px,70vw);height:8px;background:#0008;border-radius:9px;overflow:hidden;opacity:0;transition:opacity .15s}
+#pow i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5be37d,#ffcf3f,#ff4d5e)}
+.ov{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:14px;z-index:5}
+.modal{background:#1b2340;border:1px solid #fff3;border-radius:16px;padding:20px;max-width:380px;width:100%;text-align:center;max-height:96vh;overflow:auto}
+.modal.wide{max-width:640px}
+.modal h2{margin:0 0 6px;font-size:24px;color:#ffcf3f}
+.modal p{margin:6px 0 12px;color:#cdd5ea;line-height:1.45;font-size:14px}
+.modal h3{margin:14px 0 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3b8;font-weight:600}
+.modal .row{display:flex;gap:8px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
+.modal .main{background:#3a6df0;font-size:15px;padding:10px 20px}
+.modal .main:hover{background:#4c7cf5}
+.modal input{font:inherit;font-size:16px;text-align:center;padding:9px;border-radius:9px;border:1px solid #fff3;background:#10172e;color:#fff}
+#mCode{text-transform:uppercase;letter-spacing:.2em;width:6.5em}
+#mName{width:12em}
+.net{min-height:1.4em;font-size:13px;margin:8px 0 0;color:#cdd5ea}
+#lList{list-style:none;margin:12px 0;padding:0;display:grid;gap:6px;text-align:left}
+#lList li{display:flex;align-items:center;gap:8px;background:#10172e;border-radius:9px;padding:7px 10px;font-weight:700;font-size:14px}
+#lList li i{width:14px;height:14px;border-radius:50%;flex:none}
+#lList li small{margin-left:auto;color:#9aa3b8;font-weight:600;font-size:11px;text-transform:uppercase}
+#lCode{font-size:30px;font-weight:800;letter-spacing:.25em;color:#fff;margin:4px 0}
+.card{overflow-x:auto;margin:8px 0 10px}
+.card table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+.card th,.card td{padding:5px 3px;border-bottom:1px solid #fff1;text-align:center;min-width:22px}
+.card th{color:#9aa3b8;font-weight:600}
+.card td.n{text-align:left;font-weight:700;white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis}
+.card td.n i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.card td.t{font-weight:800;font-size:13px}
+.card td.u{color:#5be37d}.card td.o{color:#ff8a8a}.card td.cur{background:#ffffff10}
+.card tr.par td{color:#9aa3b8}
+.card .lead td.n{color:#ffcf3f}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="tags"></div>
+<div id="top"><div class="hc"><small id="hName"></small><b id="hHole"></b></div><div class="hc"><small id="hSL"></small><b id="hS"></b></div><div id="pl"></div></div>
+<div class="btns">
+  <button id="view"></button><button id="menuB"></button><button id="lang"></button><button id="mute"></button>
+</div>
+<div id="tray"><div id="pow"><i></i></div><div id="msg"></div></div>
+
+<div class="ov" id="menu"><div class="modal">
+  <h2 id="mT"></h2><p id="mP"></p>
+  <div class="row"><input id="mName" maxlength="12" autocomplete="off" spellcheck="false"></div>
+  <div class="row"><button class="main" id="mSolo"></button></div>
+  <h3 id="mO"></h3>
+  <div class="row"><button id="mHost"></button></div>
+  <div class="row"><input id="mCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false"><button id="mJoin"></button></div>
+  <p class="net" id="mNet"></p>
+</div></div>
+
+<div class="ov" id="lobby"><div class="modal">
+  <h2 id="lT"></h2>
+  <div id="lCode"></div>
+  <p id="lP"></p>
+  <div class="row"><button id="lShare"></button></div>
+  <ul id="lList"></ul>
+  <div class="row"><button class="main" id="lStart"></button><button id="lLeave"></button></div>
+  <p class="net" id="lNet"></p>
+</div></div>
+
+<div class="ov" id="ov"><div class="modal wide"><h2 id="oT"></h2><p id="oP"></p><div class="card" id="oCard"></div><div class="row"><button class="main" id="oB"></button><button id="oB2"></button></div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const LANG_KEY = 'miniGolfLang', BEST_KEY = 'miniGolfBest', NAME_KEY = 'miniGolfName';
+const TXT = {
+  en: { title: 'Low Poly Mini Golf', menuP: 'Nine holes of mini golf. Online, up to 6 players play every hole at the same time.',
+    namePh: 'Your name', solo: 'Solo round', online: 'Play online (2-6 players)', host: 'Create room', join: 'Join', code: 'CODE',
+    lobby: 'Lobby', lobbyHost: 'Share this code or the invite link. Start when everyone is in.', lobbyGuest: 'You are in! Waiting for the host to start…',
+    share: '🔗 Share invite link', shareText: 'Join my mini golf game!', copied: 'Link copied! Send it to your friends.',
+    start: 'Start round', needTwo: 'Waiting for at least one more player…', leave: 'Leave', hostTag: 'Host', youTag: 'You',
+    connecting: 'Connecting…', notFound: 'Room not found. Check the code.', netErr: 'Could not connect. Try again.',
+    noLib: 'Could not load the online library. Check your connection.', full: 'That room is full (6 players).', busy: 'That round already started. Wait for the next one.',
+    nolib: 'Could not load the 3D engine. Check your internet connection and reopen the game.',
+    hole: 'Hole {n}/9', par: 'Par {n}', strokes: 'Strokes', view: 'View', vAll: 'Hole', vBall: 'Ball', menu: 'Menu', snd: 'Sound',
+    aim: 'Drag back from anywhere to aim, release to putt.', roll: '', water: 'Splash! +1 stroke. Back to your last spot.',
+    maxS: 'Max strokes ({n}). Picking up.', wait: 'Waiting for the others…', hurry: '{n}s left for players still on the hole.',
+    sunk: '{s} in {n}!', s_ace: 'Hole in one', s_m3: 'Albatross', s_m2: 'Eagle', s_m1: 'Birdie', s_0: 'Par', s_1: 'Bogey', s_2: 'Double bogey', s_x: 'Holed',
+    card: 'Scorecard', after: 'After hole {n}', total: 'Tot', parRow: 'Par', next: 'Next hole', nextIn: 'Next hole in {n}s…',
+    final: 'Final scores', youWin: 'You win!', wins: '{n} wins!', tie: "It's a tie!", soloEnd: '{n} strokes ({p} vs par).', record: ' New best!',
+    again: 'Play again', toLobby: 'Back to lobby', toMenu: 'Back to menu', waitHost: 'Waiting for the host…',
+    hostLeft: 'The host left', hostLeftP: 'The round ended because the host disconnected.', you: 'You', player: 'Player',
+    confirmLeave: 'Leave this online game?', round: 'Round', best: 'Best' },
+  es: { title: 'Minigolf Low Poly', menuP: 'Nueve hoyos de minigolf. En línea, hasta 6 jugadores juegan cada hoyo a la vez.',
+    namePh: 'Tu nombre', solo: 'Ronda en solitario', online: 'Jugar en línea (2-6 jugadores)', host: 'Crear sala', join: 'Unirse', code: 'CÓDIGO',
+    lobby: 'Sala', lobbyHost: 'Comparte este código o el enlace. Empieza cuando estén todos.', lobbyGuest: '¡Ya estás dentro! Esperando a que el anfitrión empiece…',
+    share: '🔗 Compartir invitación', shareText: '¡Únete a mi partida de minigolf!', copied: '¡Enlace copiado! Envíaselo a tus amigos.',
+    start: 'Empezar ronda', needTwo: 'Esperando al menos a otro jugador…', leave: 'Salir', hostTag: 'Anfitrión', youTag: 'Tú',
+    connecting: 'Conectando…', notFound: 'Sala no encontrada. Revisa el código.', netErr: 'No se pudo conectar. Inténtalo de nuevo.',
+    noLib: 'No se pudo cargar la librería online. Revisa tu conexión.', full: 'Esa sala está llena (6 jugadores).', busy: 'Esa ronda ya empezó. Espera a la siguiente.',
+    nolib: 'No se pudo cargar el motor 3D. Revisa tu conexión a internet y vuelve a abrir el juego.',
+    hole: 'Hoyo {n}/9', par: 'Par {n}', strokes: 'Golpes', view: 'Vista', vAll: 'Hoyo', vBall: 'Bola', menu: 'Menú', snd: 'Sonido',
+    aim: 'Arrastra hacia atrás desde cualquier punto para apuntar y suelta para golpear.', roll: '', water: '¡Al agua! +1 golpe. Vuelves a tu último sitio.',
+    maxS: 'Máximo de golpes ({n}). Recoges la bola.', wait: 'Esperando a los demás…', hurry: 'Quedan {n}s para los que siguen en el hoyo.',
+    sunk: '¡{s} en {n}!', s_ace: 'Hoyo en uno', s_m3: 'Albatros', s_m2: 'Eagle', s_m1: 'Birdie', s_0: 'Par', s_1: 'Bogey', s_2: 'Doble bogey', s_x: 'Dentro',
+    card: 'Tarjeta', after: 'Tras el hoyo {n}', total: 'Tot', parRow: 'Par', next: 'Siguiente hoyo', nextIn: 'Siguiente hoyo en {n}s…',
+    final: 'Resultado final', youWin: '¡Ganas!', wins: '¡Gana {n}!', tie: '¡Empate!', soloEnd: '{n} golpes ({p} respecto al par).', record: ' ¡Nuevo récord!',
+    again: 'Jugar otra vez', toLobby: 'Volver a la sala', toMenu: 'Volver al menú', waitHost: 'Esperando al anfitrión…',
+    hostLeft: 'El anfitrión se fue', hostLeftP: 'La ronda terminó porque el anfitrión se desconectó.', you: 'Tú', player: 'Jugador',
+    confirmLeave: '¿Salir de esta partida en línea?', round: 'Ronda', best: 'Mejor' },
+};
+let lang = 'en';
+try { lang = localStorage.getItem(LANG_KEY) === 'es' ? 'es' : 'en'; } catch (e) {}
+const tr = (k, v) => {
+  let s = TXT[lang][k] ?? TXT.en[k] ?? k;
+  if (v !== undefined && v !== null) {
+    if (typeof v === 'object') for (const q in v) s = s.split('{' + q + '}').join(v[q]);
+    else s = s.split('{n}').join(v);
+  }
+  return s;
+};
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let muted = false;
+
+if (typeof THREE === 'undefined') {
+  $('#msg').textContent = tr('nolib');
+  throw new Error('THREE not loaded');
+}
+
+/* ---------- course ----------
+ * Coordinates are (x, z) on the ground; the tee is near +z (bottom of the screen), the cup towards -z.
+ * out: closed outline (walls on every edge). walls: extra [x1,z1,x2,z2] walls. blocks: solid polygons.
+ * posts: [x,z,r]. sand / water: [x0,z0,x1,z1] rects. slopes: [x0,z0,x1,z1,ax,az] push zones.
+ * funnel: [x,z,r,strength] pulls towards its centre. spin: [x,z,halfLen,speed] rotating bar. */
+const rect = (x0, z0, x1, z1) => [[x0, z0], [x1, z0], [x1, z1], [x0, z1]];
+const HOLES = [
+  { n: ['Warm-up', 'Calentamiento'], par: 2, out: rect(-1.5, -6, 1.5, 6), tee: [0, 4.8], cup: [0, -4.2] },
+  { n: ['Dogleg', 'Codo'], par: 3, out: [[-1.5, 6], [1.5, 6], [1.5, -1.5], [7, -1.5], [7, -4.5], [-1.5, -4.5]], tee: [0, 4.8], cup: [5.6, -3],
+    blocks: [[[-1.5, -4.5], [0.3, -4.5], [-1.5, -2.7]]] },
+  { n: ['Pinball', 'Pinball'], par: 2, out: rect(-2.5, -7, 2.5, 7), tee: [0, 5.8], cup: [0, -5.8],
+    posts: [[-1.2, 2.6, .28], [1.2, 2.6, .28], [0, 0.8, .3], [-1.7, -1, .28], [1.7, -1, .28], [0, -2.9, .3], [-1, -4.4, .26], [1, -4.4, .26]] },
+  { n: ['Bunker', 'Búnker'], par: 3, out: rect(-3, -6.5, 3, 6.5), tee: [0, 5.4], cup: [0.4, -5],
+    sand: [[-3, -1.2, 1.7, 1.2], [-1.4, -4, 2, -3.2]] },
+  { n: ['Windmill', 'Molino'], par: 3, out: rect(-2.2, -7, 2.2, 7), tee: [0, 5.8], cup: [0, -5.4],
+    walls: [[-2.2, 0, -0.75, 0], [0.75, 0, 2.2, 0]], spin: [0, 0, 0.62, 1.7], posts: [[0, 0, .13]] },
+  { n: ['Lake', 'Lago'], par: 3, out: rect(-2.5, -7, 2.5, 7), tee: [-1.2, 5.6], cup: [-1.2, -5],
+    water: [[-2.5, -1.6, 1.35, 1.6]], posts: [[1.9, -3.4, .25]] },
+  { n: ['Hillside', 'Ladera'], par: 3, out: rect(-3, -6.5, 3, 6.5), tee: [1.6, 5.4], cup: [-1.8, -5],
+    slopes: [[-3, -2, 3, 2.4, 2.3, 0]], posts: [[0.6, -3.4, .3]] },
+  { n: ['Zigzag', 'Zigzag'], par: 3, out: rect(-3, -8, 3, 8), tee: [-1.8, 6.6], cup: [1.8, -6.3],
+    walls: [[-3, 3, 1.5, 3], [-1.5, -2.5, 3, -2.5]], posts: [[2.2, 0.3, .26], [-2.2, -5, .26]] },
+  { n: ['Volcano', 'Volcán'], par: 3, out: rect(-3.5, -7, 3.5, 7), tee: [0, 6], cup: [0, -4],
+    blocks: [[[0, 1.4], [1.5, 2.9], [0, 4.4], [-1.5, 2.9]]], funnel: [0, -4, 2, 3], posts: [[-2.3, -0.6, .3], [2.3, -0.6, .3]] },
+];
+const NH = HOLES.length, TOTAL_PAR = HOLES.reduce((n, h) => n + h.par, 0);
+const MAXS = 10;                          // strokes cap per hole
+
+/* ---------- constants ---------- */
+const R = 0.16, WH = 0.1, WALL_H = 0.32, CUP = 0.24;
+const MAXV = 11, FRIC = 1.15, SAND = 7.5, DAMP = 0.33, BOUNCE = 0.72;
+const COLS = ['#ff5d5d', '#4da3ff', '#ffd23f', '#5be37d', '#c77dff', '#ff9f43'];
+const colHex = id => parseInt(COLS[id % 6].slice(1), 16);
+
+/* ---------- renderer / scene ---------- */
+const canvas = $('#c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8fc9e8);
+scene.fog = new THREE.Fog(0x8fc9e8, 30, 70);
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 150);
+scene.add(new THREE.HemisphereLight(0xe8f4ff, 0x3a5a2a, 0.8));
+const sun = new THREE.DirectionalLight(0xfff1d6, 0.8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+scene.add(sun, sun.target);
+
+const mat = (color, extra) => new THREE.MeshPhongMaterial(Object.assign({ color, flatShading: true, shininess: 10 }, extra));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), mat(0x4f9a3c));
+ground.rotation.x = -Math.PI / 2; ground.position.y = -0.06; ground.receiveShadow = true;
+scene.add(ground);
+
+let holeGroup = null, segs = [], H = null, spinMesh = null, spinA = 0, flag = null, slopeMarks = [];
+const shapeOf = pts => { const s = new THREE.Shape(); pts.forEach(([x, z], i) => i ? s.lineTo(x, -z) : s.moveTo(x, -z)); return s; };
+const flatGeo = pts => { const g = new THREE.ShapeGeometry(shapeOf(pts)); g.rotateX(-Math.PI / 2); return g; };
+const inRect = (r, x, z) => x >= Math.min(r[0], r[2]) && x <= Math.max(r[0], r[2]) && z >= Math.min(r[1], r[3]) && z <= Math.max(r[1], r[3]);
+const rng = seed => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+function bounds(h) {
+  const xs = h.out.map(p => p[0]), zs = h.out.map(p => p[1]);
+  return { x0: Math.min(...xs), x1: Math.max(...xs), z0: Math.min(...zs), z1: Math.max(...zs) };
+}
+
+function buildHole(i) {
+  if (holeGroup) { scene.remove(holeGroup); holeGroup.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+  H = HOLES[i]; holeGroup = new THREE.Group(); scene.add(holeGroup);
+  const add = (geo, m, x = 0, y = 0, z = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; holeGroup.add(o); return o; };
+  // walls (collision list + meshes)
+  segs = [];
+  const edges = pts => pts.forEach((p, k) => { const q = pts[(k + 1) % pts.length]; segs.push([p[0], p[1], q[0], q[1]]); });
+  edges(H.out);
+  (H.walls || []).forEach(w => segs.push(w.slice()));
+  (H.blocks || []).forEach(edges);
+  const wallM = mat(0x9a6334), capM = mat(0xc98d52), feltM = mat(0x2fae5a), fringeM = mat(0x3c8a3a);
+  const fr = add(flatGeo(H.out), fringeM, 0, -0.03, 0); fr.scale.set(1.0, 1, 1.0);
+  add(flatGeo(H.out), feltM, 0, 0, 0).castShadow = false;
+  segs.forEach(([x1, z1, x2, z2]) => {
+    const L = Math.hypot(x2 - x1, z2 - z1), a = Math.atan2(-(z2 - z1), x2 - x1);
+    const w = add(new THREE.BoxGeometry(L + 2 * WH, WALL_H, 2 * WH), wallM, (x1 + x2) / 2, WALL_H / 2 - 0.02, (z1 + z2) / 2); w.rotation.y = a;
+    const c = add(new THREE.BoxGeometry(L + 2 * WH + 0.02, 0.04, 2 * WH + 0.04), capM, (x1 + x2) / 2, WALL_H, (z1 + z2) / 2); c.rotation.y = a;
+  });
+  (H.blocks || []).forEach(pts => {
+    const g = new THREE.ExtrudeGeometry(shapeOf(pts), { depth: WALL_H, bevelEnabled: false }); g.rotateX(-Math.PI / 2);
+    add(g, mat(0x7a7f8c), 0, 0, 0);
+  });
+  (H.posts || []).forEach(([x, z, r]) => { add(new THREE.CylinderGeometry(r, r * 1.05, WALL_H + 0.06, 8), mat(0xe8e2d0), x, (WALL_H + 0.06) / 2, z); add(new THREE.CylinderGeometry(r * 0.75, r * 0.75, 0.04, 8), mat(0xd6243a), x, WALL_H + 0.07, z); });
+  const zone = (r, m, y) => { const w = Math.abs(r[2] - r[0]), d = Math.abs(r[3] - r[1]); const g = new THREE.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2); const o = add(g, m, (r[0] + r[2]) / 2, y, (r[1] + r[3]) / 2); o.castShadow = false; return o; };
+  (H.sand || []).forEach(r => zone(r, mat(0xdcb86a), 0.006));
+  (H.water || []).forEach(r => zone(r, mat(0x2f86d6, { transparent: true, opacity: 0.92, shininess: 60 }), 0.008));
+  slopeMarks = [];
+  (H.slopes || []).forEach(s => {
+    zone(s, mat(0x49c06d), 0.004);
+    const ang = Math.atan2(-s[5], s[4]), chev = new THREE.Shape();
+    chev.moveTo(-0.18, 0.22); chev.lineTo(0.12, 0); chev.lineTo(-0.18, -0.22); chev.lineTo(-0.06, 0); chev.closePath();
+    const cg = new THREE.ShapeGeometry(chev); cg.rotateX(-Math.PI / 2);
+    const cm = mat(0xdaf5c8, { transparent: true, opacity: 0.7 });
+    const x0 = Math.min(s[0], s[2]), x1 = Math.max(s[0], s[2]), z0 = Math.min(s[1], s[3]), z1 = Math.max(s[1], s[3]);
+    for (let x = x0 + 0.5; x < x1; x += 1) for (let z = z0 + 0.5; z < z1; z += 1) {
+      const o = add(cg, cm, x, 0.01, z); o.rotation.y = ang; o.castShadow = false; slopeMarks.push({ o, x, z, x0, x1, z0, z1, dx: Math.cos(ang), dz: -Math.sin(ang) });
+    }
+  });
+  if (H.funnel) {
+    const [fx, fz, fr2] = H.funnel;
+    for (let k = 1; k <= 3; k++) { const g = new THREE.RingGeometry(fr2 * k / 3 - 0.05, fr2 * k / 3, 24); g.rotateX(-Math.PI / 2); add(g, mat(0x248a47), fx, 0.005, fz).castShadow = false; }
+  }
+  // tee mat + cup + flag
+  { const g = new THREE.PlaneGeometry(0.9, 0.7); g.rotateX(-Math.PI / 2); add(g, mat(0x1e6e3a), H.tee[0], 0.005, H.tee[1]).castShadow = false; }
+  { const g = new THREE.CircleGeometry(CUP, 14); g.rotateX(-Math.PI / 2); add(g, new THREE.MeshBasicMaterial({ color: 0x111111 }), H.cup[0], 0.007, H.cup[1]).castShadow = false; }
+  flag = new THREE.Group(); flag.position.set(H.cup[0], 0, H.cup[1]); holeGroup.add(flag);
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.5, 6), mat(0xf4f4ee)); pole.position.y = 0.75; pole.castShadow = true; flag.add(pole);
+  const fs = new THREE.Shape(); fs.moveTo(0, 0); fs.lineTo(0.55, -0.17); fs.lineTo(0, -0.34); fs.closePath();
+  const fm = new THREE.Mesh(new THREE.ShapeGeometry(fs), mat(0xff3b4e, { side: THREE.DoubleSide })); fm.position.set(0.02, 1.5, 0); fm.castShadow = true; flag.add(fm);
+  // windmill bar
+  spinMesh = null;
+  if (H.spin) {
+    const [sx, sz, sl] = H.spin; spinMesh = new THREE.Group(); spinMesh.position.set(sx, 0, sz); holeGroup.add(spinMesh);
+    for (let k = 0; k < 2; k++) {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(sl, 0.2, 0.12), mat(k ? 0xf4f4ee : 0xd6243a)); b.position.set((k ? 1 : -1) * sl / 2, 0.16, 0); b.castShadow = true; spinMesh.add(b);
+    }
+  }
+  // scenery: low-poly trees and rocks around the course (same every visit)
+  const b = bounds(H), rnd = rng(1234 + i * 77), treeM = mat(0x2c7a3a), trunkM = mat(0x6b4426), rockM = mat(0x8a8f99);
+  for (let k = 0; k < 22; k++) {
+    const side = k % 4, t = rnd();
+    let x = side < 2 ? b.x0 - 1.4 - rnd() * 4 : b.x1 + 1.4 + rnd() * 4, z = b.z0 - 3 + t * (b.z1 - b.z0 + 6);
+    if (side === 1) x = b.x1 + 1.4 + rnd() * 4;
+    if (side === 3) { x = b.x0 + rnd() * (b.x1 - b.x0); z = b.z0 - 1.6 - rnd() * 4; }
+    if (rnd() < 0.75) {
+      const s = 0.7 + rnd() * 0.8;
+      add(new THREE.CylinderGeometry(0.08 * s, 0.12 * s, 0.5 * s, 5), trunkM, x, 0.25 * s, z);
+      add(new THREE.ConeGeometry(0.6 * s, 1.5 * s, 6), treeM, x, 0.5 * s + 0.75 * s, z).rotation.y = rnd() * 3;
+    } else add(new THREE.DodecahedronGeometry(0.25 + rnd() * 0.3, 0), rockM, x, 0.1, z).rotation.set(rnd() * 3, rnd() * 3, 0);
+  }
+  // shadow camera covers this hole
+  const cx = (b.x0 + b.x1) / 2, cz = (b.z0 + b.z1) / 2, ext = Math.max(b.x1 - b.x0, b.z1 - b.z0) / 2 + 3;
+  sun.position.set(cx - 6, 16, cz + 7); sun.target.position.set(cx, 0, cz);
+  Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 1, far: 50 });
+  sun.shadow.camera.updateProjectionMatrix();
+}
+
+/* ---------- balls ---------- */
+const ballGeo = new THREE.IcosahedronGeometry(R, 1);
+function makeBall(id, ghost) {
+  const m = new THREE.Mesh(ballGeo, mat(colHex(id), ghost ? { transparent: true, opacity: 0.5 } : { shininess: 40 }));
+  m.castShadow = !ghost; scene.add(m); return m;
+}
+const me = { x: 0, z: 0, vx: 0, vz: 0, strokes: 0, lx: 0, lz: 0, state: 'idle', slowT: 0, sinkT: 0, mesh: null, roll: 0 };
+const ghosts = new Map();                 // id -> { mesh, tag, x, z, tx, tz, s, done }
+
+/* aim arrow */
+const arrow = new THREE.Group(); scene.add(arrow); arrow.visible = false;
+const arrowM = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
+const shaft = new THREE.Mesh(new THREE.BoxGeometry(1, 0.02, 0.07), arrowM); arrow.add(shaft);
+const tipGeo = new THREE.ConeGeometry(0.13, 0.3, 3); tipGeo.rotateZ(-Math.PI / 2);
+const tip = new THREE.Mesh(tipGeo, arrowM); arrow.add(tip);
+
+/* ---------- sound ---------- */
+let AC = null;
+function tone(f, d = 0.08, type = 'sine', v = 0.12, slide = 0) {
+  if (muted) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime;
+    o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f + slide), t + d);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.001, t + d);
+    o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + d + 0.02);
+  } catch (e) {}
+}
+const sPutt = p => { tone(220 + p * 160, 0.09, 'triangle', 0.18, -120); };
+let lastClack = 0;
+const sClack = v => { const n = performance.now(); if (n - lastClack < 60) return; lastClack = n; tone(700 + Math.random() * 200, 0.04, 'square', Math.min(0.08, 0.02 + v * 0.012)); };
+const sCup = () => { tone(520, 0.08, 'sine', 0.2); setTimeout(() => tone(390, 0.12, 'sine', 0.2), 90); setTimeout(() => tone(780, 0.2, 'triangle', 0.12), 220); };
+const sSplash = () => { tone(300, 0.35, 'sawtooth', 0.06, -250); tone(900, 0.2, 'sine', 0.04, -700); };
+
+/* ---------- physics ---------- */
+function collideSeg(x1, z1, x2, z2, rad, spin) {
+  const dx = x2 - x1, dz = z2 - z1, L2 = dx * dx + dz * dz;
+  let t = L2 ? ((me.x - x1) * dx + (me.z - z1) * dz) / L2 : 0; t = Math.max(0, Math.min(1, t));
+  const px = x1 + dx * t, pz = z1 + dz * t;
+  let nx = me.x - px, nz = me.z - pz; const d = Math.hypot(nx, nz);
+  if (d >= rad || d < 1e-7) return;
+  nx /= d; nz /= d; me.x = px + nx * rad; me.z = pz + nz * rad;
+  let svx = 0, svz = 0;
+  if (spin) { svx = -spin.w * (pz - spin.z); svz = spin.w * (px - spin.x); }   // surface speed of the rotating bar
+  const vn = (me.vx - svx) * nx + (me.vz - svz) * nz;
+  if (vn < 0) { me.vx -= (1 + BOUNCE) * vn * nx; me.vz -= (1 + BOUNCE) * vn * nz; if (-vn > 0.5) sClack(-vn); }
+}
+function collideCircle(cx, cz, rad) {
+  let nx = me.x - cx, nz = me.z - cz; const d = Math.hypot(nx, nz);
+  if (d >= rad || d < 1e-7) return;
+  nx /= d; nz /= d; me.x = cx + nx * rad; me.z = cz + nz * rad;
+  const vn = me.vx * nx + me.vz * nz;
+  if (vn < 0) { me.vx -= (1 + BOUNCE) * vn * nx; me.vz -= (1 + BOUNCE) * vn * nz; if (-vn > 0.5) sClack(-vn); }
+}
+/** One fixed physics step for the local ball. Returns 'cup', 'water', 'stop' or null. */
+function stepBall(h) {
+  let ax = 0, az = 0, pushed = false;
+  for (const s of H.slopes || []) if (inRect(s, me.x, me.z)) { ax += s[4]; az += s[5]; pushed = true; }
+  if (H.funnel) {
+    const [fx, fz, fr, k] = H.funnel, d = Math.hypot(fx - me.x, fz - me.z);
+    if (d < fr && d > 0.02) { const f = k * (0.35 + 0.65 * d / fr); ax += (fx - me.x) / d * f; az += (fz - me.z) / d * f; pushed = true; }
+  }
+  me.vx += ax * h; me.vz += az * h;
+  const inSand = (H.sand || []).some(r => inRect(r, me.x, me.z));
+  let sp = Math.hypot(me.vx, me.vz);
+  if (sp > 0) { const ns = Math.max(0, sp - ((inSand ? SAND : FRIC) + DAMP * sp) * h); me.vx *= ns / sp; me.vz *= ns / sp; sp = ns; }
+  me.x += me.vx * h; me.z += me.vz * h;
+  me.roll += sp * h / R;
+  for (const s of segs) collideSeg(s[0], s[1], s[2], s[3], R + WH);
+  for (const p of H.posts || []) collideCircle(p[0], p[1], p[2] + R);
+  if (H.spin) {
+    const [sx, sz, sl, w] = H.spin, c = Math.cos(spinA) * sl, s = Math.sin(spinA) * sl;
+    collideSeg(sx - c, sz + s, sx + c, sz - s, R + 0.06, { x: sx, z: sz, w: -w });
+  }
+  // cup: slow enough over the hole drops in; near the lip a slow ball gets pulled in; a fast one lips out
+  const cd = Math.hypot(me.x - H.cup[0], me.z - H.cup[1]);
+  sp = Math.hypot(me.vx, me.vz);
+  if (cd < CUP + R * 0.5 && sp < 1.6 && cd > 0.01) { me.vx += (H.cup[0] - me.x) / cd * 5 * h; me.vz += (H.cup[1] - me.z) / cd * 5 * h; }
+  if (cd < CUP - R * 0.3 && sp < 4.2) return 'cup';
+  if (cd < CUP && sp >= 4.2) { me.vx *= 0.995; me.vz *= 0.995; }
+  if ((H.water || []).some(r => inRect(r, me.x, me.z))) return 'water';
+  me.slowT = sp < 0.14 ? me.slowT + h : 0;
+  if ((sp < 0.03 && !pushed) || me.slowT > 0.6) { me.vx = me.vz = 0; return 'stop'; }
+  return null;
+}
+
+/* ---------- game state ---------- */
+let mode = 'menu';                        // menu | solo | online
+let phase = 'idle';                       // play | card | over | lobby | idle
+let hi = 0;                               // current hole
+let myId = 0, players = [], scores = {};  // players: [{ id, name }], scores: id -> [strokes per hole]
+let viewMode = 'all', hurryEnd = 0, cardEnd = 0, cardTimer = null;
+let myName = '';
+try { myName = localStorage.getItem(NAME_KEY) || ''; } catch (e) {}
+let best = 0;
+try { best = +localStorage.getItem(BEST_KEY) || 0; } catch (e) {}
+const cleanName = s => String(s || '').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 12);
+const nameOf = id => { const p = players.find(q => q.id === id); return p ? (p.name || tr('player') + ' ' + (id + 1)) : '?'; };
+const scoreOf = (id, h) => (scores[id] || [])[h];
+const totalOf = id => (scores[id] || []).reduce((n, v) => n + (v || 0), 0);
+const parThrough = n => HOLES.slice(0, n).reduce((s, h) => s + h.par, 0);
+const holesDone = id => (scores[id] || []).filter(v => v).length;
+function say(k, v) { $('#msg').textContent = k ? tr(k, v) : ''; }
+
+function beginHole(h) {
+  hi = h; phase = 'play'; hurryEnd = 0;
+  $('#ov').style.display = 'none';
+  buildHole(h);
+  if (!me.mesh) me.mesh = makeBall(myId, false);
+  me.mesh.material.color.setHex(colHex(myId));
+  Object.assign(me, { x: H.tee[0], z: H.tee[1], vx: 0, vz: 0, strokes: 0, lx: H.tee[0], lz: H.tee[1], state: 'aim', slowT: 0, sinkT: 0 });
+  me.mesh.visible = true; me.mesh.scale.setScalar(1);
+  syncGhosts();
+  ghosts.forEach(g => { g.x = g.tx = H.tee[0]; g.z = g.tz = H.tee[1]; g.s = 0; g.done = false; g.mesh.visible = true; });
+  snapCam = true; say('aim'); hud(); sendPos(true);
+}
+/** Keep one translucent ghost ball + name tag for every other player in the room. */
+function syncGhosts() {
+  const ids = new Set(players.map(p => p.id).filter(id => id !== myId));
+  ghosts.forEach((g, id) => { if (!ids.has(id)) { scene.remove(g.mesh); g.tag.remove(); ghosts.delete(id); } });
+  ids.forEach(id => {
+    if (ghosts.has(id)) return;
+    const tag = document.createElement('div'); tag.className = 'tag'; tag.style.color = COLS[id % 6]; $('#tags').appendChild(tag);
+    const x = H ? H.tee[0] : 0, z = H ? H.tee[1] : 0;
+    ghosts.set(id, { mesh: makeBall(id, true), tag, x, z, tx: x, tz: z, s: 0, done: false });
+  });
+  ghosts.forEach((g, id) => { g.tag.textContent = nameOf(id); });
+  myTag.textContent = mode === 'online' ? tr('you') : '';
+  myTag.style.color = COLS[myId % 6]; myTag.style.display = mode === 'online' ? '' : 'none';
+}
+const myTag = document.createElement('div'); myTag.className = 'tag'; $('#tags').appendChild(myTag);
+
+function shoot(dx, dz, p) {
+  if (me.state !== 'aim' || phase !== 'play') return;
+  const v = MAXV * (0.05 + 0.95 * p);
+  me.lx = me.x; me.lz = me.z; me.vx = dx * v; me.vz = dz * v; me.slowT = 0;
+  me.strokes++; me.state = 'roll'; sPutt(p); say(null); hud(); sendPos(true);
+}
+function ballEvent(ev) {
+  if (ev === 'cup') {
+    me.state = 'sink'; me.sinkT = 0; me.vx = me.vz = 0; sCup();
+    const d = me.strokes - H.par, key = me.strokes === 1 ? 's_ace' : d >= -3 && d <= 2 ? 's_' + (d < 0 ? 'm' + -d : d) : 's_x';
+    say('sunk', { s: tr(key), n: me.strokes });
+    finishMe(me.strokes);
+  } else if (ev === 'water') {
+    sSplash(); me.strokes++;
+    Object.assign(me, { x: me.lx, z: me.lz, vx: 0, vz: 0 });
+    if (me.strokes >= MAXS) { say('maxS', MAXS); finishMe(MAXS); }
+    else { me.state = 'aim'; say('water'); }
+  } else if (ev === 'stop') {
+    if (me.strokes >= MAXS) { say('maxS', MAXS); finishMe(MAXS); }
+    else { me.state = 'aim'; say('aim'); }
+  }
+  hud(); sendPos(true);
+}
+function finishMe(s) {
+  if (me.state !== 'sink') me.state = 'done';
+  if (mode === 'solo') {
+    (scores[myId] = scores[myId] || [])[hi] = s; hud();
+    cardTimer = setTimeout(() => showCard(false), 1400);
+  } else if (mode === 'online') {
+    if (isHost) hostDone(myId, hi, s); else netSend({ t: 'done', h: hi, s });
+    setTimeout(() => { if (phase === 'play' && (me.state === 'done' || me.state === 'sink')) say('wait'); }, 1800);
+  }
+}
+/** Someone else (the host, for a timeout) decided we are done on this hole. */
+function forcedDone(s) {
+  if (me.state === 'done' || me.state === 'sink') return;
+  me.state = 'done'; me.vx = me.vz = 0; say('maxS', s); hud();
+}
+
+/* ---------- HUD ---------- */
+function hud() {
+  if (!H) return;
+  $('#hName').textContent = (HOLES[hi].n[lang === 'es' ? 1 : 0]) + ' · ' + tr('par', H.par);
+  $('#hHole').textContent = tr('hole', hi + 1);
+  $('#hSL').textContent = tr('strokes');
+  $('#hS').textContent = me.strokes;
+  const list = mode === 'online' ? players : [];
+  $('#pl').innerHTML = list.map(p => {
+    const sc = scoreOf(p.id, hi), g = ghosts.get(p.id), live = p.id === myId ? me.strokes : g ? g.s : 0;
+    return `<div class="pc ${p.id === myId ? 'me' : ''} ${sc ? 'done' : ''}"><i style="background:${COLS[p.id % 6]}"></i><span>${esc(nameOf(p.id))}</span><em>${sc ? '✔ ' + sc : live}</em></div>`;
+  }).join('');
+  if (mode === 'solo') $('#pl').innerHTML = `<div class="pc"><span>${esc(tr('round'))}</span><em>${totalOf(myId)}</em></div>` + (best ? `<div class="pc"><span>${esc(tr('best'))}</span><em>${best}</em></div>` : '');
+  document.documentElement.style.setProperty('--th', $('#top').offsetHeight + 'px');
+}
+
+/* ---------- scorecard ---------- */
+function cardHtml(upto) {
+  const ids = players.map(p => p.id).sort((a, b) => totalOf(a) - totalOf(b) || a - b);
+  const lead = ids.length > 1 ? totalOf(ids[0]) : null;
+  const head = `<tr><th></th>${HOLES.map((h, k) => `<th>${k + 1}</th>`).join('')}<th>${esc(tr('total'))}</th></tr>`;
+  const par = `<tr class="par"><td class="n">${esc(tr('parRow'))}</td>${HOLES.map(h => `<td>${h.par}</td>`).join('')}<td>${TOTAL_PAR}</td></tr>`;
+  const rows = ids.map(id => {
+    const cells = HOLES.map((h, k) => { const v = scoreOf(id, k); return `<td class="${v ? (v < h.par ? 'u' : v > h.par ? 'o' : '') : ''} ${k === upto ? 'cur' : ''}">${v || '·'}</td>`; }).join('');
+    const t = totalOf(id), d = t - parThrough(holesDone(id) ? Math.max(...(scores[id] || []).map((v, k) => v ? k + 1 : 0)) : 0);
+    return `<tr class="${lead !== null && t === lead ? 'lead' : ''}"><td class="n"><i style="background:${COLS[id % 6]}"></i>${esc(nameOf(id))}${id === myId && mode === 'online' ? ' (' + esc(tr('you')) + ')' : ''}</td>${cells}<td class="t">${t}<small style="color:#9aa3b8;font-weight:600"> ${d > 0 ? '+' + d : d === 0 ? 'E' : d}</small></td></tr>`;
+  }).join('');
+  return `<table>${head}${par}${rows}</table>`;
+}
+function showCard(online) {
+  phase = 'card'; me.state = me.state === 'sink' ? 'sink' : 'done'; say(null);
+  const last = hi === NH - 1;
+  $('#oT').textContent = last ? tr('final') : tr('card');
+  $('#oCard').innerHTML = cardHtml(hi);
+  $('#oB2').style.display = 'none';
+  if (last) return showFinal();
+  $('#oP').textContent = tr('after', hi + 1);
+  if (online) {
+    $('#oB').style.display = 'none';
+    cardEnd = performance.now() + 5000;
+  } else {
+    $('#oB').style.display = ''; $('#oB').textContent = tr('next');
+    $('#oB').onclick = () => beginHole(hi + 1);
+  }
+  $('#ov').style.display = 'flex';
+}
+function showFinal() {
+  phase = 'over'; cardEnd = 0;
+  const ids = players.map(p => p.id), low = Math.min(...ids.map(totalOf)), winners = ids.filter(id => totalOf(id) === low);
+  if (mode === 'solo') {
+    const t = totalOf(myId), d = t - TOTAL_PAR, rec = !best || t < best;
+    if (rec) { best = t; try { localStorage.setItem(BEST_KEY, t); } catch (e) {} }
+    $('#oP').textContent = tr('soloEnd', { n: t, p: d > 0 ? '+' + d : d === 0 ? 'E' : d }) + (rec ? tr('record') : '');
+    $('#oB').style.display = ''; $('#oB').textContent = tr('again'); $('#oB').onclick = startSolo;
+    $('#oB2').style.display = ''; $('#oB2').textContent = tr('toMenu'); $('#oB2').onclick = showMenu;
+  } else {
+    $('#oP').textContent = winners.length > 1 ? tr('tie') : winners[0] === myId ? tr('youWin') : tr('wins', nameOf(winners[0]));
+    if (isHost) { $('#oB').style.display = ''; $('#oB').textContent = tr('toLobby'); $('#oB').onclick = hostToLobby; }
+    else { $('#oB').style.display = 'none'; $('#oP').textContent += ' ' + tr('waitHost'); }
+    $('#oB2').style.display = ''; $('#oB2').textContent = tr('toMenu'); $('#oB2').onclick = showMenu;
+  }
+  $('#ov').style.display = 'flex';
+  if (winners.includes(myId)) { sCup(); }
+}
+
+/* ---------- menus ---------- */
+function showMenu() {
+  netClose(); clearTimeout(cardTimer);
+  mode = 'menu'; phase = 'idle'; players = []; scores = {}; syncGhosts();
+  $('#ov').style.display = $('#lobby').style.display = 'none';
+  $('#menu').style.display = 'flex'; $('#mNet').textContent = '';
+  if (me.mesh) me.mesh.visible = true;
+  hud(); say(null);
+}
+function readName() {
+  myName = cleanName($('#mName').value);
+  try { localStorage.setItem(NAME_KEY, myName); } catch (e) {}
+  return myName || tr('player');
+}
+function startSolo() {
+  netClose(); clearTimeout(cardTimer);
+  mode = 'solo'; myId = 0; players = [{ id: 0, name: readName() }]; scores = { 0: [] };
+  $('#menu').style.display = $('#lobby').style.display = 'none';
+  syncGhosts(); beginHole(0);
+}
+function renderLobby() {
+  $('#lT').textContent = tr('lobby');
+  $('#lCode').textContent = isHost ? hostCode : roomCode;
+  $('#lP').textContent = tr(isHost ? 'lobbyHost' : 'lobbyGuest');
+  $('#lShare').textContent = tr('share');
+  $('#lList').innerHTML = players.map(p => `<li><i style="background:${COLS[p.id % 6]}"></i>${esc(nameOf(p.id))}<small>${p.id === 0 ? esc(tr('hostTag')) : ''}${p.id === myId ? (p.id === 0 ? ' · ' : '') + esc(tr('youTag')) : ''}</small></li>`).join('');
+  $('#lStart').textContent = tr('start'); $('#lStart').style.display = isHost ? '' : 'none';
+  $('#lStart').disabled = players.length < 2;
+  $('#lLeave').textContent = tr('leave');
+  if (isHost && players.length < 2) $('#lNet').textContent = tr('needTwo');
+  else if (!isHost || $('#lNet').dataset.k !== 'copied') $('#lNet').textContent = '';
+}
+function showLobby() {
+  phase = 'lobby'; $('#menu').style.display = 'none'; $('#ov').style.display = 'none';
+  $('#lobby').style.display = 'flex'; $('#lNet').dataset.k = ''; renderLobby();
+}
+
+/* ---------- online play ----------
+ * PeerJS (same setup as Low Poly Pool): a 4-letter room code reaches the host through a free public broker,
+ * then each guest has a direct link to the host only (a star). Every player simulates just their own ball and
+ * streams its position (about 12 times a second while it rolls); the others see it as a translucent ghost.
+ * Balls never touch each other, so nothing else needs syncing. The host is the referee: it hands out player
+ * ids/colours, relays positions, collects each player's strokes, runs the "hurry up" timer once someone has
+ * holed out, and decides when to show the scorecard and move to the next hole. */
+const NET_PREFIX = 'lpg-', CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', MAXP = 6, HURRY_MS = 75000, CARD_MS = 5000;
+let peer = null, conn = null, isHost = false, hostCode = '', roomCode = '', lastPos = 0;
+const guests = new Map();                 // host only: id -> conn
+const num = (...v) => v.every(Number.isFinite);
+const netSend = m => { try { if (conn && conn.open) conn.send(m); } catch (e) {} };
+const sendTo = (c, m) => { try { if (c && c.open) c.send(m); } catch (e) {} };
+const broadcast = (m, except) => guests.forEach((c, id) => { if (id !== except) sendTo(c, m); });
+const netStatus = (k, v) => { $('#mNet').textContent = k ? tr(k, v) : ''; };
+function netClose() {
+  guests.forEach(c => { try { c.removeAllListeners(); c.close(); } catch (e) {} }); guests.clear();
+  try { if (conn) { conn.removeAllListeners(); conn.close(); } } catch (e) {}
+  try { if (peer) { peer.removeAllListeners(); peer.destroy(); } } catch (e) {}
+  peer = conn = null; hostCode = roomCode = ''; isHost = false; hurryEnd = cardEnd = 0;
+}
+function sendPos(force) {
+  if (mode !== 'online') return;
+  const n = performance.now(); if (!force && n - lastPos < 80) return; lastPos = n;
+  const m = { t: 'pos', x: +me.x.toFixed(3), z: +me.z.toFixed(3), s: me.strokes, h: hi };
+  if (isHost) broadcast(Object.assign({ id: myId }, m)); else netSend(m);
+}
+/* host side */
+function netHost() {
+  netClose(); netStatus('');
+  if (typeof Peer === 'undefined') return netStatus('noLib');
+  isHost = true; myId = 0;
+  const name = readName();
+  const attempt = n => {
+    const code = Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
+    const pr = peer = new Peer(NET_PREFIX + code);
+    pr.on('open', () => {
+      hostCode = code; mode = 'online'; players = [{ id: 0, name }]; scores = {};
+      syncGhosts(); showLobby();
+    });
+    pr.on('error', e => { if (e.type === 'unavailable-id' && n < 6) attempt(n + 1); else netStatus('netErr'); });
+    pr.on('connection', hostAccept);
+  };
+  attempt(0);
+}
+function hostAccept(c) {
+  let id = -1;
+  c.on('data', m => {
+    if (!m || typeof m.t !== 'string') return;
+    if (m.t === 'hello' && id < 0) {
+      if (phase !== 'lobby') { sendTo(c, { t: 'busy' }); setTimeout(() => c.close(), 400); return; }
+      if (players.length >= MAXP) { sendTo(c, { t: 'full' }); setTimeout(() => c.close(), 400); return; }
+      for (id = 1; players.some(p => p.id === id); id++);
+      guests.set(id, c); players.push({ id, name: cleanName(m.name) }); players.sort((a, b) => a.id - b.id);
+      hostLobbyUpdate();
+    } else if (id >= 0) hostOnGuest(id, m);
+  });
+  const gone = () => {
+    if (id < 0 || !guests.has(id)) return;
+    guests.delete(id); players = players.filter(p => p.id !== id); delete scores[id];
+    hostLobbyUpdate();
+    if (phase === 'play') hostCheckHole();
+  };
+  c.on('close', gone); c.on('error', gone);
+}
+function hostLobbyUpdate() {
+  const list = players.map(p => ({ id: p.id, name: p.name }));
+  guests.forEach((c, id) => sendTo(c, { t: 'lobby', list, you: id, code: hostCode, phase }));
+  syncGhosts(); hud();
+  if (phase === 'lobby') renderLobby();
+}
+function hostOnGuest(id, m) {
+  if (m.t === 'pos' && num(m.x, m.z, m.s) && m.h === hi && phase === 'play') {
+    const g = ghosts.get(id); if (g) { g.tx = m.x; g.tz = m.z; g.s = m.s | 0; }
+    broadcast({ t: 'pos', id, x: m.x, z: m.z, s: m.s | 0, h: hi }, id); hud();
+  } else if (m.t === 'done' && Number.isInteger(m.s) && m.h === hi) hostDone(id, hi, Math.max(1, Math.min(MAXS, m.s)));
+}
+function hostStart() {
+  if (players.length < 2) return;
+  scores = {}; players.forEach(p => { scores[p.id] = []; });
+  hostHole(0);
+}
+function hostHole(h) {
+  cardEnd = 0; hurryEnd = 0;
+  broadcast({ t: 'hole', h, reset: h === 0 });
+  $('#lobby').style.display = 'none';
+  beginHole(h);
+}
+function hostDone(id, h, s) {
+  if (h !== hi || phase !== 'play' || scoreOf(id, h)) return;
+  (scores[id] = scores[id] || [])[h] = s;
+  const g = ghosts.get(id); if (g) { g.done = true; g.s = s; }
+  broadcast({ t: 'done', id, h, s });
+  if (!hurryEnd && players.some(p => !scoreOf(p.id, h))) { hurryEnd = performance.now() + HURRY_MS; broadcast({ t: 'hurry', ms: HURRY_MS }); }
+  hud(); hostCheckHole();
+}
+function hostCheckHole() {
+  if (phase !== 'play' || !players.every(p => scoreOf(p.id, hi))) return;
+  hurryEnd = 0;
+  setTimeout(() => {
+    if (mode !== 'online' || !isHost || phase !== 'play') return;
+    broadcast({ t: 'card', h: hi, scores });
+    showCard(true);
+  }, 1300);
+}
+function hostTick(now) {
+  if (phase === 'play' && hurryEnd && now > hurryEnd) {       // time's up: everyone still out there picks up with max strokes
+    hurryEnd = 0;
+    players.filter(p => !scoreOf(p.id, hi)).forEach(p => { if (p.id === myId) forcedDone(MAXS); hostDone(p.id, hi, MAXS); });
+  }
+  if (phase === 'card' && cardEnd && now > cardEnd) { cardEnd = 0; hostHole(hi + 1); }
+}
+function hostToLobby() {
+  phase = 'lobby'; scores = {};
+  hostLobbyUpdate(); showLobby();
+}
+/* guest side */
+function netJoin(code) {
+  netClose(); netStatus('');
+  if (typeof Peer === 'undefined') return netStatus('noLib');
+  isHost = false; netStatus('connecting'); roomCode = code;
+  const name = readName();
+  const pr = peer = new Peer();
+  pr.on('open', () => {
+    const c = conn = pr.connect(NET_PREFIX + code, { reliable: true });
+    c.on('open', () => netSend({ t: 'hello', name }));
+    c.on('data', onNet);
+    c.on('close', onHostGone); c.on('error', onHostGone);
+  });
+  pr.on('error', e => netStatus(e.type === 'peer-unavailable' ? 'notFound' : 'netErr'));
+}
+function validScores(s) {
+  if (!s || typeof s !== 'object') return null;
+  const out = {};
+  for (const k in s) if (/^\d$/.test(k) && Array.isArray(s[k])) out[k] = s[k].slice(0, NH).map(v => Number.isInteger(v) && v > 0 && v <= MAXS ? v : undefined);
+  return out;
+}
+function onNet(m) {
+  if (!m || typeof m.t !== 'string') return;
+  if (m.t === 'full' || m.t === 'busy') { netStatus(m.t); try { conn.removeAllListeners(); } catch (e) {} return; }
+  if (m.t === 'lobby' && Array.isArray(m.list) && Number.isInteger(m.you)) {
+    players = m.list.filter(p => p && Number.isInteger(p.id) && p.id >= 0 && p.id < MAXP).map(p => ({ id: p.id, name: cleanName(p.name) }));
+    myId = m.you; mode = 'online';
+    for (const k in scores) if (!players.some(p => p.id === +k)) delete scores[k];
+    syncGhosts(); hud();
+    if (m.phase === 'lobby') showLobby();
+    return;
+  }
+  if (mode !== 'online') return;
+  if (m.t === 'hole' && Number.isInteger(m.h) && m.h >= 0 && m.h < NH) {
+    if (m.reset) { scores = {}; players.forEach(p => { scores[p.id] = []; }); }
+    $('#lobby').style.display = 'none'; beginHole(m.h);
+  } else if (m.t === 'pos' && num(m.x, m.z, m.s) && m.h === hi) {
+    const g = ghosts.get(m.id); if (g) { g.tx = m.x; g.tz = m.z; g.s = m.s | 0; hud(); }
+  } else if (m.t === 'done' && Number.isInteger(m.id) && Number.isInteger(m.s) && m.h === hi) {
+    (scores[m.id] = scores[m.id] || [])[hi] = m.s;
+    const g = ghosts.get(m.id); if (g) { g.done = true; g.s = m.s; }
+    if (m.id === myId) forcedDone(m.s);
+    hud();
+  } else if (m.t === 'hurry' && num(m.ms)) hurryEnd = performance.now() + Math.min(HURRY_MS, m.ms);
+  else if (m.t === 'card' && m.h === hi) {
+    const s = validScores(m.scores); if (s) scores = s;
+    hurryEnd = 0; showCard(true);
+  }
+}
+function onHostGone() {
+  if (mode !== 'online') { netStatus('netErr'); return; }
+  netClose(); mode = 'menu'; phase = 'over';
+  $('#lobby').style.display = 'none';
+  $('#oT').textContent = tr('hostLeft'); $('#oP').textContent = tr('hostLeftP'); $('#oCard').innerHTML = '';
+  $('#oB').style.display = ''; $('#oB').textContent = tr('toMenu'); $('#oB').onclick = showMenu; $('#oB2').style.display = 'none';
+  $('#ov').style.display = 'flex';
+}
+function inviteUrl(code) {
+  let base = ''; try { base = parent.location.href.split('#')[0]; } catch (e) { base = location.href.split('#')[0]; }
+  return base + '#/game/mini-golf?join=' + code;
+}
+async function shareInvite() {
+  const code = isHost ? hostCode : roomCode; if (!code) return;
+  const url = inviteUrl(code);
+  try { if (navigator.share) { await navigator.share({ title: tr('title'), text: tr('shareText'), url }); return; } }
+  catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); $('#lNet').textContent = tr('copied'); $('#lNet').dataset.k = 'copied'; }
+  catch (e) { $('#lNet').textContent = url; }
+}
+function autoJoin() {
+  let h = ''; try { h = parent.location.hash; } catch (e) {}
+  const m = h.match(/[?&]join=([A-Za-z0-9]{4})/); if (!m) return;
+  const code = m[1].toUpperCase();
+  try { parent.history.replaceState(null, '', parent.location.href.split('#')[0] + '#/game/mini-golf'); } catch (e) {}
+  $('#mCode').value = code;
+  netJoin(code);
+}
+
+/* ---------- input ---------- */
+const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -R), v2 = new THREE.Vector2(), hit = new THREE.Vector3();
+function groundAt(e) {
+  const r = canvas.getBoundingClientRect();
+  v2.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(v2, camera);
+  return ray.ray.intersectPlane(plane, hit) ? { x: hit.x, z: hit.z } : null;
+}
+let drag = null, aim = { x: 0, z: -1, p: 0 };
+canvas.addEventListener('pointerdown', e => {
+  if (me.state !== 'aim' || phase !== 'play') return;
+  const g = groundAt(e); if (!g) return;
+  drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, g };
+  aim.p = 0;
+  try { canvas.setPointerCapture(e.pointerId); } catch (er) {}
+});
+canvas.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const g = groundAt(e); if (!g) return;
+  const dx = drag.g.x - g.x, dz = drag.g.z - g.z, L = Math.hypot(dx, dz);
+  const px = Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy), full = Math.min(innerWidth, innerHeight) * 0.38;
+  if (L > 0.02) { aim.x = dx / L; aim.z = dz / L; }
+  aim.p = Math.min(1, px / full);
+});
+const release = e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  drag = null;
+  if (aim.p > 0.04) shoot(aim.x, aim.z, aim.p);
+  aim.p = 0;
+};
+canvas.addEventListener('pointerup', release);
+canvas.addEventListener('pointercancel', e => { if (drag && e.pointerId === drag.id) { drag = null; aim.p = 0; } });
+
+/* ---------- buttons ---------- */
+function applyLang() {
+  document.documentElement.lang = lang;
+  const btn = (id, icon, label) => { $(id).innerHTML = `<span>${icon}</span><small>${esc(label)}</small>`; };
+  btn('#view', viewMode === 'all' ? '🗺️' : '🎯', viewMode === 'all' ? tr('vAll') : tr('vBall'));
+  btn('#menuB', '☰', tr('menu'));
+  btn('#lang', '🌐', lang.toUpperCase());
+  btn('#mute', muted ? '🔇' : '🔊', tr('snd'));
+  $('#mute').classList.toggle('off', muted);
+  $('#mT').textContent = tr('title'); $('#mP').textContent = tr('menuP');
+  $('#mName').placeholder = tr('namePh'); $('#mName').value = myName;
+  $('#mSolo').textContent = tr('solo'); $('#mO').textContent = tr('online');
+  $('#mHost').textContent = tr('host'); $('#mJoin').textContent = tr('join'); $('#mCode').placeholder = tr('code');
+  if (phase === 'lobby') renderLobby();
+  syncGhosts(); hud();
+  if (phase === 'play') say(me.state === 'aim' ? 'aim' : null);
+}
+$('#view').onclick = () => { viewMode = viewMode === 'all' ? 'ball' : 'all'; applyLang(); };
+$('#menuB').onclick = () => { if (mode === 'online' && !confirm(tr('confirmLeave'))) return; showMenu(); };
+$('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); };
+$('#mute').onclick = () => { muted = !muted; applyLang(); };
+$('#mSolo').onclick = startSolo;
+$('#mHost').onclick = netHost;
+$('#mJoin').onclick = () => { const c = $('#mCode').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (c.length !== 4) return netStatus('notFound'); netJoin(c); };
+$('#mCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#mJoin').click(); });
+$('#mName').addEventListener('keydown', e => { if (e.key === 'Enter') { readName(); if ($('#mCode').value.length === 4) $('#mJoin').click(); } });
+$('#lStart').onclick = hostStart;
+$('#lLeave').onclick = showMenu;
+$('#lShare').onclick = shareInvite;
+[$('#view'), $('#menuB'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
+
+/* ---------- camera ---------- */
+let snapCam = true;
+const cam = { x: 0, z: 0, d: 14 };
+const PITCH = 0.98;                       // ~56 degrees down
+let fitCache = null;
+/** Overview: the closest camera (same tilt) that shows every corner of the hole inside the space the HUD leaves free. */
+function fitHole() {
+  const key = hi + ':' + innerWidth + 'x' + innerHeight + ':' + $('#top').offsetHeight;
+  if (fitCache && fitCache.key === key) return fitCache;
+  const b = bounds(H), m = 0.5, pts = [[b.x0 - m, b.z0 - m], [b.x1 + m, b.z0 - m], [b.x0 - m, b.z1 + m], [b.x1 + m, b.z1 + m]];
+  const vh = Math.max(1, innerHeight), topY = 1 - 2 * ($('#top').offsetHeight + 14) / vh, botY = -1 + 2 * 40 / vh, side = 1 - 2 * 58 / Math.max(1, innerWidth);
+  const cx = (b.x0 + b.x1) / 2, v = new THREE.Vector3();
+  let cz = (b.z0 + b.z1) / 2, d = 12;
+  const proj = (dd, zz) => {
+    camera.position.set(cx, dd * Math.sin(PITCH), zz + dd * Math.cos(PITCH)); camera.lookAt(cx, 0, zz); camera.updateMatrixWorld();
+    let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
+    for (const [x, z] of pts) for (const y of [0, WALL_H]) { v.set(x, y, z).project(camera); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
+    return { x0, x1, y0, y1 };
+  };
+  for (let pass = 0; pass < 4; pass++) {
+    let lo = 3, hi2 = 120;
+    for (let k = 0; k < 28; k++) { const mid = (lo + hi2) / 2, r = proj(mid, cz); if (r.x0 >= -side && r.x1 <= side && r.y0 >= botY && r.y1 <= topY) hi2 = mid; else lo = mid; }
+    d = hi2;
+    const r = proj(d, cz), want = (topY + botY) / 2, have = (r.y0 + r.y1) / 2;   // slide the view so the hole sits centred in the free band
+    cz += (want - have) * d * 0.35;
+  }
+  fitCache = { key, x: cx, z: cz, d };
+  return fitCache;
+}
+function camGoal() {
+  if (viewMode === 'ball') return { x: me.x, z: me.z + 0.4, d: 7.5 };
+  return fitHole();
+}
+function placeCamera(dt) {
+  if (!H) { camera.position.set(0, 12, 10); camera.lookAt(0, 0, 0); return; }
+  const g = camGoal(), k = snapCam ? 1 : Math.min(1, dt * 3);
+  snapCam = false;
+  cam.x += (g.x - cam.x) * k; cam.z += (g.z - cam.z) * k; cam.d += (g.d - cam.d) * k;
+  camera.position.set(cam.x, cam.d * Math.sin(PITCH), cam.z + cam.d * Math.cos(PITCH));
+  camera.lookAt(cam.x, 0, cam.z);
+}
+function resize() {
+  renderer.setSize(innerWidth, innerHeight, false);
+  camera.aspect = innerWidth / Math.max(1, innerHeight); camera.updateProjectionMatrix();
+  hud(); snapCam = true;
+}
+addEventListener('resize', resize);
+
+/* ---------- main loop ---------- */
+const STEP = 1 / 240, tmpV = new THREE.Vector3();
+let last = performance.now(), acc = 0;
+function placeTag(el, x, z) {
+  tmpV.set(x, R * 2 + 0.25, z).project(camera);
+  if (tmpV.z > 1) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.style.transform = `translate(${(tmpV.x + 1) / 2 * innerWidth}px,${(1 - tmpV.y) / 2 * innerHeight}px) translate(-50%,-100%)`;
+}
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (H && phase === 'play') {
+    acc += dt;
+    while (acc >= STEP) {
+      acc -= STEP;
+      if (H.spin) spinA += H.spin[3] * STEP;
+      if (me.state === 'roll') { const ev = stepBall(STEP); if (ev) { ballEvent(ev); } }
+    }
+    if (me.state === 'roll') sendPos(false);
+  } else if (H && H.spin) spinA += H.spin[3] * dt;
+  // host referee timers run on setInterval (below), so they keep going when the host's tab is in the background
+
+  // own ball
+  if (me.mesh && H) {
+    if (me.state === 'sink') { me.sinkT += dt; me.x += (H.cup[0] - me.x) * Math.min(1, dt * 14); me.z += (H.cup[1] - me.z) * Math.min(1, dt * 14); }
+    const sink = me.state === 'sink' || (me.state === 'done' && me.sinkT > 0);
+    const y = sink ? R - Math.min(0.4, me.sinkT * 1.4) : R;
+    me.mesh.position.set(me.x, y, me.z);
+    me.mesh.visible = !(sink && me.sinkT > 0.35) && mode !== 'menu';
+    me.mesh.rotation.set(me.roll * 0.7, 0, me.roll * 0.3);
+  }
+  ghosts.forEach(g => {
+    const k = Math.min(1, dt * 12);
+    g.x += (g.tx - g.x) * k; g.z += (g.tz - g.z) * k;
+    g.mesh.position.set(g.x, R, g.z);
+    g.mesh.visible = phase === 'play' && !g.done;
+    if (g.mesh.visible) placeTag(g.tag, g.x, g.z); else g.tag.style.display = 'none';
+  });
+  if (mode === 'online' && me.mesh && me.mesh.visible && phase === 'play') placeTag(myTag, me.x, me.z); else myTag.style.display = 'none';
+  if (spinMesh) spinMesh.rotation.y = spinA;
+  if (flag) flag.children[1].rotation.y = Math.sin(now / 400) * 0.25;
+  for (const s of slopeMarks) {                    // chevrons drift downhill
+    const t = (now / 1000 * 0.4) % 1;
+    s.o.position.x = s.x + s.dx * (t - 0.5) * 0.9; s.o.position.z = s.z + s.dz * (t - 0.5) * 0.9;
+    s.o.material.opacity = 0.25 + 0.5 * Math.sin(t * Math.PI);
+  }
+
+  // aim arrow
+  const aiming = !!drag && me.state === 'aim' && aim.p > 0.02;
+  arrow.visible = aiming;
+  $('#pow').style.opacity = aiming ? 1 : 0; $('#pow i').style.width = (aim.p * 100) + '%';
+  if (aiming) {
+    const len = 0.35 + aim.p * 2.6;
+    arrow.position.set(me.x, 0.03, me.z); arrow.rotation.y = Math.atan2(-aim.z, aim.x);
+    shaft.scale.x = len; shaft.position.x = R + len / 2; tip.position.x = R + len + 0.12;
+    arrowM.color.setHSL(0.33 - aim.p * 0.33, 0.85, 0.6);
+  }
+
+  // timers in the message strip
+  if (mode === 'online' && phase === 'play' && hurryEnd) {
+    const left = Math.max(0, Math.ceil((hurryEnd - now) / 1000));
+    if (me.state === 'done' || me.state === 'sink') say('hurry', left);
+    else if (me.state === 'aim' && !drag) $('#msg').textContent = tr('aim') + ' ⏱ ' + left + 's';
+  }
+  if (phase === 'card' && cardEnd) $('#oP').textContent = tr('after', hi + 1) + ' · ' + tr('nextIn', Math.max(0, Math.ceil((cardEnd - now) / 1000)));
+
+  placeCamera(dt);
+  renderer.render(scene, camera);
+}
+
+setInterval(() => { if (isHost && mode === 'online') hostTick(performance.now()); }, 250);
+buildHole(0); resize(); applyLang(); showMenu(); autoJoin();
+requestAnimationFrame(frame);
+<\/script>
+</body>
+</html>
+</script>
 <script>
 /* =====================================================================
    SCRIPT
@@ -4425,6 +5382,8 @@ class I18n {
       'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly 8-ball table. Pot your solids or stripes, then the 8-ball, and never scratch. Play solo, against an AI, or online with a friend.',
       'ss.title': 'Space Shooter', 'ss.desc': 'Drag to fly while the ship fires on its own. Six random waves, a boss, and power-ups (one is a trap).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Play poker hands to beat rising targets. Buy jokers, level up hands, and survive nerfs and cursed jokers.',
+      'mg.title': 'Low Poly Mini Golf', 'mg.desc': 'Nine 3D mini golf holes with windmills, water, sand and slopes. Play solo, or online with up to 6 players who all play each hole at the same time.',
+      'mg.best': 'Best round {n}',
       'bp.best': 'Best {n} shots', 'ss.best': 'Best score {n}', 'pp.best': 'Best level {n}',
       'saves.title': 'Save data', 'saves.intro': 'Everything is stored locally in this browser. Export a backup to move it elsewhere.',
       'saves.export': '⬇ Export', 'saves.import': '⬆ Import', 'saves.wipe': 'Delete all', 'saves.done': 'Done', 'saves.delete': 'Delete',
@@ -4530,6 +5489,8 @@ class I18n {
       'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly de bola 8. Mete tus lisas o rayadas y luego la bola 8, sin embolsar la blanca. Juega solo, contra una IA o en línea con un amigo.',
       'ss.title': 'Shooter Espacial', 'ss.desc': 'Arrastra para volar mientras la nave dispara sola. Seis oleadas aleatorias, un jefe y power-ups (uno es una trampa).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Juega manos de póker para superar objetivos cada vez más altos. Compra comodines, mejora manos y sobrevive a nerfs y comodines malditos.',
+      'mg.title': 'Minigolf Low Poly', 'mg.desc': 'Nueve hoyos de minigolf 3D con molinos, agua, arena y pendientes. Juega solo o en línea con hasta 6 jugadores que juegan cada hoyo a la vez.',
+      'mg.best': 'Mejor ronda {n}',
       'bp.best': 'Mejor {n} tiros', 'ss.best': 'Récord {n}', 'pp.best': 'Mejor nivel {n}',
       'saves.title': 'Datos guardados', 'saves.intro': 'Todo se guarda localmente en este navegador. Exporta una copia de seguridad para llevarla a otro sitio.',
       'saves.export': '⬇ Exportar', 'saves.import': '⬆ Importar', 'saves.wipe': 'Borrar todo', 'saves.done': 'Listo', 'saves.delete': 'Borrar',
@@ -5797,6 +6758,12 @@ const EMBED_THUMBS = {
       <path d="M52 22L56 20L60 22L58 26L54 26Z" fill="#d6243a"/><path d="M58 26L62 24L66 26L64 30L60 30Z" fill="#f2c500"/><path d="M46 26L50 24L54 26L52 30L48 30Z" fill="#1f5fd6"/>
       <path d="M26 30L30 28L34 30L32 34L28 34Z" fill="#f4f4ee"/><path d="M14 44L40 33" stroke="#e0b878" stroke-width="1.6"/>
       <circle cx="23" cy="17" r="2.4" fill="#0a0a0c"/><circle cx="67" cy="17" r="2.4" fill="#0a0a0c"/></svg></div>`,
+  mg: `<div class="th" style="background:linear-gradient(#8fc9e8,#4f9a3c 45%)"><svg class="full" viewBox="0 0 90 56" preserveAspectRatio="xMidYMid slice">
+      <path d="M30 8H62L70 50H20Z" fill="#9a6334"/><path d="M32.5 10.5H59.8L66.8 47.5H23.2Z" fill="#2fae5a"/>
+      <path d="M26 30H44M48 30H66" stroke="#9a6334" stroke-width="2.4"/><path d="M40 32L52 28" stroke="#d6243a" stroke-width="2"/><path d="M46 31L50 29" stroke="#f4f4ee" stroke-width="2"/>
+      <ellipse cx="46" cy="16" rx="2.6" ry="1.4" fill="#111"/><path d="M46 16V4" stroke="#f4f4ee" stroke-width=".9"/><path d="M46 4L53 6L46 8Z" fill="#ff3b4e"/>
+      <circle cx="38" cy="42" r="1.8" fill="#ff5d5d"/><circle cx="52" cy="40" r="1.8" fill="#4da3ff" opacity=".6"/><circle cx="44" cy="37" r="1.8" fill="#ffd23f" opacity=".6"/>
+      <path d="M8 50L13 34L18 50Z" fill="#2c7a3a"/><path d="M74 48L79 30L84 48Z" fill="#2c7a3a"/></svg></div>`,
   pp: `<div class="th th-pp">${[['A', 'H', '#d62839'], ['K', 'S', '#2b2d42'], ['Q', 'D', '#f08a24']].map(([r, s, c]) => `<div class="th-card" style="color:${c}">${r}${Art.pixel({
         H: ['.##.##.', '#######', '#######', '#######', '.#####.', '..###..', '...#...'],
         S: ['...#...', '..###..', '.#####.', '#######', '#######', '...#...', '.#####.'],
@@ -5822,6 +6789,9 @@ const CATALOG = [
   { id: 'low-poly-pool', icon: '🎱', genre: 'multi', GameClass: EmbeddedGame.define({
       id: 'low-poly-pool', key: 'bp', langKey: 'lowPolyPoolLang', saveKeys: ['lowPolyPoolBest8'], thumb: EMBED_THUMBS.bp,
       summary: get => get('lowPolyPoolBest8') ? t('bp.best', { n: get('lowPolyPoolBest8') }) : '' }) },
+  { id: 'mini-golf',     icon: '⛳', genre: 'multi', GameClass: EmbeddedGame.define({
+      id: 'mini-golf', key: 'mg', langKey: 'miniGolfLang', saveKeys: ['miniGolfBest'], thumb: EMBED_THUMBS.mg,
+      summary: get => get('miniGolfBest') ? t('mg.best', { n: get('miniGolfBest') }) : '' }) },
   { id: 'space-shooter', icon: '🚀', genre: 'action', GameClass: EmbeddedGame.define({
       id: 'space-shooter', key: 'ss', langKey: 'spaceShooterLang', saveKeys: ['spaceShooterHi'], thumb: EMBED_THUMBS.ss,
       summary: get => +get('spaceShooterHi') ? t('ss.best', { n: Fmt.num(+get('spaceShooterHi')) }) : '' }) },
