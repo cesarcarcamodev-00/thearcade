@@ -4435,66 +4435,101 @@ requestAnimationFrame(frame);
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Low Poly Mini Golf</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px);--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
 html,body{margin:0;height:100%;overflow:hidden;background:#15241c;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
-#top{position:fixed;left:6px;right:6px;top:6px;display:flex;gap:6px;align-items:stretch;pointer-events:none;z-index:2}
+#top{position:fixed;left:calc(6px + var(--sl));right:calc(6px + var(--sr));top:calc(6px + var(--st));display:flex;gap:6px;align-items:stretch;pointer-events:none;z-index:2}
 .hc{flex:none;background:#0b1020d9;border:2px solid #fff2;border-radius:12px;padding:4px 10px;display:flex;flex-direction:column;justify-content:center;line-height:1.15}
 .hc b{font-size:15px;white-space:nowrap}
-.hc small{font-size:10px;color:#9aa3b8;text-transform:uppercase;letter-spacing:.06em;font-weight:700;white-space:nowrap}
+.hc small{font-size:10px;color:#9aa3b8;text-transform:uppercase;letter-spacing:.06em;font-weight:700;white-space:nowrap;max-width:44vw;overflow:hidden;text-overflow:ellipsis}
 #pl{display:flex;gap:5px;flex:1;min-width:0;flex-wrap:wrap;align-content:flex-start}
-.pc{background:#0b1020d9;border:2px solid #fff2;border-radius:12px;padding:3px 8px;display:flex;align-items:center;gap:6px;font-size:12px;min-width:0;max-width:160px;height:28px}
+.pc{position:relative;background:#0b1020d9;border:2px solid #fff2;border-radius:12px;padding:3px 8px;display:flex;align-items:center;gap:5px;font-size:12px;min-width:0;max-width:150px;height:28px;flex:none;transition:border-color .2s,box-shadow .2s}
 .pc i{width:12px;height:12px;border-radius:50%;flex:none;box-shadow:inset -2px -2px 2px #0006}
 .pc span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;min-width:0}
 .pc em{font-style:normal;color:#cdd5ea;padding-left:2px;white-space:nowrap}
-.pc.me{border-color:#ffcf3faa}
+.pc.me span{color:#ffe28a}
+.pc.turn{border-color:#ffcf3f;box-shadow:0 0 12px #ffcf3f99;background:#1a2140ee}
 .pc.done em{color:#5be37d;font-weight:800}
-.btns{position:fixed;left:6px;top:calc(var(--th,52px) + 12px);display:flex;flex-direction:column;gap:6px;z-index:2}
+.btns{position:fixed;left:calc(6px + var(--sl));top:calc(var(--th,52px) + 12px + var(--st));display:flex;flex-direction:column;gap:6px;z-index:3}
 .btns button{width:46px;height:46px;padding:0;border-radius:11px;background:#0b1020cc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1}
 .btns button span{font-size:18px}
-.btns button small{font-size:9px;color:#cdd5ea}
-button{font:inherit;font-size:13px;color:#fff;background:#2c3550;border:1px solid #fff3;border-radius:9px;padding:8px 12px;cursor:pointer}
+.btns button small{font-size:9px;color:#cdd5ea;max-width:44px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btns button.on{border-color:#ffcf3f;background:#1a2140}
+button{font:inherit;font-size:14px;color:#fff;background:#2c3550;border:1px solid #fff3;border-radius:10px;padding:9px 14px;cursor:pointer;min-height:40px}
 button:hover{background:#3a4670}
 button:disabled{opacity:.45;cursor:default}
 button.off{opacity:.5;text-decoration:line-through}
 #tags{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
-.tag{position:absolute;left:0;top:0;font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:#000b;white-space:nowrap;border:1px solid currentColor;will-change:transform}
-#tray{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;pointer-events:none;z-index:2}
-#msg{font-size:13px;color:#e6ebf7;background:#000b;border-radius:99px;padding:5px 14px;text-align:center;max-width:94vw}
+.tag{position:absolute;left:0;top:0;font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:#000b;white-space:nowrap;border:1px solid currentColor;will-change:transform;max-width:110px;overflow:hidden;text-overflow:ellipsis}
+.tag.turn{background:#ffcf3f;color:#14171f!important;border-color:#ffcf3f}
+.emo{position:absolute;left:0;top:0;font-size:34px;line-height:1;pointer-events:none;will-change:transform,opacity;filter:drop-shadow(0 2px 3px #000a);text-align:center}
+.emo small{display:block;font-size:10px;font-weight:800;margin-top:2px;padding:1px 6px;border-radius:99px;background:#000b;white-space:nowrap}
+#emo{position:fixed;left:50%;bottom:calc(58px + var(--sb));transform:translateX(-50%);display:none;grid-template-columns:repeat(5,48px);gap:6px;padding:8px;background:#0b1020ee;border:2px solid #fff3;border-radius:16px;z-index:4}
+#emo.on{display:grid}
+#emo button{width:48px;height:48px;padding:0;font-size:25px;border-radius:12px;background:#1b2340;min-height:0}
+#emo button.ed{font-size:20px}
+#tray{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 10px calc(10px + var(--sb));pointer-events:none;z-index:2}
+#msg{font-size:13px;color:#e6ebf7;background:#000b;border-radius:99px;padding:6px 14px;text-align:center;max-width:94vw}
 #msg:empty{display:none}
+#msg.mine{background:#ffcf3f;color:#14171f;font-weight:800}
 #pow{width:min(280px,70vw);height:8px;background:#0008;border-radius:9px;overflow:hidden;opacity:0;transition:opacity .15s}
 #pow i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5be37d,#ffcf3f,#ff4d5e)}
-.ov{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:14px;z-index:5}
-.modal{background:#1b2340;border:1px solid #fff3;border-radius:16px;padding:20px;max-width:380px;width:100%;text-align:center;max-height:96vh;overflow:auto}
+.ov{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;padding:14px;padding-top:calc(14px + var(--st));padding-bottom:calc(14px + var(--sb));z-index:6}
+.modal{background:#1b2340;border:1px solid #fff3;border-radius:16px;padding:20px;max-width:380px;width:100%;text-align:center;max-height:100%;overflow:auto;-webkit-user-select:text;user-select:text}
 .modal.wide{max-width:640px}
 .modal h2{margin:0 0 6px;font-size:24px;color:#ffcf3f}
 .modal p{margin:6px 0 12px;color:#cdd5ea;line-height:1.45;font-size:14px}
-.modal h3{margin:14px 0 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3b8;font-weight:600}
+.modal h3{margin:16px 0 0;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3b8;font-weight:600}
 .modal .row{display:flex;gap:8px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
 .modal .main{background:#3a6df0;font-size:15px;padding:10px 20px}
 .modal .main:hover{background:#4c7cf5}
-.modal input{font:inherit;font-size:16px;text-align:center;padding:9px;border-radius:9px;border:1px solid #fff3;background:#10172e;color:#fff}
+.modal .full{flex:1 1 100%}
+.modal input{font:inherit;font-size:16px;text-align:center;padding:9px;border-radius:10px;border:1px solid #fff3;background:#10172e;color:#fff;min-height:40px;min-width:0}
 #mCode{text-transform:uppercase;letter-spacing:.2em;width:6.5em}
-#mName{width:12em}
+#nIn,#lName{flex:1;max-width:14em}
 .net{min-height:1.4em;font-size:13px;margin:8px 0 0;color:#cdd5ea}
 #lList{list-style:none;margin:12px 0;padding:0;display:grid;gap:6px;text-align:left}
-#lList li{display:flex;align-items:center;gap:8px;background:#10172e;border-radius:9px;padding:7px 10px;font-weight:700;font-size:14px}
+#lList li{display:flex;align-items:center;gap:8px;background:#10172e;border-radius:9px;padding:8px 10px;font-weight:700;font-size:14px;min-width:0}
+#lList li b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 #lList li i{width:14px;height:14px;border-radius:50%;flex:none}
-#lList li small{margin-left:auto;color:#9aa3b8;font-weight:600;font-size:11px;text-transform:uppercase}
+#lList li small{margin-left:auto;color:#9aa3b8;font-weight:600;font-size:11px;text-transform:uppercase;white-space:nowrap}
 #lCode{font-size:30px;font-weight:800;letter-spacing:.25em;color:#fff;margin:4px 0}
-.card{overflow-x:auto;margin:8px 0 10px}
+.card{overflow-x:auto;margin:8px 0 10px;-webkit-overflow-scrolling:touch}
 .card table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
-.card th,.card td{padding:5px 3px;border-bottom:1px solid #fff1;text-align:center;min-width:22px}
+.card th,.card td{padding:5px 3px;border-bottom:1px solid #fff1;text-align:center;min-width:20px}
 .card th{color:#9aa3b8;font-weight:600}
-.card td.n{text-align:left;font-weight:700;white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis}
+.card td.n{text-align:left;font-weight:700;white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis;position:sticky;left:0;background:#1b2340}
 .card td.n i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
-.card td.t{font-weight:800;font-size:13px}
+.card td.t{font-weight:800;font-size:13px;white-space:nowrap}
 .card td.u{color:#5be37d}.card td.o{color:#ff8a8a}.card td.cur{background:#ffffff10}
 .card tr.par td{color:#9aa3b8}
 .card .lead td.n{color:#ffcf3f}
+/* phones: hole + strokes on the first row, the player chips scroll sideways on their own row */
+@media (max-width:600px){
+  #top{flex-wrap:wrap;gap:5px}
+  #pl{order:3;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;pointer-events:auto;padding-bottom:2px}
+  #pl::-webkit-scrollbar{display:none}
+  .pc{max-width:124px;height:30px}
+  .hc{padding:3px 9px}
+  .hc b{font-size:14px}
+  .modal{padding:16px}
+  .modal h2{font-size:21px}
+  .card table{font-size:11px}
+  .card th,.card td{padding:5px 2px;min-width:18px}
+  #emo{grid-template-columns:repeat(5,46px);gap:5px}
+  #emo button{width:46px;height:46px}
+  #msg{font-size:12.5px}
+}
+@media (max-height:460px) and (orientation:landscape){
+  .btns{flex-direction:row;top:auto;bottom:calc(8px + var(--sb));left:calc(6px + var(--sl))}
+  #tray{padding-left:250px;align-items:flex-start}
+  #emo{left:auto;right:calc(8px + var(--sr));bottom:calc(8px + var(--sb));transform:none;grid-template-columns:repeat(10,38px);gap:4px;padding:6px}
+  #emo button{width:38px;height:38px;font-size:20px}
+}
 </style>
 </head>
 <body>
@@ -4502,18 +4537,24 @@ button.off{opacity:.5;text-decoration:line-through}
 <div id="tags"></div>
 <div id="top"><div class="hc"><small id="hName"></small><b id="hHole"></b></div><div class="hc"><small id="hSL"></small><b id="hS"></b></div><div id="pl"></div></div>
 <div class="btns">
-  <button id="view"></button><button id="menuB"></button><button id="lang"></button><button id="mute"></button>
+  <button id="view"></button><button id="emoB"></button><button id="menuB"></button><button id="lang"></button><button id="mute"></button>
 </div>
+<div id="emo"></div>
 <div id="tray"><div id="pow"><i></i></div><div id="msg"></div></div>
 
 <div class="ov" id="menu"><div class="modal">
   <h2 id="mT"></h2><p id="mP"></p>
-  <div class="row"><input id="mName" maxlength="12" autocomplete="off" spellcheck="false"></div>
   <div class="row"><button class="main" id="mSolo"></button></div>
   <h3 id="mO"></h3>
   <div class="row"><button id="mHost"></button></div>
-  <div class="row"><input id="mCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false"><button id="mJoin"></button></div>
+  <div class="row"><input id="mCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go"><button id="mJoin"></button></div>
   <p class="net" id="mNet"></p>
+</div></div>
+
+<div class="ov" id="nameDlg"><div class="modal">
+  <h2 id="nT"></h2><p id="nP"></p>
+  <div class="row"><input id="nIn" maxlength="12" autocomplete="nickname" spellcheck="false" enterkeyhint="done"></div>
+  <div class="row"><button class="main" id="nOk"></button><button id="nCancel"></button></div>
 </div></div>
 
 <div class="ov" id="lobby"><div class="modal">
@@ -4522,6 +4563,7 @@ button.off{opacity:.5;text-decoration:line-through}
   <p id="lP"></p>
   <div class="row"><button id="lShare"></button></div>
   <ul id="lList"></ul>
+  <div class="row"><input id="lName" maxlength="12" autocomplete="nickname" spellcheck="false" enterkeyhint="done"><button id="lRename"></button></div>
   <div class="row"><button class="main" id="lStart"></button><button id="lLeave"></button></div>
   <p class="net" id="lNet"></p>
 </div></div>
@@ -4535,34 +4577,42 @@ button.off{opacity:.5;text-decoration:line-through}
 const $ = s => document.querySelector(s);
 const LANG_KEY = 'miniGolfLang', BEST_KEY = 'miniGolfBest', NAME_KEY = 'miniGolfName';
 const TXT = {
-  en: { title: 'Low Poly Mini Golf', menuP: 'Nine holes of mini golf. Online, up to 6 players play every hole at the same time.',
-    namePh: 'Your name', solo: 'Solo round', online: 'Play online (2-6 players)', host: 'Create room', join: 'Join', code: 'CODE',
+  en: { title: 'Low Poly Mini Golf', menuP: 'Nine holes of mini golf. Online, up to 6 players take turns on every hole.',
+    namePh: 'Your name', nameT: 'What should we call you?', nameP: 'Other players will see this name. You can change it later.',
+    ok: 'OK', cancel: 'Cancel', rename: 'Change name', save: 'Save',
+    solo: 'Solo round', online: 'Play online (2-6 players)', host: 'Create room', join: 'Join', code: 'CODE',
     lobby: 'Lobby', lobbyHost: 'Share this code or the invite link. Start when everyone is in.', lobbyGuest: 'You are in! Waiting for the host to start…',
     share: '🔗 Share invite link', shareText: 'Join my mini golf game!', copied: 'Link copied! Send it to your friends.',
     start: 'Start round', needTwo: 'Waiting for at least one more player…', leave: 'Leave', hostTag: 'Host', youTag: 'You',
     connecting: 'Connecting…', notFound: 'Room not found. Check the code.', netErr: 'Could not connect. Try again.',
     noLib: 'Could not load the online library. Check your connection.', full: 'That room is full (6 players).', busy: 'That round already started. Wait for the next one.',
     nolib: 'Could not load the 3D engine. Check your internet connection and reopen the game.',
-    hole: 'Hole {n}/9', par: 'Par {n}', strokes: 'Strokes', view: 'View', vAll: 'Hole', vBall: 'Ball', menu: 'Menu', snd: 'Sound',
-    aim: 'Drag back from anywhere to aim, release to putt.', roll: '', water: 'Splash! +1 stroke. Back to your last spot.',
-    maxS: 'Max strokes ({n}). Picking up.', wait: 'Waiting for the others…', hurry: '{n}s left for players still on the hole.',
+    hole: 'Hole {n}/9', par: 'Par {n}', strokes: 'Strokes', vAll: 'Hole', vBall: 'Ball', menu: 'Menu', snd: 'Sound', emotes: 'Emote',
+    aim: 'Drag back from anywhere to aim, release to putt.', water: 'Splash! +1 stroke. Back to your last spot.',
+    maxS: 'Max strokes ({n}). Picking up.', wait: 'Waiting for the others…',
+    yourTurn: 'Your turn! Drag back and release to putt.', yourTurnT: 'Your turn · {n}s', turnOf: "{n}'s turn", turnOfT: "{n}'s turn · {s}s",
+    skipped: 'Out of time: +1 stroke.', skippedOf: '{n} ran out of time: +1 stroke.',
     sunk: '{s} in {n}!', s_ace: 'Hole in one', s_m3: 'Albatross', s_m2: 'Eagle', s_m1: 'Birdie', s_0: 'Par', s_1: 'Bogey', s_2: 'Double bogey', s_x: 'Holed',
     card: 'Scorecard', after: 'After hole {n}', total: 'Tot', parRow: 'Par', next: 'Next hole', nextIn: 'Next hole in {n}s…',
     final: 'Final scores', youWin: 'You win!', wins: '{n} wins!', tie: "It's a tie!", soloEnd: '{n} strokes ({p} vs par).', record: ' New best!',
     again: 'Play again', toLobby: 'Back to lobby', toMenu: 'Back to menu', waitHost: 'Waiting for the host…',
     hostLeft: 'The host left', hostLeftP: 'The round ended because the host disconnected.', you: 'You', player: 'Player',
     confirmLeave: 'Leave this online game?', round: 'Round', best: 'Best' },
-  es: { title: 'Minigolf Low Poly', menuP: 'Nueve hoyos de minigolf. En línea, hasta 6 jugadores juegan cada hoyo a la vez.',
-    namePh: 'Tu nombre', solo: 'Ronda en solitario', online: 'Jugar en línea (2-6 jugadores)', host: 'Crear sala', join: 'Unirse', code: 'CÓDIGO',
+  es: { title: 'Minigolf Low Poly', menuP: 'Nueve hoyos de minigolf. En línea, hasta 6 jugadores se turnan en cada hoyo.',
+    namePh: 'Tu nombre', nameT: '¿Cómo te llamamos?', nameP: 'Los demás jugadores verán este nombre. Puedes cambiarlo después.',
+    ok: 'Aceptar', cancel: 'Cancelar', rename: 'Cambiar nombre', save: 'Guardar',
+    solo: 'Ronda en solitario', online: 'Jugar en línea (2-6 jugadores)', host: 'Crear sala', join: 'Unirse', code: 'CÓDIGO',
     lobby: 'Sala', lobbyHost: 'Comparte este código o el enlace. Empieza cuando estén todos.', lobbyGuest: '¡Ya estás dentro! Esperando a que el anfitrión empiece…',
     share: '🔗 Compartir invitación', shareText: '¡Únete a mi partida de minigolf!', copied: '¡Enlace copiado! Envíaselo a tus amigos.',
     start: 'Empezar ronda', needTwo: 'Esperando al menos a otro jugador…', leave: 'Salir', hostTag: 'Anfitrión', youTag: 'Tú',
     connecting: 'Conectando…', notFound: 'Sala no encontrada. Revisa el código.', netErr: 'No se pudo conectar. Inténtalo de nuevo.',
     noLib: 'No se pudo cargar la librería online. Revisa tu conexión.', full: 'Esa sala está llena (6 jugadores).', busy: 'Esa ronda ya empezó. Espera a la siguiente.',
     nolib: 'No se pudo cargar el motor 3D. Revisa tu conexión a internet y vuelve a abrir el juego.',
-    hole: 'Hoyo {n}/9', par: 'Par {n}', strokes: 'Golpes', view: 'Vista', vAll: 'Hoyo', vBall: 'Bola', menu: 'Menú', snd: 'Sonido',
-    aim: 'Arrastra hacia atrás desde cualquier punto para apuntar y suelta para golpear.', roll: '', water: '¡Al agua! +1 golpe. Vuelves a tu último sitio.',
-    maxS: 'Máximo de golpes ({n}). Recoges la bola.', wait: 'Esperando a los demás…', hurry: 'Quedan {n}s para los que siguen en el hoyo.',
+    hole: 'Hoyo {n}/9', par: 'Par {n}', strokes: 'Golpes', vAll: 'Hoyo', vBall: 'Bola', menu: 'Menú', snd: 'Sonido', emotes: 'Emote',
+    aim: 'Arrastra hacia atrás desde cualquier punto para apuntar y suelta para golpear.', water: '¡Al agua! +1 golpe. Vuelves a tu último sitio.',
+    maxS: 'Máximo de golpes ({n}). Recoges la bola.', wait: 'Esperando a los demás…',
+    yourTurn: '¡Tu turno! Arrastra hacia atrás y suelta para golpear.', yourTurnT: 'Tu turno · {n}s', turnOf: 'Turno de {n}', turnOfT: 'Turno de {n} · {s}s',
+    skipped: 'Se acabó el tiempo: +1 golpe.', skippedOf: 'A {n} se le acabó el tiempo: +1 golpe.',
     sunk: '¡{s} en {n}!', s_ace: 'Hoyo en uno', s_m3: 'Albatros', s_m2: 'Eagle', s_m1: 'Birdie', s_0: 'Par', s_1: 'Bogey', s_2: 'Doble bogey', s_x: 'Dentro',
     card: 'Tarjeta', after: 'Tras el hoyo {n}', total: 'Tot', parRow: 'Par', next: 'Siguiente hoyo', nextIn: 'Siguiente hoyo en {n}s…',
     final: 'Resultado final', youWin: '¡Ganas!', wins: '¡Gana {n}!', tie: '¡Empate!', soloEnd: '{n} golpes ({p} respecto al par).', record: ' ¡Nuevo récord!',
@@ -4621,6 +4671,7 @@ const R = 0.16, WH = 0.1, WALL_H = 0.32, CUP = 0.24;
 const MAXV = 11, FRIC = 1.15, SAND = 7.5, DAMP = 0.33, BOUNCE = 0.72;
 const COLS = ['#ff5d5d', '#4da3ff', '#ffd23f', '#5be37d', '#c77dff', '#ff9f43'];
 const colHex = id => parseInt(COLS[id % 6].slice(1), 16);
+const EMOTES = ['👍', '👏', '😂', '😮', '😬', '😡', '🔥', '🎉', '🙏'];
 
 /* ---------- renderer / scene ---------- */
 const canvas = $('#c');
@@ -4664,7 +4715,7 @@ function buildHole(i) {
   (H.walls || []).forEach(w => segs.push(w.slice()));
   (H.blocks || []).forEach(edges);
   const wallM = mat(0x9a6334), capM = mat(0xc98d52), feltM = mat(0x2fae5a), fringeM = mat(0x3c8a3a);
-  const fr = add(flatGeo(H.out), fringeM, 0, -0.03, 0); fr.scale.set(1.0, 1, 1.0);
+  add(flatGeo(H.out), fringeM, 0, -0.03, 0);
   add(flatGeo(H.out), feltM, 0, 0, 0).castShadow = false;
   segs.forEach(([x1, z1, x2, z2]) => {
     const L = Math.hypot(x2 - x1, z2 - z1), a = Math.atan2(-(z2 - z1), x2 - x1);
@@ -4688,7 +4739,7 @@ function buildHole(i) {
     const cm = mat(0xdaf5c8, { transparent: true, opacity: 0.7 });
     const x0 = Math.min(s[0], s[2]), x1 = Math.max(s[0], s[2]), z0 = Math.min(s[1], s[3]), z1 = Math.max(s[1], s[3]);
     for (let x = x0 + 0.5; x < x1; x += 1) for (let z = z0 + 0.5; z < z1; z += 1) {
-      const o = add(cg, cm, x, 0.01, z); o.rotation.y = ang; o.castShadow = false; slopeMarks.push({ o, x, z, x0, x1, z0, z1, dx: Math.cos(ang), dz: -Math.sin(ang) });
+      const o = add(cg, cm, x, 0.01, z); o.rotation.y = ang; o.castShadow = false; slopeMarks.push({ o, x, z, dx: Math.cos(ang), dz: -Math.sin(ang) });
     }
   });
   if (H.funnel) {
@@ -4696,7 +4747,7 @@ function buildHole(i) {
     for (let k = 1; k <= 3; k++) { const g = new THREE.RingGeometry(fr2 * k / 3 - 0.05, fr2 * k / 3, 24); g.rotateX(-Math.PI / 2); add(g, mat(0x248a47), fx, 0.005, fz).castShadow = false; }
   }
   // tee mat + cup + flag
-  { const g = new THREE.PlaneGeometry(0.9, 0.7); g.rotateX(-Math.PI / 2); add(g, mat(0x1e6e3a), H.tee[0], 0.005, H.tee[1]).castShadow = false; }
+  { const g = new THREE.PlaneGeometry(mode === 'online' ? Math.max(0.9, 0.5 + 0.34 * (players.length - 1)) : 0.9, 0.7); g.rotateX(-Math.PI / 2); add(g, mat(0x1e6e3a), H.tee[0], 0.005, H.tee[1]).castShadow = false; }
   { const g = new THREE.CircleGeometry(CUP, 14); g.rotateX(-Math.PI / 2); add(g, new THREE.MeshBasicMaterial({ color: 0x111111 }), H.cup[0], 0.007, H.cup[1]).castShadow = false; }
   flag = new THREE.Group(); flag.position.set(H.cup[0], 0, H.cup[1]); holeGroup.add(flag);
   const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.5, 6), mat(0xf4f4ee)); pole.position.y = 0.75; pole.castShadow = true; flag.add(pole);
@@ -4728,13 +4779,14 @@ function buildHole(i) {
   sun.position.set(cx - 6, 16, cz + 7); sun.target.position.set(cx, 0, cz);
   Object.assign(sun.shadow.camera, { left: -ext, right: ext, top: ext, bottom: -ext, near: 1, far: 50 });
   sun.shadow.camera.updateProjectionMatrix();
+  fitCache = null;
 }
 
 /* ---------- balls ---------- */
 const ballGeo = new THREE.IcosahedronGeometry(R, 1);
 function makeBall(id, ghost) {
-  const m = new THREE.Mesh(ballGeo, mat(colHex(id), ghost ? { transparent: true, opacity: 0.5 } : { shininess: 40 }));
-  m.castShadow = !ghost; scene.add(m); return m;
+  const m = new THREE.Mesh(ballGeo, mat(colHex(id), ghost ? { transparent: true, opacity: 0.8 } : { shininess: 40 }));
+  m.castShadow = true; scene.add(m); return m;
 }
 const me = { x: 0, z: 0, vx: 0, vz: 0, strokes: 0, lx: 0, lz: 0, state: 'idle', slowT: 0, sinkT: 0, mesh: null, roll: 0 };
 const ghosts = new Map();                 // id -> { mesh, tag, x, z, tx, tz, s, done }
@@ -4745,6 +4797,10 @@ const arrowM = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true,
 const shaft = new THREE.Mesh(new THREE.BoxGeometry(1, 0.02, 0.07), arrowM); arrow.add(shaft);
 const tipGeo = new THREE.ConeGeometry(0.13, 0.3, 3); tipGeo.rotateZ(-Math.PI / 2);
 const tip = new THREE.Mesh(tipGeo, arrowM); arrow.add(tip);
+/* pulsing ring under the ball whose turn it is */
+const turnRing = new THREE.Mesh((() => { const g = new THREE.RingGeometry(R * 1.6, R * 2.1, 20); g.rotateX(-Math.PI / 2); return g; })(),
+  new THREE.MeshBasicMaterial({ color: 0xffcf3f, transparent: true, opacity: 0.85 }));
+turnRing.visible = false; scene.add(turnRing);
 
 /* ---------- sound ---------- */
 let AC = null;
@@ -4763,6 +4819,9 @@ let lastClack = 0;
 const sClack = v => { const n = performance.now(); if (n - lastClack < 60) return; lastClack = n; tone(700 + Math.random() * 200, 0.04, 'square', Math.min(0.08, 0.02 + v * 0.012)); };
 const sCup = () => { tone(520, 0.08, 'sine', 0.2); setTimeout(() => tone(390, 0.12, 'sine', 0.2), 90); setTimeout(() => tone(780, 0.2, 'triangle', 0.12), 220); };
 const sSplash = () => { tone(300, 0.35, 'sawtooth', 0.06, -250); tone(900, 0.2, 'sine', 0.04, -700); };
+const sTurn = () => { tone(880, 0.1, 'sine', 0.12); setTimeout(() => tone(1320, 0.14, 'sine', 0.1), 110); };
+const sPop = () => tone(600, 0.06, 'sine', 0.08, 300);
+const buzz = n => { try { if (!muted && navigator.vibrate) navigator.vibrate(n); } catch (e) {} };
 
 /* ---------- physics ---------- */
 function collideSeg(x1, z1, x2, z2, rad, spin) {
@@ -4821,32 +4880,41 @@ let mode = 'menu';                        // menu | solo | online
 let phase = 'idle';                       // play | card | over | lobby | idle
 let hi = 0;                               // current hole
 let myId = 0, players = [], scores = {};  // players: [{ id, name }], scores: id -> [strokes per hole]
-let viewMode = 'all', hurryEnd = 0, cardEnd = 0, cardTimer = null;
+let turnId = -1, turnEnd = 0;             // online: whose turn it is and when their time runs out (local clock)
+let viewMode = 'all', cardEnd = 0, cardTimer = null;
 let myName = '';
 try { myName = localStorage.getItem(NAME_KEY) || ''; } catch (e) {}
 let best = 0;
 try { best = +localStorage.getItem(BEST_KEY) || 0; } catch (e) {}
-const cleanName = s => String(s || '').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 12);
+const cleanName = s => String(s || '').replace(/[\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 12);
 const nameOf = id => { const p = players.find(q => q.id === id); return p ? (p.name || tr('player') + ' ' + (id + 1)) : '?'; };
 const scoreOf = (id, h) => (scores[id] || [])[h];
 const totalOf = id => (scores[id] || []).reduce((n, v) => n + (v || 0), 0);
 const parThrough = n => HOLES.slice(0, n).reduce((s, h) => s + h.par, 0);
-const holesDone = id => (scores[id] || []).filter(v => v).length;
-function say(k, v) { $('#msg').textContent = k ? tr(k, v) : ''; }
+const finished = () => me.state === 'done' || me.state === 'sink';
+const myTurn = () => mode !== 'online' || turnId === myId;
+function say(k, v) { $('#msg').textContent = k ? tr(k, v) : ''; $('#msg').classList.remove('mine'); }
 
 function beginHole(h) {
-  hi = h; phase = 'play'; hurryEnd = 0;
+  hi = h; phase = 'play'; turnId = -1; turnEnd = 0;
   $('#ov').style.display = 'none';
   buildHole(h);
   if (!me.mesh) me.mesh = makeBall(myId, false);
   me.mesh.material.color.setHex(colHex(myId));
-  Object.assign(me, { x: H.tee[0], z: H.tee[1], vx: 0, vz: 0, strokes: 0, lx: H.tee[0], lz: H.tee[1], state: 'aim', slowT: 0, sinkT: 0 });
+  const t0 = teeSpot(myId);
+  Object.assign(me, { x: t0, z: H.tee[1], vx: 0, vz: 0, strokes: 0, lx: t0, lz: H.tee[1], state: mode === 'online' ? 'wait' : 'aim', slowT: 0, sinkT: 0 });
   me.mesh.visible = true; me.mesh.scale.setScalar(1);
   syncGhosts();
-  ghosts.forEach(g => { g.x = g.tx = H.tee[0]; g.z = g.tz = H.tee[1]; g.s = 0; g.done = false; g.mesh.visible = true; });
-  snapCam = true; say('aim'); hud(); sendPos(true);
+  ghosts.forEach((g, id) => { g.x = g.tx = teeSpot(id); g.z = g.tz = H.tee[1]; g.s = 0; g.done = false; g.mesh.visible = true; });
+  snapCam = true; say(mode === 'online' ? null : 'aim'); hud();
 }
-/** Keep one translucent ghost ball + name tag for every other player in the room. */
+/** Each player tees off from their own spot across the tee mat (x only), so waiting balls never sit on top of each other. */
+function teeSpot(id) {
+  if (mode !== 'online' || players.length < 2) return H.tee[0];
+  const ids = players.map(p => p.id).sort((a, b) => a - b), k = ids.indexOf(id);
+  return H.tee[0] + (Math.max(0, k) - (ids.length - 1) / 2) * 0.34;
+}
+/** Keep one ghost ball + name tag for every other player in the room. */
 function syncGhosts() {
   const ids = new Set(players.map(p => p.id).filter(id => id !== myId));
   ghosts.forEach((g, id) => { if (!ids.has(id)) { scene.remove(g.mesh); g.tag.remove(); ghosts.delete(id); } });
@@ -4858,32 +4926,41 @@ function syncGhosts() {
   });
   ghosts.forEach((g, id) => { g.tag.textContent = nameOf(id); });
   myTag.textContent = mode === 'online' ? tr('you') : '';
-  myTag.style.color = COLS[myId % 6]; myTag.style.display = mode === 'online' ? '' : 'none';
+  myTag.style.color = COLS[myId % 6];
 }
 const myTag = document.createElement('div'); myTag.className = 'tag'; $('#tags').appendChild(myTag);
 
 function shoot(dx, dz, p) {
-  if (me.state !== 'aim' || phase !== 'play') return;
+  if (me.state !== 'aim' || phase !== 'play' || !myTurn()) return;
   const v = MAXV * (0.05 + 0.95 * p);
   me.lx = me.x; me.lz = me.z; me.vx = dx * v; me.vz = dz * v; me.slowT = 0;
-  me.strokes++; me.state = 'roll'; sPutt(p); say(null); hud(); sendPos(true);
+  me.strokes++; me.state = 'roll'; sPutt(p); say(null); closeEmotes(); hud(); sendPos(true);
+  if (mode === 'online' && isHost) hostShotTaken();
 }
 function ballEvent(ev) {
   if (ev === 'cup') {
     me.state = 'sink'; me.sinkT = 0; me.vx = me.vz = 0; sCup();
     const d = me.strokes - H.par, key = me.strokes === 1 ? 's_ace' : d >= -3 && d <= 2 ? 's_' + (d < 0 ? 'm' + -d : d) : 's_x';
-    say('sunk', { s: tr(key), n: me.strokes });
+    flash(tr('sunk', { s: tr(key), n: me.strokes }));
     finishMe(me.strokes);
   } else if (ev === 'water') {
     sSplash(); me.strokes++;
     Object.assign(me, { x: me.lx, z: me.lz, vx: 0, vz: 0 });
-    if (me.strokes >= MAXS) { say('maxS', MAXS); finishMe(MAXS); }
-    else { me.state = 'aim'; say('water'); }
+    if (me.strokes >= MAXS) { flash(tr('maxS', MAXS)); finishMe(MAXS); }
+    else { endStroke(); flash(tr('water')); }
   } else if (ev === 'stop') {
-    if (me.strokes >= MAXS) { say('maxS', MAXS); finishMe(MAXS); }
-    else { me.state = 'aim'; say('aim'); }
+    if (me.strokes >= MAXS) { flash(tr('maxS', MAXS)); finishMe(MAXS); }
+    else { endStroke(); if (mode !== 'online') say('aim'); }
   }
   hud(); sendPos(true);
+}
+/** The ball came to rest (not holed): solo keeps putting, online passes the turn on. */
+function endStroke() {
+  if (mode !== 'online') { me.state = 'aim'; return; }
+  me.state = 'wait';
+  const m = { t: 'rest', h: hi, s: me.strokes, x: +me.x.toFixed(3), z: +me.z.toFixed(3) };
+  sendPos(true);
+  if (isHost) hostRest(myId, m); else netSend(m);
 }
 function finishMe(s) {
   if (me.state !== 'sink') me.state = 'done';
@@ -4892,13 +4969,35 @@ function finishMe(s) {
     cardTimer = setTimeout(() => showCard(false), 1400);
   } else if (mode === 'online') {
     if (isHost) hostDone(myId, hi, s); else netSend({ t: 'done', h: hi, s });
-    setTimeout(() => { if (phase === 'play' && (me.state === 'done' || me.state === 'sink')) say('wait'); }, 1800);
   }
 }
-/** Someone else (the host, for a timeout) decided we are done on this hole. */
+/** The host decided we are done on this hole (out of time on the last allowed stroke). */
 function forcedDone(s) {
-  if (me.state === 'done' || me.state === 'sink') return;
-  me.state = 'done'; me.vx = me.vz = 0; say('maxS', s); hud();
+  if (finished()) return;
+  me.state = 'done'; me.strokes = s; me.vx = me.vz = 0; hud();
+}
+/** Whose turn it is now; ms = how long they have to putt. */
+function setTurn(id, ms) {
+  turnId = id; turnEnd = performance.now() + ms;
+  if (id === myId && !finished()) {
+    if (me.state === 'roll') { me.vx = me.vz = 0; }
+    me.state = 'aim'; sTurn(); buzz(60);
+  } else if (me.state === 'aim') me.state = 'wait';
+  hud(); turnMsg(performance.now());
+}
+function turnMsg(now) {
+  if (mode !== 'online' || phase !== 'play' || drag) return;
+  const left = Math.max(0, Math.ceil((turnEnd - now) / 1000)), msg = $('#msg');
+  if (turnId === myId && me.state === 'aim') {
+    msg.textContent = left > 30 ? tr('yourTurn') : tr('yourTurnT', left); msg.classList.add('mine');
+  } else if (turnId >= 0 && turnId !== myId && (me.state === 'wait' || finished()) && !msg.dataset.hold) {
+    msg.textContent = left <= 15 ? tr('turnOfT', { n: nameOf(turnId), s: left }) : tr('turnOf', nameOf(turnId)); msg.classList.remove('mine');
+  }
+}
+/** Show a one-off line in the message strip for a couple of seconds before turn messages take over again. */
+function flash(text) {
+  const msg = $('#msg'); msg.textContent = text; msg.classList.remove('mine'); msg.dataset.hold = '1';
+  clearTimeout(flash.t); flash.t = setTimeout(() => { delete msg.dataset.hold; }, 2600);
 }
 
 /* ---------- HUD ---------- */
@@ -4908,13 +5007,92 @@ function hud() {
   $('#hHole').textContent = tr('hole', hi + 1);
   $('#hSL').textContent = tr('strokes');
   $('#hS').textContent = me.strokes;
-  const list = mode === 'online' ? players : [];
-  $('#pl').innerHTML = list.map(p => {
-    const sc = scoreOf(p.id, hi), g = ghosts.get(p.id), live = p.id === myId ? me.strokes : g ? g.s : 0;
-    return `<div class="pc ${p.id === myId ? 'me' : ''} ${sc ? 'done' : ''}"><i style="background:${COLS[p.id % 6]}"></i><span>${esc(nameOf(p.id))}</span><em>${sc ? '✔ ' + sc : live}</em></div>`;
-  }).join('');
-  if (mode === 'solo') $('#pl').innerHTML = `<div class="pc"><span>${esc(tr('round'))}</span><em>${totalOf(myId)}</em></div>` + (best ? `<div class="pc"><span>${esc(tr('best'))}</span><em>${best}</em></div>` : '');
+  if (mode === 'online') {
+    $('#pl').innerHTML = players.map(p => {
+      const sc = scoreOf(p.id, hi), g = ghosts.get(p.id), live = p.id === myId ? me.strokes : g ? g.s : 0;
+      const cls = (p.id === myId ? ' me' : '') + (sc ? ' done' : '') + (phase === 'play' && p.id === turnId && !sc ? ' turn' : '');
+      return `<div class="pc${cls}" data-id="${p.id}"><i style="background:${COLS[p.id % 6]}"></i><span>${esc(nameOf(p.id))}</span><em>${sc ? '✔ ' + sc : live}</em></div>`;
+    }).join('');
+  } else if (mode === 'solo') {
+    $('#pl').innerHTML = `<div class="pc"><span>${esc(tr('round'))}</span><em>${totalOf(myId)}</em></div>` + (best ? `<div class="pc"><span>${esc(tr('best'))}</span><em>${best}</em></div>` : '');
+  } else $('#pl').innerHTML = '';
+  $('#emoB').style.display = mode === 'online' ? '' : 'none';
+  if (mode !== 'online') closeEmotes();
   document.documentElement.style.setProperty('--th', $('#top').offsetHeight + 'px');
+}
+
+/* ---------- emotes ----------
+ * A tap sends one emoji to everyone; it floats up from that player's ball (or their chip in the HUD when the ball is not
+ * on screen). Limited to one every 0.8s per player so nobody can flood the room. */
+const floating = [];
+let lastEmote = 0;
+function buildEmotePanel() {
+  $('#emo').innerHTML = EMOTES.map((e, i) => `<button data-e="${i}">${e}</button>`).join('') + `<button class="ed" id="emoName" title="">✏️</button>`;
+  $('#emoName').title = tr('rename');
+}
+function closeEmotes() { $('#emo').classList.remove('on'); $('#emoB').classList.remove('on'); }
+$('#emo').addEventListener('pointerdown', e => e.stopPropagation());
+$('#emo').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.id === 'emoName') { closeEmotes(); askName(tr('rename'), n => rename(n)); return; }
+  sendEmote(+b.dataset.e);
+});
+function sendEmote(i) {
+  const n = performance.now(); if (n - lastEmote < 800 || !(i >= 0 && i < EMOTES.length)) return;
+  lastEmote = n; showEmote(myId, i);
+  if (isHost) broadcast({ t: 'emote', id: myId, e: i }); else netSend({ t: 'emote', e: i });
+}
+function showEmote(id, i) {
+  if (!EMOTES[i]) return;
+  const el = document.createElement('div'); el.className = 'emo';
+  el.innerHTML = `${EMOTES[i]}<small style="color:${COLS[id % 6]}">${esc(nameOf(id))}</small>`;
+  $('#tags').appendChild(el);
+  floating.push({ el, id, t0: performance.now(), dx: (Math.random() - 0.5) * 30 });
+  while (floating.length > 14) floating.shift().el.remove();
+  sPop();
+}
+function ballScreen(id) {                 // where a player's ball is on screen, or null if it is not shown
+  if (id === myId) return me.mesh && me.mesh.visible ? toScreen(me.x, me.z) : null;
+  const g = ghosts.get(id); return g && g.mesh.visible ? toScreen(g.x, g.z) : null;
+}
+function updateEmotes(now) {
+  for (let k = floating.length - 1; k >= 0; k--) {
+    const f = floating[k], t = (now - f.t0) / 2600;
+    if (t >= 1) { f.el.remove(); floating.splice(k, 1); continue; }
+    let p = phase === 'play' ? ballScreen(f.id) : null;
+    if (!p) { const chip = $(`#pl .pc[data-id="${f.id}"]`), r = chip && chip.getBoundingClientRect(); p = r && r.width ? { x: r.left + r.width / 2, y: r.bottom + 46 } : { x: innerWidth / 2, y: innerHeight / 2 }; }
+    const rise = 30 + t * 60, s = t < 0.15 ? 0.4 + t * 4 : 1;
+    f.el.style.transform = `translate(${p.x + f.dx * t}px,${p.y - rise}px) translate(-50%,-100%) scale(${s})`;
+    f.el.style.opacity = t > 0.75 ? (1 - t) * 4 : 1;
+  }
+}
+
+/* ---------- names ---------- */
+let nameCb = null;
+/** Ask for a name (prefilled with the saved one), then call cb(name). */
+function askName(title, cb) {
+  nameCb = cb;
+  $('#nT').textContent = title || tr('nameT'); $('#nP').textContent = tr('nameP');
+  $('#nIn').value = myName; $('#nIn').placeholder = tr('namePh');
+  $('#nameDlg').style.display = 'flex';
+  setTimeout(() => { try { $('#nIn').focus(); $('#nIn').select(); } catch (e) {} }, 50);
+}
+function nameDone(ok) {
+  const cb = nameCb; nameCb = null; $('#nameDlg').style.display = 'none';
+  if (!ok || !cb) return;
+  myName = cleanName($('#nIn').value) || myName || tr('player');
+  try { localStorage.setItem(NAME_KEY, myName); } catch (e) {}
+  cb(myName);
+}
+$('#nOk').onclick = () => nameDone(true);
+$('#nCancel').onclick = () => nameDone(false);
+$('#nIn').addEventListener('keydown', e => { if (e.key === 'Enter') nameDone(true); if (e.key === 'Escape') nameDone(false); });
+function rename(n) {
+  n = cleanName(n); if (!n) return;
+  myName = n; try { localStorage.setItem(NAME_KEY, n); } catch (e) {}
+  const p = players.find(q => q.id === myId); if (p) p.name = n;
+  if (mode === 'online') { if (isHost) hostLobbyUpdate(); else netSend({ t: 'name', name: n }); }
+  syncGhosts(); hud(); if (phase === 'lobby') renderLobby();
 }
 
 /* ---------- scorecard ---------- */
@@ -4925,13 +5103,13 @@ function cardHtml(upto) {
   const par = `<tr class="par"><td class="n">${esc(tr('parRow'))}</td>${HOLES.map(h => `<td>${h.par}</td>`).join('')}<td>${TOTAL_PAR}</td></tr>`;
   const rows = ids.map(id => {
     const cells = HOLES.map((h, k) => { const v = scoreOf(id, k); return `<td class="${v ? (v < h.par ? 'u' : v > h.par ? 'o' : '') : ''} ${k === upto ? 'cur' : ''}">${v || '·'}</td>`; }).join('');
-    const t = totalOf(id), d = t - parThrough(holesDone(id) ? Math.max(...(scores[id] || []).map((v, k) => v ? k + 1 : 0)) : 0);
+    const played = (scores[id] || []).reduce((m, v, k) => v ? k + 1 : m, 0), t = totalOf(id), d = t - parThrough(played);
     return `<tr class="${lead !== null && t === lead ? 'lead' : ''}"><td class="n"><i style="background:${COLS[id % 6]}"></i>${esc(nameOf(id))}${id === myId && mode === 'online' ? ' (' + esc(tr('you')) + ')' : ''}</td>${cells}<td class="t">${t}<small style="color:#9aa3b8;font-weight:600"> ${d > 0 ? '+' + d : d === 0 ? 'E' : d}</small></td></tr>`;
   }).join('');
   return `<table>${head}${par}${rows}</table>`;
 }
 function showCard(online) {
-  phase = 'card'; me.state = me.state === 'sink' ? 'sink' : 'done'; say(null);
+  phase = 'card'; turnId = -1; if (!finished()) me.state = 'done'; say(null); hud();
   const last = hi === NH - 1;
   $('#oT').textContent = last ? tr('final') : tr('card');
   $('#oCard').innerHTML = cardHtml(hi);
@@ -4940,7 +5118,7 @@ function showCard(online) {
   $('#oP').textContent = tr('after', hi + 1);
   if (online) {
     $('#oB').style.display = 'none';
-    cardEnd = performance.now() + 5000;
+    cardEnd = performance.now() + CARD_MS;
   } else {
     $('#oB').style.display = ''; $('#oB').textContent = tr('next');
     $('#oB').onclick = () => beginHole(hi + 1);
@@ -4963,26 +5141,20 @@ function showFinal() {
     $('#oB2').style.display = ''; $('#oB2').textContent = tr('toMenu'); $('#oB2').onclick = showMenu;
   }
   $('#ov').style.display = 'flex';
-  if (winners.includes(myId)) { sCup(); }
+  if (winners.includes(myId)) sCup();
 }
 
 /* ---------- menus ---------- */
 function showMenu() {
   netClose(); clearTimeout(cardTimer);
-  mode = 'menu'; phase = 'idle'; players = []; scores = {}; syncGhosts();
-  $('#ov').style.display = $('#lobby').style.display = 'none';
+  mode = 'menu'; phase = 'idle'; players = []; scores = {}; turnId = -1; syncGhosts();
+  $('#ov').style.display = $('#lobby').style.display = $('#nameDlg').style.display = 'none';
   $('#menu').style.display = 'flex'; $('#mNet').textContent = '';
-  if (me.mesh) me.mesh.visible = true;
   hud(); say(null);
-}
-function readName() {
-  myName = cleanName($('#mName').value);
-  try { localStorage.setItem(NAME_KEY, myName); } catch (e) {}
-  return myName || tr('player');
 }
 function startSolo() {
   netClose(); clearTimeout(cardTimer);
-  mode = 'solo'; myId = 0; players = [{ id: 0, name: readName() }]; scores = { 0: [] };
+  mode = 'solo'; myId = 0; players = [{ id: 0, name: myName || tr('you') }]; scores = { 0: [] };
   $('#menu').style.display = $('#lobby').style.display = 'none';
   syncGhosts(); beginHole(0);
 }
@@ -4991,28 +5163,35 @@ function renderLobby() {
   $('#lCode').textContent = isHost ? hostCode : roomCode;
   $('#lP').textContent = tr(isHost ? 'lobbyHost' : 'lobbyGuest');
   $('#lShare').textContent = tr('share');
-  $('#lList').innerHTML = players.map(p => `<li><i style="background:${COLS[p.id % 6]}"></i>${esc(nameOf(p.id))}<small>${p.id === 0 ? esc(tr('hostTag')) : ''}${p.id === myId ? (p.id === 0 ? ' · ' : '') + esc(tr('youTag')) : ''}</small></li>`).join('');
+  $('#lList').innerHTML = players.map(p => `<li><i style="background:${COLS[p.id % 6]}"></i><b>${esc(nameOf(p.id))}</b><small>${p.id === 0 ? esc(tr('hostTag')) : ''}${p.id === myId ? (p.id === 0 ? ' · ' : '') + esc(tr('youTag')) : ''}</small></li>`).join('');
+  $('#lName').placeholder = tr('namePh'); $('#lRename').textContent = tr('save');
   $('#lStart').textContent = tr('start'); $('#lStart').style.display = isHost ? '' : 'none';
   $('#lStart').disabled = players.length < 2;
   $('#lLeave').textContent = tr('leave');
   if (isHost && players.length < 2) $('#lNet').textContent = tr('needTwo');
-  else if (!isHost || $('#lNet').dataset.k !== 'copied') $('#lNet').textContent = '';
+  else if ($('#lNet').dataset.k !== 'copied') $('#lNet').textContent = '';
 }
 function showLobby() {
+  const was = $('#lobby').style.display === 'flex';
   phase = 'lobby'; $('#menu').style.display = 'none'; $('#ov').style.display = 'none';
-  $('#lobby').style.display = 'flex'; $('#lNet').dataset.k = ''; renderLobby();
+  $('#lobby').style.display = 'flex';
+  if (!was) { $('#lNet').dataset.k = ''; $('#lName').value = myName; }
+  renderLobby();
 }
 
 /* ---------- online play ----------
  * PeerJS (same setup as Low Poly Pool): a 4-letter room code reaches the host through a free public broker,
- * then each guest has a direct link to the host only (a star). Every player simulates just their own ball and
- * streams its position (about 12 times a second while it rolls); the others see it as a translucent ghost.
- * Balls never touch each other, so nothing else needs syncing. The host is the referee: it hands out player
- * ids/colours, relays positions, collects each player's strokes, runs the "hurry up" timer once someone has
- * holed out, and decides when to show the scorecard and move to the next hole. */
-const NET_PREFIX = 'lpg-', CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', MAXP = 6, HURRY_MS = 75000, CARD_MS = 5000;
+ * then each guest has a direct link to the host only (a star). Players take turns: only the player whose turn it is
+ * simulates their ball, streaming its position (about 12 times a second) so everyone watches the putt; the other
+ * balls stay where they stopped. Balls never touch each other, so nothing else needs syncing.
+ * The host is the referee: it hands out ids/colours, relays positions and emotes, picks whose turn is next
+ * (the player who scored best on the last hole tees off first, then turns rotate among those still on the hole),
+ * gives each turn 40s (an idle player gets +1 stroke and the turn moves on), collects scores, and moves to the
+ * scorecard and next hole. */
+const NET_PREFIX = 'lpg-', CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', MAXP = 6, TURN_MS = 40000, ROLL_MS = 30000, CARD_MS = 6000;
 let peer = null, conn = null, isHost = false, hostCode = '', roomCode = '', lastPos = 0;
 const guests = new Map();                 // host only: id -> conn
+let hTurnEnd = 0, hShot = false, hStrokes = {};   // host only: turn deadline, whether the current player has putted, strokes this hole
 const num = (...v) => v.every(Number.isFinite);
 const netSend = m => { try { if (conn && conn.open) conn.send(m); } catch (e) {} };
 const sendTo = (c, m) => { try { if (c && c.open) c.send(m); } catch (e) {} };
@@ -5022,7 +5201,7 @@ function netClose() {
   guests.forEach(c => { try { c.removeAllListeners(); c.close(); } catch (e) {} }); guests.clear();
   try { if (conn) { conn.removeAllListeners(); conn.close(); } } catch (e) {}
   try { if (peer) { peer.removeAllListeners(); peer.destroy(); } } catch (e) {}
-  peer = conn = null; hostCode = roomCode = ''; isHost = false; hurryEnd = cardEnd = 0;
+  peer = conn = null; hostCode = roomCode = ''; isHost = false; cardEnd = 0; hTurnEnd = 0;
 }
 function sendPos(force) {
   if (mode !== 'online') return;
@@ -5031,11 +5210,10 @@ function sendPos(force) {
   if (isHost) broadcast(Object.assign({ id: myId }, m)); else netSend(m);
 }
 /* host side */
-function netHost() {
+function netHost(name) {
   netClose(); netStatus('');
   if (typeof Peer === 'undefined') return netStatus('noLib');
   isHost = true; myId = 0;
-  const name = readName();
   const attempt = n => {
     const code = Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
     const pr = peer = new Peer(NET_PREFIX + code);
@@ -5046,6 +5224,7 @@ function netHost() {
     pr.on('error', e => { if (e.type === 'unavailable-id' && n < 6) attempt(n + 1); else netStatus('netErr'); });
     pr.on('connection', hostAccept);
   };
+  netStatus('connecting');
   attempt(0);
 }
 function hostAccept(c) {
@@ -5064,7 +5243,7 @@ function hostAccept(c) {
     if (id < 0 || !guests.has(id)) return;
     guests.delete(id); players = players.filter(p => p.id !== id); delete scores[id];
     hostLobbyUpdate();
-    if (phase === 'play') hostCheckHole();
+    if (phase === 'play') { if (!hostCheckHole() && turnId === id) hostNextTurn(id); }
   };
   c.on('close', gone); c.on('error', gone);
 }
@@ -5075,56 +5254,104 @@ function hostLobbyUpdate() {
   if (phase === 'lobby') renderLobby();
 }
 function hostOnGuest(id, m) {
-  if (m.t === 'pos' && num(m.x, m.z, m.s) && m.h === hi && phase === 'play') {
-    const g = ghosts.get(id); if (g) { g.tx = m.x; g.tz = m.z; g.s = m.s | 0; }
-    broadcast({ t: 'pos', id, x: m.x, z: m.z, s: m.s | 0, h: hi }, id); hud();
-  } else if (m.t === 'done' && Number.isInteger(m.s) && m.h === hi) hostDone(id, hi, Math.max(1, Math.min(MAXS, m.s)));
+  if (m.t === 'pos' && num(m.x, m.z, m.s) && m.h === hi && phase === 'play' && id === turnId) {
+    const g = ghosts.get(id);
+    if (m.s > (hStrokes[id] || 0)) hostShotTaken();
+    hStrokes[id] = Math.max(hStrokes[id] || 0, Math.min(MAXS, m.s | 0));
+    if (g) { g.tx = m.x; g.tz = m.z; g.s = hStrokes[id]; }
+    broadcast({ t: 'pos', id, x: m.x, z: m.z, s: hStrokes[id], h: hi }, id); hud();
+  } else if (m.t === 'rest' && m.h === hi && num(m.x, m.z, m.s)) hostRest(id, m);
+  else if (m.t === 'done' && Number.isInteger(m.s) && m.h === hi) hostDone(id, hi, Math.max(1, Math.min(MAXS, m.s)));
+  else if (m.t === 'emote' && Number.isInteger(m.e) && m.e >= 0 && m.e < EMOTES.length) {
+    const n = performance.now(), p = players.find(q => q.id === id); if (!p || n - (p.lastE || 0) < 700) return;
+    p.lastE = n; showEmote(id, m.e); broadcast({ t: 'emote', id, e: m.e }, id);
+  } else if (m.t === 'name') {
+    const n = cleanName(m.name), p = players.find(q => q.id === id);
+    if (n && p) { p.name = n; hostLobbyUpdate(); }
+  }
 }
+function hostShotTaken() { hShot = true; hTurnEnd = performance.now() + ROLL_MS; }
 function hostStart() {
   if (players.length < 2) return;
   scores = {}; players.forEach(p => { scores[p.id] = []; });
   hostHole(0);
 }
+/** Tee-off order: best score on the previous hole first (ties keep the room order). */
+function hostOrder() {
+  return players.map(p => p.id).sort((a, b) => hi > 0 ? (scoreOf(a, hi - 1) || MAXS) - (scoreOf(b, hi - 1) || MAXS) || a - b : a - b);
+}
 function hostHole(h) {
-  cardEnd = 0; hurryEnd = 0;
+  cardEnd = 0; hStrokes = {};
   broadcast({ t: 'hole', h, reset: h === 0 });
   $('#lobby').style.display = 'none';
   beginHole(h);
+  hostNextTurn(null);
+}
+/** Pass the turn to the next player still on the hole, in tee-off order, starting after `after`. */
+function hostNextTurn(after) {
+  if (phase !== 'play') return;
+  const ord = hostOrder(), left = ord.filter(id => !scoreOf(id, hi));
+  if (!left.length) return;
+  let next = left[0];
+  const i = ord.indexOf(after);
+  if (i >= 0) for (let k = 1; k <= ord.length; k++) { const id = ord[(i + k) % ord.length]; if (left.includes(id)) { next = id; break; } }
+  hShot = false; hTurnEnd = performance.now() + TURN_MS;
+  broadcast({ t: 'turn', id: next, ms: TURN_MS });
+  setTurn(next, TURN_MS);
+}
+function hostRest(id, m) {
+  if (phase !== 'play' || id !== turnId || scoreOf(id, hi)) return;
+  hStrokes[id] = Math.max(1, Math.min(MAXS, m.s | 0));
+  const g = ghosts.get(id); if (g) { g.tx = m.x; g.tz = m.z; g.s = hStrokes[id]; }
+  if (id !== myId) broadcast({ t: 'pos', id, x: m.x, z: m.z, s: hStrokes[id], h: hi }, id);
+  hostNextTurn(id);
 }
 function hostDone(id, h, s) {
   if (h !== hi || phase !== 'play' || scoreOf(id, h)) return;
   (scores[id] = scores[id] || [])[h] = s;
   const g = ghosts.get(id); if (g) { g.done = true; g.s = s; }
   broadcast({ t: 'done', id, h, s });
-  if (!hurryEnd && players.some(p => !scoreOf(p.id, h))) { hurryEnd = performance.now() + HURRY_MS; broadcast({ t: 'hurry', ms: HURRY_MS }); }
-  hud(); hostCheckHole();
+  hud();
+  if (!hostCheckHole() && id === turnId) hostNextTurn(id);
 }
+/** Everyone holed out? Then show the scorecard shortly. Returns true when the hole is over. */
 function hostCheckHole() {
-  if (phase !== 'play' || !players.every(p => scoreOf(p.id, hi))) return;
-  hurryEnd = 0;
+  if (phase !== 'play' || !players.every(p => scoreOf(p.id, hi))) return false;
+  hTurnEnd = 0;
   setTimeout(() => {
     if (mode !== 'online' || !isHost || phase !== 'play') return;
     broadcast({ t: 'card', h: hi, scores });
     showCard(true);
-  }, 1300);
+  }, 1500);
+  return true;
 }
 function hostTick(now) {
-  if (phase === 'play' && hurryEnd && now > hurryEnd) {       // time's up: everyone still out there picks up with max strokes
-    hurryEnd = 0;
-    players.filter(p => !scoreOf(p.id, hi)).forEach(p => { if (p.id === myId) forcedDone(MAXS); hostDone(p.id, hi, MAXS); });
+  if (phase === 'play' && hTurnEnd && now > hTurnEnd && turnId >= 0) {
+    const id = turnId; hTurnEnd = 0;
+    if (hShot) { hostNextTurn(id); return; }              // the putt never reported back: just move on
+    const s = (id === myId ? me.strokes : hStrokes[id] || 0) + 1;   // idle: +1 stroke, ball stays put
+    hStrokes[id] = s;
+    if (s >= MAXS) { if (id === myId) forcedDone(MAXS); hostDone(id, hi, MAXS); return; }
+    broadcast({ t: 'skip', id, s });
+    applySkip(id, s);
+    hostNextTurn(id);
   }
   if (phase === 'card' && cardEnd && now > cardEnd) { cardEnd = 0; hostHole(hi + 1); }
 }
+function applySkip(id, s) {
+  if (id === myId) { me.strokes = s; if (me.state === 'aim') me.state = 'wait'; flash(tr('skipped')); }
+  else { const g = ghosts.get(id); if (g) g.s = s; flash(tr('skippedOf', nameOf(id))); }
+  hud();
+}
 function hostToLobby() {
-  phase = 'lobby'; scores = {};
+  phase = 'lobby'; scores = {}; turnId = -1;
   hostLobbyUpdate(); showLobby();
 }
 /* guest side */
-function netJoin(code) {
+function netJoin(code, name) {
   netClose(); netStatus('');
   if (typeof Peer === 'undefined') return netStatus('noLib');
   isHost = false; netStatus('connecting'); roomCode = code;
-  const name = readName();
   const pr = peer = new Peer();
   pr.on('open', () => {
     const c = conn = pr.connect(NET_PREFIX + code, { reliable: true });
@@ -5146,32 +5373,36 @@ function onNet(m) {
   if (m.t === 'lobby' && Array.isArray(m.list) && Number.isInteger(m.you)) {
     players = m.list.filter(p => p && Number.isInteger(p.id) && p.id >= 0 && p.id < MAXP).map(p => ({ id: p.id, name: cleanName(p.name) }));
     myId = m.you; mode = 'online';
+    if (me.mesh) me.mesh.material.color.setHex(colHex(myId));
     for (const k in scores) if (!players.some(p => p.id === +k)) delete scores[k];
     syncGhosts(); hud();
     if (m.phase === 'lobby') showLobby();
     return;
   }
   if (mode !== 'online') return;
+  const known = id => Number.isInteger(id) && players.some(p => p.id === id);
   if (m.t === 'hole' && Number.isInteger(m.h) && m.h >= 0 && m.h < NH) {
     if (m.reset) { scores = {}; players.forEach(p => { scores[p.id] = []; }); }
     $('#lobby').style.display = 'none'; beginHole(m.h);
-  } else if (m.t === 'pos' && num(m.x, m.z, m.s) && m.h === hi) {
+  } else if (m.t === 'turn' && known(m.id) && num(m.ms) && phase === 'play') setTurn(m.id, Math.min(TURN_MS, m.ms));
+  else if (m.t === 'pos' && num(m.x, m.z, m.s) && m.h === hi && known(m.id)) {
     const g = ghosts.get(m.id); if (g) { g.tx = m.x; g.tz = m.z; g.s = m.s | 0; hud(); }
-  } else if (m.t === 'done' && Number.isInteger(m.id) && Number.isInteger(m.s) && m.h === hi) {
+  } else if (m.t === 'done' && known(m.id) && Number.isInteger(m.s) && m.h === hi) {
     (scores[m.id] = scores[m.id] || [])[hi] = m.s;
     const g = ghosts.get(m.id); if (g) { g.done = true; g.s = m.s; }
     if (m.id === myId) forcedDone(m.s);
     hud();
-  } else if (m.t === 'hurry' && num(m.ms)) hurryEnd = performance.now() + Math.min(HURRY_MS, m.ms);
+  } else if (m.t === 'skip' && known(m.id) && Number.isInteger(m.s)) applySkip(m.id, m.s);
+  else if (m.t === 'emote' && known(m.id) && m.id !== myId && Number.isInteger(m.e)) showEmote(m.id, m.e);
   else if (m.t === 'card' && m.h === hi) {
     const s = validScores(m.scores); if (s) scores = s;
-    hurryEnd = 0; showCard(true);
+    showCard(true);
   }
 }
 function onHostGone() {
   if (mode !== 'online') { netStatus('netErr'); return; }
-  netClose(); mode = 'menu'; phase = 'over';
-  $('#lobby').style.display = 'none';
+  netClose(); mode = 'menu'; phase = 'over'; turnId = -1;
+  $('#lobby').style.display = 'none'; closeEmotes();
   $('#oT').textContent = tr('hostLeft'); $('#oP').textContent = tr('hostLeftP'); $('#oCard').innerHTML = '';
   $('#oB').style.display = ''; $('#oB').textContent = tr('toMenu'); $('#oB').onclick = showMenu; $('#oB2').style.display = 'none';
   $('#ov').style.display = 'flex';
@@ -5188,13 +5419,13 @@ async function shareInvite() {
   try { await navigator.clipboard.writeText(url); $('#lNet').textContent = tr('copied'); $('#lNet').dataset.k = 'copied'; }
   catch (e) { $('#lNet').textContent = url; }
 }
+function joinCode(code) { askName(tr('nameT'), n => netJoin(code, n)); }
 function autoJoin() {
   let h = ''; try { h = parent.location.hash; } catch (e) {}
   const m = h.match(/[?&]join=([A-Za-z0-9]{4})/); if (!m) return;
   const code = m[1].toUpperCase();
   try { parent.history.replaceState(null, '', parent.location.href.split('#')[0] + '#/game/mini-golf'); } catch (e) {}
-  $('#mCode').value = code;
-  netJoin(code);
+  $('#mCode').value = code; joinCode(code);
 }
 
 /* ---------- input ---------- */
@@ -5207,7 +5438,8 @@ function groundAt(e) {
 }
 let drag = null, aim = { x: 0, z: -1, p: 0 };
 canvas.addEventListener('pointerdown', e => {
-  if (me.state !== 'aim' || phase !== 'play') return;
+  closeEmotes();
+  if (me.state !== 'aim' || phase !== 'play' || !myTurn()) return;
   const g = groundAt(e); if (!g) return;
   drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, g };
   aim.p = 0;
@@ -5235,63 +5467,74 @@ function applyLang() {
   document.documentElement.lang = lang;
   const btn = (id, icon, label) => { $(id).innerHTML = `<span>${icon}</span><small>${esc(label)}</small>`; };
   btn('#view', viewMode === 'all' ? '🗺️' : '🎯', viewMode === 'all' ? tr('vAll') : tr('vBall'));
+  btn('#emoB', '😀', tr('emotes'));
   btn('#menuB', '☰', tr('menu'));
   btn('#lang', '🌐', lang.toUpperCase());
   btn('#mute', muted ? '🔇' : '🔊', tr('snd'));
   $('#mute').classList.toggle('off', muted);
   $('#mT').textContent = tr('title'); $('#mP').textContent = tr('menuP');
-  $('#mName').placeholder = tr('namePh'); $('#mName').value = myName;
   $('#mSolo').textContent = tr('solo'); $('#mO').textContent = tr('online');
   $('#mHost').textContent = tr('host'); $('#mJoin').textContent = tr('join'); $('#mCode').placeholder = tr('code');
+  $('#nOk').textContent = tr('ok'); $('#nCancel').textContent = tr('cancel');
+  buildEmotePanel();
   if (phase === 'lobby') renderLobby();
   syncGhosts(); hud();
-  if (phase === 'play') say(me.state === 'aim' ? 'aim' : null);
+  if (phase === 'play' && mode === 'solo') say(me.state === 'aim' ? 'aim' : null);
 }
 $('#view').onclick = () => { viewMode = viewMode === 'all' ? 'ball' : 'all'; applyLang(); };
+$('#emoB').onclick = () => { const on = !$('#emo').classList.contains('on'); $('#emo').classList.toggle('on', on); $('#emoB').classList.toggle('on', on); };
 $('#menuB').onclick = () => { if (mode === 'online' && !confirm(tr('confirmLeave'))) return; showMenu(); };
 $('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); };
 $('#mute').onclick = () => { muted = !muted; applyLang(); };
 $('#mSolo').onclick = startSolo;
-$('#mHost').onclick = netHost;
-$('#mJoin').onclick = () => { const c = $('#mCode').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (c.length !== 4) return netStatus('notFound'); netJoin(c); };
+$('#mHost').onclick = () => askName(tr('nameT'), n => netHost(n));
+$('#mJoin').onclick = () => { const c = $('#mCode').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (c.length !== 4) return netStatus('notFound'); joinCode(c); };
 $('#mCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#mJoin').click(); });
-$('#mName').addEventListener('keydown', e => { if (e.key === 'Enter') { readName(); if ($('#mCode').value.length === 4) $('#mJoin').click(); } });
 $('#lStart').onclick = hostStart;
 $('#lLeave').onclick = showMenu;
 $('#lShare').onclick = shareInvite;
-[$('#view'), $('#menuB'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
+$('#lRename').onclick = () => rename($('#lName').value);
+$('#lName').addEventListener('keydown', e => { if (e.key === 'Enter') { rename($('#lName').value); e.target.blur(); } });
+[$('#view'), $('#emoB'), $('#menuB'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
 
 /* ---------- camera ---------- */
-let snapCam = true;
+let snapCam = true, fitCache = null;
 const cam = { x: 0, z: 0, d: 14 };
 const PITCH = 0.98;                       // ~56 degrees down
-let fitCache = null;
 /** Overview: the closest camera (same tilt) that shows every corner of the hole inside the space the HUD leaves free. */
 function fitHole() {
+  const land = innerHeight < 460 && innerWidth > innerHeight;
   const key = hi + ':' + innerWidth + 'x' + innerHeight + ':' + $('#top').offsetHeight;
   if (fitCache && fitCache.key === key) return fitCache;
   const b = bounds(H), m = 0.5, pts = [[b.x0 - m, b.z0 - m], [b.x1 + m, b.z0 - m], [b.x0 - m, b.z1 + m], [b.x1 + m, b.z1 + m]];
-  const vh = Math.max(1, innerHeight), topY = 1 - 2 * ($('#top').offsetHeight + 14) / vh, botY = -1 + 2 * 40 / vh, side = 1 - 2 * 58 / Math.max(1, innerWidth);
-  const cx = (b.x0 + b.x1) / 2, v = new THREE.Vector3();
-  let cz = (b.z0 + b.z1) / 2, d = 12;
-  const proj = (dd, zz) => {
-    camera.position.set(cx, dd * Math.sin(PITCH), zz + dd * Math.cos(PITCH)); camera.lookAt(cx, 0, zz); camera.updateMatrixWorld();
+  const vh = Math.max(1, innerHeight), vw = Math.max(1, innerWidth);
+  const topY = 1 - 2 * ($('#top').offsetHeight + 14) / vh, botY = -1 + 2 * (land ? 12 : 44) / vh;
+  const sideL = -1 + 2 * (land ? 12 : 58) / vw, sideR = 1 - 2 * (land ? 12 : 14) / vw;
+  const cx0 = (b.x0 + b.x1) / 2, v = new THREE.Vector3();
+  let cx = cx0, cz = (b.z0 + b.z1) / 2, d = 12;
+  const proj = (dd, xx, zz) => {
+    camera.position.set(xx, dd * Math.sin(PITCH), zz + dd * Math.cos(PITCH)); camera.lookAt(xx, 0, zz); camera.updateMatrixWorld();
     let x0 = 9, x1 = -9, y0 = 9, y1 = -9;
     for (const [x, z] of pts) for (const y of [0, WALL_H]) { v.set(x, y, z).project(camera); x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y); }
     return { x0, x1, y0, y1 };
   };
-  for (let pass = 0; pass < 4; pass++) {
+  for (let pass = 0; pass < 5; pass++) {
     let lo = 3, hi2 = 120;
-    for (let k = 0; k < 28; k++) { const mid = (lo + hi2) / 2, r = proj(mid, cz); if (r.x0 >= -side && r.x1 <= side && r.y0 >= botY && r.y1 <= topY) hi2 = mid; else lo = mid; }
+    for (let k = 0; k < 28; k++) { const mid = (lo + hi2) / 2, r = proj(mid, cx, cz); if (r.x0 >= sideL && r.x1 <= sideR && r.y0 >= botY && r.y1 <= topY) hi2 = mid; else lo = mid; }
     d = hi2;
-    const r = proj(d, cz), want = (topY + botY) / 2, have = (r.y0 + r.y1) / 2;   // slide the view so the hole sits centred in the free band
-    cz += (want - have) * d * 0.35;
+    const r = proj(d, cx, cz);       // slide the view so the hole sits centred in the free area
+    cz += ((topY + botY) / 2 - (r.y0 + r.y1) / 2) * d * 0.35;
+    cx -= ((sideL + sideR) / 2 - (r.x0 + r.x1) / 2) * d * 0.3;
   }
   fitCache = { key, x: cx, z: cz, d };
   return fitCache;
 }
 function camGoal() {
-  if (viewMode === 'ball') return { x: me.x, z: me.z + 0.4, d: 7.5 };
+  if (viewMode === 'ball') {
+    let x = me.x, z = me.z;
+    if (mode === 'online' && turnId !== myId && ghosts.has(turnId)) { const g = ghosts.get(turnId); x = g.x; z = g.z; }   // watch whoever is putting
+    return { x, z: z + 0.4, d: 7.5 };
+  }
   return fitHole();
 }
 function placeCamera(dt) {
@@ -5312,11 +5555,18 @@ addEventListener('resize', resize);
 /* ---------- main loop ---------- */
 const STEP = 1 / 240, tmpV = new THREE.Vector3();
 let last = performance.now(), acc = 0;
-function placeTag(el, x, z) {
+function toScreen(x, z) {
   tmpV.set(x, R * 2 + 0.25, z).project(camera);
-  if (tmpV.z > 1) { el.style.display = 'none'; return; }
+  if (tmpV.z > 1) return null;
+  return { x: (tmpV.x + 1) / 2 * innerWidth, y: (1 - tmpV.y) / 2 * innerHeight };
+}
+/** Name tag above a ball; every other player's tag sits a row higher so neighbours on the tee don't overlap. */
+function placeTag(el, x, z, id) {
+  const p = toScreen(x, z);
+  if (!p) { el.style.display = 'none'; return; }
   el.style.display = '';
-  el.style.transform = `translate(${(tmpV.x + 1) / 2 * innerWidth}px,${(1 - tmpV.y) / 2 * innerHeight}px) translate(-50%,-100%)`;
+  const k = players.map(q => q.id).sort((a, b) => a - b).indexOf(id), lift = k % 2 ? 18 : 0;
+  el.style.transform = `translate(${p.x}px,${p.y - lift}px) translate(-50%,-100%)`;
 }
 function frame(now) {
   requestAnimationFrame(frame);
@@ -5330,7 +5580,6 @@ function frame(now) {
     }
     if (me.state === 'roll') sendPos(false);
   } else if (H && H.spin) spinA += H.spin[3] * dt;
-  // host referee timers run on setInterval (below), so they keep going when the host's tab is in the background
 
   // own ball
   if (me.mesh && H) {
@@ -5341,14 +5590,20 @@ function frame(now) {
     me.mesh.visible = !(sink && me.sinkT > 0.35) && mode !== 'menu';
     me.mesh.rotation.set(me.roll * 0.7, 0, me.roll * 0.3);
   }
-  ghosts.forEach(g => {
+  ghosts.forEach((g, id) => {
     const k = Math.min(1, dt * 12);
     g.x += (g.tx - g.x) * k; g.z += (g.tz - g.z) * k;
     g.mesh.position.set(g.x, R, g.z);
     g.mesh.visible = phase === 'play' && !g.done;
-    if (g.mesh.visible) placeTag(g.tag, g.x, g.z); else g.tag.style.display = 'none';
+    g.tag.classList.toggle('turn', id === turnId);
+    if (g.mesh.visible) placeTag(g.tag, g.x, g.z, id); else g.tag.style.display = 'none';
   });
-  if (mode === 'online' && me.mesh && me.mesh.visible && phase === 'play') placeTag(myTag, me.x, me.z); else myTag.style.display = 'none';
+  myTag.classList.toggle('turn', turnId === myId);
+  if (mode === 'online' && me.mesh && me.mesh.visible && phase === 'play') placeTag(myTag, me.x, me.z, myId); else myTag.style.display = 'none';
+  // ring under the ball whose turn it is
+  const tb = mode === 'online' && phase === 'play' ? (turnId === myId ? (finished() ? null : me) : ghosts.get(turnId)) : null;
+  turnRing.visible = !!(tb && (tb === me || !tb.done));
+  if (turnRing.visible) { turnRing.position.set(tb.x, 0.012, tb.z); turnRing.scale.setScalar(1 + 0.15 * Math.sin(now / 180)); }
   if (spinMesh) spinMesh.rotation.y = spinA;
   if (flag) flag.children[1].rotation.y = Math.sin(now / 400) * 0.25;
   for (const s of slopeMarks) {                    // chevrons drift downhill
@@ -5368,18 +5623,15 @@ function frame(now) {
     arrowM.color.setHSL(0.33 - aim.p * 0.33, 0.85, 0.6);
   }
 
-  // timers in the message strip
-  if (mode === 'online' && phase === 'play' && hurryEnd) {
-    const left = Math.max(0, Math.ceil((hurryEnd - now) / 1000));
-    if (me.state === 'done' || me.state === 'sink') say('hurry', left);
-    else if (me.state === 'aim' && !drag) $('#msg').textContent = tr('aim') + ' ⏱ ' + left + 's';
-  }
+  turnMsg(now);
   if (phase === 'card' && cardEnd) $('#oP').textContent = tr('after', hi + 1) + ' · ' + tr('nextIn', Math.max(0, Math.ceil((cardEnd - now) / 1000)));
+  updateEmotes(now);
 
   placeCamera(dt);
   renderer.render(scene, camera);
 }
 
+// host referee timers run on setInterval, so they keep going when the host's tab is in the background
 setInterval(() => { if (isHost && mode === 'online') hostTick(performance.now()); }, 250);
 buildHole(0); resize(); applyLang(); showMenu(); autoJoin();
 requestAnimationFrame(frame);
@@ -5511,7 +5763,7 @@ class I18n {
       'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly 8-ball table. Pot your solids or stripes, then the 8-ball, and never scratch. Play solo, against an AI, or online with a friend.',
       'ss.title': 'Space Shooter', 'ss.desc': 'Drag to fly while the ship fires on its own. Six random waves, a boss, and power-ups (one is a trap).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Play poker hands to beat rising targets. Buy jokers, level up hands, and survive nerfs and cursed jokers.',
-      'mg.title': 'Low Poly Mini Golf', 'mg.desc': 'Nine 3D mini golf holes with windmills, water, sand and slopes. Play solo, or online with up to 6 players who all play each hole at the same time.',
+      'mg.title': 'Low Poly Mini Golf', 'mg.desc': 'Nine 3D mini golf holes with windmills, water, sand and slopes. Play solo, or online with up to 6 players taking turns, with emotes to cheer (or tease) each other.',
       'mg.best': 'Best round {n}',
       'bp.best': 'Best {n} shots', 'ss.best': 'Best score {n}', 'pp.best': 'Best level {n}',
       'saves.title': 'Save data', 'saves.intro': 'Everything is stored locally in this browser. Export a backup to move it elsewhere.',
@@ -5618,7 +5870,7 @@ class I18n {
       'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly de bola 8. Mete tus lisas o rayadas y luego la bola 8, sin embolsar la blanca. Juega solo, contra una IA o en línea con un amigo.',
       'ss.title': 'Shooter Espacial', 'ss.desc': 'Arrastra para volar mientras la nave dispara sola. Seis oleadas aleatorias, un jefe y power-ups (uno es una trampa).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Juega manos de póker para superar objetivos cada vez más altos. Compra comodines, mejora manos y sobrevive a nerfs y comodines malditos.',
-      'mg.title': 'Minigolf Low Poly', 'mg.desc': 'Nueve hoyos de minigolf 3D con molinos, agua, arena y pendientes. Juega solo o en línea con hasta 6 jugadores que juegan cada hoyo a la vez.',
+      'mg.title': 'Minigolf Low Poly', 'mg.desc': 'Nueve hoyos de minigolf 3D con molinos, agua, arena y pendientes. Juega solo o en línea con hasta 6 jugadores por turnos, con emotes para animar (o picar) a los demás.',
       'mg.best': 'Mejor ronda {n}',
       'bp.best': 'Mejor {n} tiros', 'ss.best': 'Récord {n}', 'pp.best': 'Mejor nivel {n}',
       'saves.title': 'Datos guardados', 'saves.intro': 'Todo se guarda localmente en este navegador. Exporta una copia de seguridad para llevarla a otro sitio.',
