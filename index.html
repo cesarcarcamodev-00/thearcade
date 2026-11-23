@@ -3362,13 +3362,45 @@ applyLang();render();title();
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;overflow:hidden;background:#14171f;color:#fff;font-family:system-ui,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none}
 #c{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
-.hud{position:fixed;left:0;right:0;top:0;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;pointer-events:none;flex-wrap:wrap}
-.hud>*{pointer-events:auto}
-.stats{display:flex;gap:8px}
-.stat{background:#000a;border:1px solid #fff2;border-radius:10px;padding:5px 12px;text-align:center;min-width:64px}
-.stat small{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#9aa3b8}
-.stat b{font-size:18px}
-.btns{display:flex;gap:6px}
+:root{--mb:20px}
+@media (max-width:430px){:root{--mb:16px}}
+#sb{position:fixed;left:6px;right:6px;top:6px;display:flex;gap:6px;pointer-events:none;z-index:2}
+.pc{flex:1;min-width:0;background:#0b1020d9;border:2px solid #fff2;border-radius:12px;padding:5px 7px 6px;transition:border-color .2s,box-shadow .2s,background .2s}
+.pc.act{border-color:#ffcf3f;box-shadow:0 0 14px #ffcf3f99;background:#1a2140ee}
+.ph{display:flex;align-items:center;gap:5px;margin-bottom:4px;min-height:20px}
+.pn{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.pt{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#14171f;background:#ffcf3f;border-radius:99px;padding:2px 6px;white-space:nowrap}
+.pg{font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:800;color:#14171f;border-radius:99px;padding:2px 7px;white-space:nowrap;background:#5c6784}
+.pg.solid{background:#ffcf3f}.pg.stripe{background:#8fd3ff}.pg.open{color:#fff}
+.trk{display:flex;gap:2px;align-items:center;min-height:var(--mb)}
+.trk .hint{font-size:10.5px;color:#9aa3b8;line-height:1.2}
+.mb{width:var(--mb);height:var(--mb);flex:none;border-radius:50%;display:inline-grid;place-items:center;box-shadow:inset -2px -2px 3px #0006,0 1px 2px #000a;transition:opacity .3s,transform .3s}
+.mb b{width:56%;height:56%;border-radius:50%;background:#f4f4ee;color:#111;font:800 calc(var(--mb)*.36)/1 system-ui,sans-serif;display:grid;place-items:center}
+.mb.gone{opacity:.15;transform:scale(.65);filter:grayscale(.7)}
+.mb.wait{opacity:.5}
+.mb.next{outline:2px solid #ffcf3f;outline-offset:1px;animation:nx 1s ease-in-out infinite alternate}
+@keyframes nx{to{outline-color:#fff0}}
+.big{font-size:18px;font-weight:800}
+.pn.sub{color:#9aa3b8;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.btns{position:fixed;left:6px;top:calc(var(--sbh,70px) + 14px);display:flex;flex-direction:column;gap:6px;z-index:2}
+.btns button{width:46px;height:46px;padding:0;border-radius:11px;background:#0b1020cc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;line-height:1}
+.btns button span{font-size:18px}
+.btns button small{font-size:9px;color:#cdd5ea}
+#tgt{display:none;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;background:#0b1020e6;border:1px solid #fff3;border-radius:99px;padding:4px 12px 4px 11px;font-size:12px;color:#cdd5ea;max-width:96vw}
+#tgt .tl{font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#ffcf3f;font-size:11px}
+#tgt.opp .tl{color:#8fd3ff}
+#tgt .mb{--mb:22px}
+#pwr{position:fixed;right:8px;top:50%;transform:translateY(-46%);display:none;flex-direction:column;align-items:center;gap:8px;z-index:3}
+body.touch #pwr.on{display:flex}
+body.touch #pow{display:none}
+#pwr label{font-size:10px;letter-spacing:.1em;font-weight:800;color:#cdd5ea;text-transform:uppercase}
+#pwrT{position:relative;width:50px;height:min(34vh,240px);background:#0b1020d9;border:2px solid #fff4;border-radius:25px;overflow:hidden;touch-action:none}
+#pwrT i{position:absolute;left:0;right:0;top:0;height:0;background:linear-gradient(180deg,#5be37d,#ffcf3f,#ff4d5e);border-radius:0 0 23px 23px}
+#pwrT span{position:absolute;inset:0;display:grid;place-items:center;writing-mode:vertical-rl;font-size:11px;letter-spacing:.12em;color:#cdd5ea;text-transform:uppercase;pointer-events:none;transition:opacity .15s}
+#pwrT.on span{opacity:0}
+#pwrT.on{border-color:#ffcf3f}
+.nudge{display:flex;gap:8px}
+.nb{width:46px;height:46px;border-radius:50%;font-size:22px;padding:0;background:#0b1020d9;touch-action:none}
 button{font:inherit;font-size:13px;color:#fff;background:#2c3550;border:1px solid #fff3;border-radius:9px;padding:8px 12px;cursor:pointer}
 button:hover{background:#3a4670}
 button.off{opacity:.5;text-decoration:line-through}
@@ -3395,17 +3427,16 @@ button.off{opacity:.5;text-decoration:line-through}
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="hud">
-  <div class="stats">
-    <div class="stat"><small id="lShots">Shots</small><b id="shots">0</b></div>
-    <div class="stat"><small id="lLeft">Left</small><b id="left">9</b></div>
-    <div class="stat"><small id="lBest">Best</small><b id="best">-</b></div>
-  </div>
-  <div class="btns">
-    <button id="view"></button><button id="newg"></button><button id="lang">ES</button><button id="mute"></button>
-  </div>
+<div id="sb"></div>
+<div class="btns">
+  <button id="view"></button><button id="newg"></button><button id="lang"></button><button id="mute"></button>
 </div>
-<div id="tray"><div id="pow"><i></i></div><div id="dots"></div><div id="msg"></div></div>
+<div id="pwr">
+  <label id="pwrL">Power</label>
+  <div id="pwrT"><i></i><span id="pwrH"></span></div>
+  <div class="nudge"><button class="nb" id="rotL">⟲</button><button class="nb" id="rotR">⟳</button></div>
+</div>
+<div id="tray"><div id="pow"><i></i></div><div id="tgt"></div><div id="msg"></div></div>
 <div id="menu" style="position:fixed;inset:0;background:#0005;display:none;align-items:center;justify-content:center;padding:14px"><div class="modal">
   <h2 id="mT"></h2><p id="mP"></p>
   <div class="row"><button id="mSolo" data-m="solo"></button></div>
@@ -3427,6 +3458,10 @@ const $ = s => document.querySelector(s);
 const LANG_KEY = 'lowPolyPoolLang', BEST_KEY = 'lowPolyPoolBest8';
 const TXT = {
   en: { shots: 'Shots', left: 'Left', best: 'Best', view: 'View', newg: 'New game', snd: 'Sound',
+    vAim: 'Aim', vTop: 'Top', vAng: 'Table', newShort: 'New', pwr: 'Power', pull: 'Pull down to shoot',
+    aimT: 'Drag to aim (or use ⟲ ⟳), then pull the power bar down to shoot.',
+    tgtMe: 'Your targets', tgtOf: "{n}'s targets", tgtOpen: 'Open table: hit any ball except the 8', openTag: 'Open', turnTag: 'Turn',
+    pickHint: 'Pot a ball to pick solids or stripes',
     aim: 'Drag back from anywhere to aim and set power, then release to shoot.', roll: 'Balls rolling…',
     potted: 'Nice pot! Shoot again.', win: 'Table cleared!', winP: 'You sank the 8-ball in {n} shots.', record: ' New best!', again: 'Play again',
     nolib: 'Could not load the 3D engine. Check your internet connection and reopen the game.',
@@ -3447,6 +3482,10 @@ const TXT = {
     ai_o: 'Friend', aiTurn_o: 'Your friend is playing…', aiPotted_o: 'Your friend potted one and shoots again…', aiIs_o: 'Your friend is {n}.',
     aiHand_o: 'Your friend has ball in hand.', aiWin_o: 'Your friend wins', rWinAi_o: 'Your friend sank the 8-ball.', rEarlyAi_o: 'Your friend sank the 8-ball illegally.' },
   es: { shots: 'Tiros', left: 'Faltan', best: 'Mejor', view: 'Vista', newg: 'Nueva', snd: 'Sonido',
+    vAim: 'Mira', vTop: 'Arriba', vAng: 'Mesa', newShort: 'Nueva', pwr: 'Fuerza', pull: 'Baja para tirar',
+    aimT: 'Arrastra para apuntar (o usa ⟲ ⟳) y baja la barra de fuerza para tirar.',
+    tgtMe: 'Tus bolas', tgtOf: 'Bolas de {n}', tgtOpen: 'Mesa libre: golpea cualquier bola menos la 8', openTag: 'Libre', turnTag: 'Turno',
+    pickHint: 'Mete una bola para elegir lisas o rayadas',
     aim: 'Arrastra hacia atrás desde cualquier punto para apuntar y dar fuerza; suelta para tirar.', roll: 'Las bolas ruedan…',
     potted: '¡Buena! Tira otra vez.', win: '¡Mesa limpia!', winP: 'Metiste la bola 8 en {n} tiros.', record: ' ¡Nuevo récord!', again: 'Jugar otra vez',
     nolib: 'No se pudo cargar el motor 3D. Revisa tu conexión a internet y vuelve a abrir el juego.',
@@ -3470,7 +3509,11 @@ const TXT = {
 let lang = 'en';
 try { lang = localStorage.getItem(LANG_KEY) === 'es' ? 'es' : 'en'; } catch (e) {}
 // In an online match the opponent is "your friend": use the <key>_o wording when there is one.
-const tr = (k, v) => ((mode === 'online' && TXT[lang][k + '_o']) || TXT[lang][k] || k).replace('{n}', v);
+var touchUI = false; try { touchUI = matchMedia('(pointer: coarse)').matches; } catch (e) {}
+const tr = (k, v) => {
+  if (touchUI && (k === 'aim' || k === 'youTurn')) k = 'aimT';       // touch screens: explain the drag + power bar controls
+  return ((mode === 'online' && TXT[lang][k + '_o']) || TXT[lang][k] || k).replace('{n}', v);
+};
 let muted = false;
 
 if (typeof THREE === 'undefined') {
@@ -3565,6 +3608,12 @@ function makeBall(num) {
   return { num, mesh, x: 0, z: 0, vx: 0, vz: 0, on: true, sink: null };
 }
 
+/* gold pulsing rings that mark the balls the shooter is allowed to hit first */
+const rings = [...Array(8)].map(() => {
+  const m = new THREE.Mesh(new THREE.RingGeometry(R * 1.4, R * 1.85, 20), new THREE.MeshBasicMaterial({ color: 0xffcf3f, transparent: true, opacity: 0.95, side: THREE.DoubleSide, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.position.y = 0.03; m.visible = false; scene.add(m); return m;
+});
+
 /* ---------- cue + aim helpers ---------- */
 const cueGeo = new THREE.CylinderGeometry(0.06, 0.13, 9, 6);
 cueGeo.rotateZ(-Math.PI / 2); cueGeo.translate(-4.5, 0, 0);
@@ -3605,8 +3654,6 @@ function rack(fixed) {
   } });
   shots = 0; state = 'aim'; turn = 'me'; ai = null; aiPull = 0; pottedNums = [];
   groups = mode === 'solo' ? { me: 'solid', ai: 'stripe' } : { me: null, ai: null };
-  const dotBg = n => { const c = '#' + colorOf(n).toString(16).padStart(6, '0'); return n > 8 ? 'linear-gradient(#f4f4ee 25%,' + c + ' 25% 75%,#f4f4ee 75%)' : c; };
-  $('#dots').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(n => '<i data-n="' + n + '" style="background:' + dotBg(n) + '"></i>').join('');
   $('#ov').style.display = 'none';
   syncMeshes(); hud(); say('aim');
 }
@@ -3655,9 +3702,7 @@ function pot(b, px, pz) {
   b.sink = { t: 0, px, pz, sx: b.x, sz: b.z }; b.vx = b.vz = 0;
   sfx('pot', 1);
   if (b === cueBall) scratched = true; else { potThisShot++; pottedNums.push(b.num); }
-  if (b !== cueBall) {
-    const d = $(`#dots i[data-n="${b.num}"]`); if (d) d.classList.add('gone');
-  }
+  hud();                                   // scoreboard: grey the ball out as it drops
 }
 
 /* ---------- audio ---------- */
@@ -3701,7 +3746,11 @@ function syncMeshes(dt) {
 }
 
 /* ---------- camera ---------- */
-let viewTop = false, camT = 0;       // camT: 0 = angled, 1 = top-down (smoothed)
+/* Views: 'aim' = chase camera behind the cue ball that turns with your aim (best on phones),
+ * 'top' = whole table from above, 'angled' = whole table in perspective. 'aim' only applies while you are lining up a shot. */
+const VIEWS = ['aim', 'top', 'angled'];
+let viewMode = touchUI ? 'aim' : 'angled', camT = 0, camA = 0, camAng = 0;   // camT: 0 angled .. 1 top; camA: 0 overview .. 1 chase cam
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), aimPos = new THREE.Vector3(), aimLook = new THREE.Vector3();
 function placeCamera() {
   const w = innerWidth, h = innerHeight, aspect = w / h;
   renderer.setSize(w, h, false); camera.aspect = aspect;
@@ -3709,13 +3758,21 @@ function placeCamera() {
   // Portrait screens (phones): turn the camera 90 degrees so the long side of the table runs up the screen.
   const portrait = aspect < 1;
   const need = portrait
-    ? Math.max(12 / Math.tan(vf / 2) * 0.95, 6.8 / Math.tan(hf / 2))
+    ? Math.max(12 / Math.tan(vf / 2) * 1.12, 6.8 / Math.tan(hf / 2))      // extra room for the scoreboard and target bar
     : Math.max(7.2 / Math.tan(vf / 2) * 1.2, 12.2 / Math.tan(hf / 2));
   const dist = Math.max(need, 17);
   const k = camT, ang = (1 - k) * 0.95 + k * 1.5;        // elevation angle from the table plane
   const flat = Math.cos(ang) * dist + (k > 0.98 ? 0.01 : 0), look = k > 0.5 ? 0 : 0.4;
-  if (portrait) { camera.position.set(-flat, Math.sin(ang) * dist, 0); camera.lookAt(look, 0, 0); }
-  else { camera.position.set(0, Math.sin(ang) * dist, flat); camera.lookAt(0, 0, look); }
+  if (portrait) { camPos.set(-flat, Math.sin(ang) * dist, 0); camLook.set(look, 0, 0); }
+  else { camPos.set(0, Math.sin(ang) * dist, flat); camLook.set(0, 0, look); }
+  if (camA > 0.001 && cueBall) {                          // chase cam: behind the cue ball, looking down the aim line
+    const D = portrait ? 19 : 14, el = 0.9, ca = Math.cos(camAng), sa = Math.sin(camAng);
+    aimLook.set(cueBall.x + ca * 4, 0, cueBall.z + sa * 4);
+    aimPos.set(aimLook.x - ca * Math.cos(el) * D, Math.sin(el) * D, aimLook.z - sa * Math.cos(el) * D);
+    const e = camA * camA * (3 - 2 * camA);
+    camPos.lerp(aimPos, e); camLook.lerp(aimLook, e);
+  }
+  camera.position.copy(camPos); camera.lookAt(camLook);
   camera.updateProjectionMatrix();
 }
 addEventListener('resize', placeCamera);
@@ -3724,24 +3781,48 @@ addEventListener('resize', placeCamera);
 const ray = new THREE.Raycaster(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -R);
 const mouse = new THREE.Vector2(), hitP = new THREE.Vector3();
 let dragging = false, dragStart = null, aimDir = { x: 1, z: 0 }, power = 0;
-function worldPoint(e) {
+function worldPoint(e, lift) {
   const r = canvas.getBoundingClientRect();
-  mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - (lift || 0) - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(mouse, camera);
   return ray.ray.intersectPlane(plane, hitP) ? { x: hitP.x, z: hitP.z } : null;
 }
-let placing = false;
+let placing = false, gest = null;
+const setTouch = on => { touchUI = on; document.body.classList.toggle('touch', on); };
+const normAng = d => Math.atan2(Math.sin(d), Math.cos(d));
+const aimAngle = () => Math.atan2(aimDir.z, aimDir.x);
+const setAim = a => { aimDir = { x: Math.cos(a), z: Math.sin(a) }; if (mode === 'online') netThrottle({ t: 'aim', x: aimDir.x, z: aimDir.z, p: 0 }); };
+const FINGER = 70;                          // while placing the cue ball the ball sits above the fingertip so it stays visible
 canvas.addEventListener('pointerdown', e => {
   if (e.button > 0) return;
-  const p = worldPoint(e); if (!p) return;
-  if (state === 'place') { canvas.setPointerCapture(e.pointerId); placing = true; movePlace(p); return; }
+  if ((e.pointerType === 'touch') !== touchUI) { setTouch(e.pointerType === 'touch'); hud(); }
+  const touch = e.pointerType === 'touch';
+  const p = worldPoint(e, state === 'place' && touch ? FINGER : 0); if (!p) return;
+  if (state === 'place') { canvas.setPointerCapture(e.pointerId); placing = touch ? 'touch' : 'mouse'; movePlace(p); return; }
   if (state !== 'aim') return;
   canvas.setPointerCapture(e.pointerId);
+  if (touch) {                              // touch: dragging only turns the aim; power comes from the bar on the right
+    const q = worldPoint(e), dx = q ? q.x - cueBall.x : 0, dz = q ? q.z - cueBall.z : 0;
+    gest = { x: e.clientX, a: aimAngle(), th: q && Math.hypot(dx, dz) > 0.6 ? Math.atan2(dz, dx) : null };
+    return;
+  }
   dragging = true; dragStart = p; power = 0;
 });
 canvas.addEventListener('pointermove', e => {
+  if (gest) {
+    if (state !== 'aim') return;
+    if (camA > 0.5) setAim(gest.a + (e.clientX - gest.x) * 0.0035);        // chase cam: sideways swipe = turn left/right
+    else {                                                                  // overview: swing the aim around the cue ball
+      const q = worldPoint(e); if (!q) return;
+      const dx = q.x - cueBall.x, dz = q.z - cueBall.z;
+      if (Math.hypot(dx, dz) < 0.6) return;
+      const th = Math.atan2(dz, dx);
+      if (gest.th === null) gest.th = th; else { setAim(gest.a + normAng(th - gest.th)); }
+    }
+    return;
+  }
   if (!dragging && !placing) return;
-  const p = worldPoint(e); if (!p) return;
+  const p = worldPoint(e, placing === 'touch' ? FINGER : 0); if (!p) return;
   if (placing) { movePlace(p); return; }
   const dx = dragStart.x - p.x, dz = dragStart.z - p.z, len = Math.hypot(dx, dz);
   if (len > 0.05) aimDir = { x: dx / len, z: dz / len };
@@ -3749,6 +3830,7 @@ canvas.addEventListener('pointermove', e => {
   if (mode === 'online') netThrottle({ t: 'aim', x: aimDir.x, z: aimDir.z, p: power });
 });
 const endDrag = shoot => {
+  if (gest) { gest = null; return; }
   if (placing) {
     placing = false;
     if (shoot && state === 'place') {
@@ -3764,10 +3846,49 @@ const endDrag = shoot => {
 };
 canvas.addEventListener('pointerup', () => endDrag(true));
 canvas.addEventListener('pointercancel', () => endDrag(false));
+
+/* Touch controls: a power bar (drag down from anywhere on it, release to shoot; release at the top to cancel)
+ * and two nudge buttons that turn the aim slowly, speeding up while held. */
+let slide = null;
+const pwrT = $('#pwrT');
+pwrT.addEventListener('pointerdown', e => {
+  if (state !== 'aim') return;
+  pwrT.setPointerCapture(e.pointerId); slide = { y: e.clientY, h: pwrT.clientHeight * 0.85 }; power = 0;
+});
+pwrT.addEventListener('pointermove', e => {
+  if (!slide) return;
+  power = Math.max(0, Math.min(1, (e.clientY - slide.y) / slide.h));
+  if (mode === 'online') netThrottle({ t: 'aim', x: aimDir.x, z: aimDir.z, p: power });
+});
+const slideEnd = shoot => {
+  if (!slide) return; slide = null;
+  if (shoot && power > 0.05 && state === 'aim') fire(); else if (mode === 'online') netSend({ t: 'aim', x: aimDir.x, z: aimDir.z, p: 0 });
+  power = 0;
+};
+pwrT.addEventListener('pointerup', () => slideEnd(true));
+pwrT.addEventListener('pointercancel', () => slideEnd(false));
+function holdToTurn(btn, dir) {
+  let timer = 0, t0 = 0;
+  const stop = () => { clearInterval(timer); timer = 0; };
+  btn.addEventListener('pointerdown', e => {
+    if (state !== 'aim') return;
+    btn.setPointerCapture(e.pointerId); stop(); t0 = performance.now();
+    const step = () => {
+      if (state !== 'aim') return stop();
+      const rate = 0.12 + Math.min(1.4, (performance.now() - t0) / 1500) * 0.75;      // rad/s: 7 deg/s, easing up to ~50 deg/s
+      setAim(aimAngle() + dir * rate * 0.016);
+    };
+    step(); timer = setInterval(step, 16);
+  });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(n => btn.addEventListener(n, stop));
+}
+holdToTurn($('#rotL'), -1); holdToTurn($('#rotR'), 1);
 addEventListener('keydown', e => {
   if (e.target && e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { dragging = false; power = 0; }
   else if (e.key === 'v' || e.key === 'V') toggleView();
+  else if (e.key === 'ArrowLeft' && state === 'aim') setAim(aimAngle() - 0.01);
+  else if (e.key === 'ArrowRight' && state === 'aim') setAim(aimAngle() + 0.01);
   else if ((e.key === 'r' || e.key === 'R') && mode !== 'online') rack();
 });
 
@@ -3798,25 +3919,49 @@ function aimTarget() {
 }
 
 /* ---------- UI ---------- */
-const SYM = { solid: ' ●', stripe: ' ◐' };
+/* Scoreboard: one card per player with their group and a tray of its balls (potted ones fade out, the 8 lights up
+ * once the group is cleared), plus a bar above the message showing exactly which balls the shooter must hit. */
+const ballBg = n => { const c = '#' + colorOf(n).toString(16).padStart(6, '0'); return n > 8 ? 'linear-gradient(#f4f4ee 24%,' + c + ' 24% 76%,#f4f4ee 76%)' : c; };
+const chip = (n, cls) => '<i class="mb ' + (cls || '') + '" style="background:' + ballBg(n) + '"><b>' + n + '</b></i>';
+const groupNums = g => g === 'solid' ? [1, 2, 3, 4, 5, 6, 7] : [9, 10, 11, 12, 13, 14, 15];
+const alive = n => balls.some(b => b.num === n && inPlay(b));
+function playerCard(w) {
+  const g = groups[w], cleared = !!g && remaining(g) === 0, active = versus() && turn === w && state !== 'won';
+  const tag = g ? '<span class="pg ' + g + '">' + tr(g === 'solid' ? 'solids' : 'stripes') + '</span>' : '<span class="pg open">' + tr('openTag') + '</span>';
+  const trk = g ? groupNums(g).map(n => chip(n, alive(n) ? '' : 'gone')).join('') + chip(8, !alive(8) ? 'gone' : cleared ? 'next' : 'wait')
+    : '<span class="hint">' + tr('pickHint') + '</span>';
+  return '<div class="pc' + (active ? ' act' : '') + '"><div class="ph"><span class="pn">' + tr(w === 'me' ? 'you' : 'ai') + '</span>' +
+    (active ? '<span class="pt">▶ ' + tr('turnTag') + '</span>' : '') + tag + '</div><div class="trk">' + trk + '</div></div>';
+}
+function statsCard() {                       // solo practice: shots taken and the best run
+  const row = (k, v) => '<div class="ph"><span class="pn sub">' + tr(k) + '</span><span class="big">' + v + '</span></div>';
+  return '<div class="pc" style="flex:.55">' + row('shots', shots) + row('best', best || '-') + '</div>';
+}
+function targetBar() {
+  const el = $('#tgt');
+  if (!balls.length || (state !== 'aim' && state !== 'aiAim' && state !== 'place')) { el.style.display = 'none'; return; }
+  const w = who0(), g = groups[w], cleared = !!g && remaining(g) === 0;
+  const chips = !g ? '<span>' + tr('tgtOpen') + '</span>' : cleared ? chip(8) : groupNums(g).filter(alive).map(n => chip(n)).join('');
+  el.className = w === 'me' ? '' : 'opp';
+  el.innerHTML = '<span class="tl">' + (w === 'me' ? tr('tgtMe') : tr('tgtOf', tr('ai'))) + '</span>' + chips;
+  el.style.display = 'flex';
+}
 function hud() {
-  const vs = versus(), sym = w => (vs && groups[w]) ? SYM[groups[w]] : '';
-  const n8 = balls.some(b => b.num === 8 && inPlay(b)) ? 1 : 0;
-  const leftOf = w => groups[w] ? remaining(groups[w]) + n8 : '-';
-  $('#lShots').textContent = vs ? tr('you') + sym('me') : tr('shots'); $('#lBest').textContent = vs ? tr('ai') + sym('ai') : tr('best');
-  $('#shots').parentNode.style.borderColor = vs && turn === 'me' ? '#ffcf3f' : '';
-  $('#best').parentNode.style.borderColor = vs && turn === 'ai' ? '#ffcf3f' : '';
-  $('#shots').textContent = vs ? leftOf('me') : shots;
-  $('#left').textContent = vs ? balls.filter(b => b !== cueBall && inPlay(b)).length : leftOf('me');
-  $('#best').textContent = vs ? leftOf('ai') : (best || '-');
+  $('#sb').innerHTML = versus() ? playerCard('me') + playerCard('ai') : playerCard('me') + statsCard();
+  document.documentElement.style.setProperty('--sbh', $('#sb').offsetHeight + 'px');
+  targetBar();
 }
 function say(k, v) { $('#msg').textContent = tr(k, v); }
+const btnFace = (icon, label) => '<span>' + icon + '</span><small>' + label + '</small>';
 function applyLang() {
   document.documentElement.lang = lang;
-  $('#lShots').textContent = tr('shots'); $('#lLeft').textContent = tr('left'); $('#lBest').textContent = tr('best');
-  $('#view').textContent = '🎥 ' + tr('view'); $('#newg').textContent = '↺ ' + tr('newg');
-  $('#mute').textContent = '🔊 ' + tr('snd'); $('#mute').classList.toggle('off', muted);
-  $('#lang').textContent = lang === 'en' ? 'ES' : 'EN';
+  const VI = { aim: ['🎯', 'vAim'], top: ['🗺️', 'vTop'], angled: ['🎥', 'vAng'] }[viewMode];
+  $('#view').innerHTML = btnFace(VI[0], tr(VI[1])); $('#view').title = tr('view');
+  $('#newg').innerHTML = btnFace('↺', tr('newShort')); $('#newg').title = tr('newg');
+  $('#mute').innerHTML = btnFace(muted ? '🔇' : '🔊', tr('snd')); $('#mute').classList.toggle('off', muted);
+  $('#lang').innerHTML = btnFace('🌐', lang === 'en' ? 'ES' : 'EN');
+  $('#pwrL').textContent = tr('pwr'); $('#pwrH').textContent = tr('pull');
+  $('#rotL').title = $('#rotR').title = tr('aimT');
   $('#mT').textContent = tr('menuT'); $('#mP').textContent = tr('menuP'); $('#mSolo').textContent = tr('solo'); $('#mV').textContent = tr('vsAi');
   $('#mE').textContent = tr('easy'); $('#mN').textContent = tr('normal'); $('#mH').textContent = tr('hard');
   $('#mO').textContent = tr('mO'); $('#mHost').textContent = tr('netHost'); $('#mJoin').textContent = tr('netJoin'); $('#mShare').textContent = tr('shareBtn'); $('#mCode').placeholder = tr('netCode');
@@ -3828,7 +3973,7 @@ document.querySelectorAll('#menu button[data-m]').forEach(b => b.onclick = () =>
   mode = b.dataset.m; if (b.dataset.d) diff = b.dataset.d;
   $('#menu').style.display = 'none'; rack(); say(versus() ? 'youTurn' : 'soloHint');
 });
-function toggleView() { viewTop = !viewTop; }
+function toggleView() { viewMode = VIEWS[(VIEWS.indexOf(viewMode) + 1) % VIEWS.length]; applyLang(); }
 $('#view').onclick = toggleView;
 $('#newg').onclick = showMenu;
 $('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); say(state === 'rolling' ? 'roll' : state === 'aiAim' ? 'aiTurn' : state === 'place' ? 'placeHint' : versus() ? 'youTurn' : 'soloHint'); };
@@ -4089,7 +4234,6 @@ function applyEnd(m) {                     // snap to the shooter's result, then
   m.b.forEach(e => {
     const b = balls.find(o => o.num === e.n); if (!b || !num(e.x, e.z)) return;
     b.x = e.x; b.z = e.z; b.vx = b.vz = 0; b.sink = null; b.on = !!e.on; b.mesh.scale.setScalar(1);
-    if (b.num) { const d = $('#dots i[data-n="' + b.num + '"]'); if (d) d.classList.toggle('gone', !b.on); }
   });
   firstHit = Number.isInteger(m.fh) ? m.fh : null; pottedNums = Array.isArray(m.pn) ? m.pn.filter(Number.isInteger) : [];
   scratched = !!m.sc; clearedBefore = !!m.cb;
@@ -4116,13 +4260,29 @@ function frame(now) {
     if (!moving) { if (mode === 'online') onlineSettled(); else endShot(); }
   }
   syncMeshes(dt);
-  camT += ((viewTop ? 1 : 0) - camT) * Math.min(1, dt * 6); placeCamera();
+  camT += ((viewMode === 'top' ? 1 : 0) - camT) * Math.min(1, dt * 6);
+  camA += ((viewMode === 'aim' && state === 'aim' ? 1 : 0) - camA) * Math.min(1, dt * 4);
+  camAng += normAng(aimAngle() - camAng) * Math.min(1, dt * 9);
+  placeCamera();
+
+  // glowing rings under the balls the shooter must hit (only once solids/stripes are known)
+  let ri = 0;
+  if (state === 'aim' && groups[who0()]) {
+    const w = who0(), cl = clearedNow();
+    for (const b of balls) if (b !== cueBall && inPlay(b) && allowed(w, b.num, cl) && ri < rings.length) {
+      const r = rings[ri++]; r.visible = true; r.position.x = b.x; r.position.z = b.z; r.scale.setScalar(1 + 0.12 * Math.sin(now / 220));
+    }
+  }
+  for (; ri < rings.length; ri++) rings[ri].visible = false;
 
   const showAim = state === 'aim' || state === 'aiAim';
   cue.visible = showAim; aimLine.visible = ghost.visible = state === 'aim';
+  const pulling = dragging || !!slide;
   $('#pow').style.opacity = dragging ? 1 : 0; $('#pow i').style.width = (power * 100) + '%';
+  $('#pwr').classList.toggle('on', touchUI && state === 'aim');
+  pwrT.classList.toggle('on', !!slide); $('#pwrT i').style.height = (pulling ? power * 100 : 0) + '%';
   if (showAim) {
-    const pull = dragging ? power * 2.4 : state === 'aiAim' ? aiPull * 2.4 : 0.1 * Math.sin(now / 350) + 0.1;
+    const pull = pulling ? power * 2.4 : state === 'aiAim' ? aiPull * 2.4 : 0.1 * Math.sin(now / 350) + 0.1;
     cue.position.set(cueBall.x - aimDir.x * (R + 0.12 + pull), R + 0.02, cueBall.z - aimDir.z * (R + 0.12 + pull));
     cue.rotation.y = Math.atan2(-aimDir.z, aimDir.x);
     const { t, hitBall } = aimTarget();
@@ -4135,7 +4295,7 @@ function frame(now) {
   renderer.render(scene, camera);
 }
 
-applyLang(); rack(); placeCamera(); showMenu(); autoJoin();
+setTouch(touchUI); applyLang(); rack(); placeCamera(); showMenu(); autoJoin();
 requestAnimationFrame(frame);
 <\/script>
 </body>
