@@ -3183,7 +3183,7 @@ button.off{opacity:.5;text-decoration:line-through}
   </div>
 </div>
 <div id="tray"><div id="pow"><i></i></div><div id="dots"></div><div id="msg"></div></div>
-<div id="menu" style="position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:14px"><div class="modal">
+<div id="menu" style="position:fixed;inset:0;background:#0005;display:none;align-items:center;justify-content:center;padding:14px"><div class="modal">
   <h2 id="mT"></h2><p id="mP"></p>
   <div class="row"><button id="mSolo" data-m="solo"></button></div>
   <h3 id="mV"></h3>
@@ -3195,26 +3195,34 @@ button.off{opacity:.5;text-decoration:line-through}
 <script>
 'use strict';
 const $ = s => document.querySelector(s);
-const LANG_KEY = 'lowPolyPoolLang', BEST_KEY = 'lowPolyPoolBest';
+const LANG_KEY = 'lowPolyPoolLang', BEST_KEY = 'lowPolyPoolBest8';
 const TXT = {
   en: { shots: 'Shots', left: 'Left', best: 'Best', view: 'View', newg: 'New game', snd: 'Sound',
     aim: 'Drag back from anywhere to aim and set power, then release to shoot.', roll: 'Balls rolling…',
-    scratch: 'Scratch! +2 shots penalty.', potted: 'Nice pot!', win: 'Table cleared!',
-    winP: 'You cleared all nine balls in {n} shots.', record: ' New best!', again: 'Play again',
+    potted: 'Nice pot! Shoot again.', win: 'Table cleared!', winP: 'You sank the 8-ball in {n} shots.', record: ' New best!', again: 'Play again',
     nolib: 'Could not load the 3D engine. Check your internet connection and reopen the game.',
     you: 'You', ai: 'AI', menuT: 'Low Poly Pool', menuP: 'Choose how you want to play.', solo: 'Solo practice', vsAi: 'Play against the AI',
     easy: 'Easy', normal: 'Normal', hard: 'Hard', youTurn: 'Your turn. Drag back to aim, release to shoot.', aiTurn: 'AI is playing…',
-    aiPotted: 'AI potted one and shoots again…', foulTurn: 'Scratch! Turn passes.', youWin: 'You win!', aiWin: 'The AI wins',
-    scoreP: 'Final score {n}. Each ball is worth its number.' },
+    aiPotted: 'AI potted one and shoots again…', youWin: 'You win!', aiWin: 'The AI wins', lose: 'Game over',
+    soloHint: 'Pot all the solids (1-7), then the 8-ball. Hit only your own balls first.',
+    solids: 'solids', stripes: 'stripes', youAre: 'You are {n}.', aiIs: 'The AI is {n}.',
+    foulScratch: 'Scratch!', foulNone: 'Foul: no ball was hit.', foulWrong: 'Foul: wrong ball hit first.', penalty: '+2 shots.',
+    placeHint: 'Ball in hand: drag to place the cue ball, then release.', aiHand: 'The AI has ball in hand.',
+    rWinMe: 'You sank the 8-ball to win.', rWinAi: 'The AI sank the 8-ball.',
+    rEarlyMe: 'You sank the 8-ball illegally.', rEarlyAi: 'The AI sank the 8-ball illegally.' },
   es: { shots: 'Tiros', left: 'Faltan', best: 'Mejor', view: 'Vista', newg: 'Nueva', snd: 'Sonido',
     aim: 'Arrastra hacia atrás desde cualquier punto para apuntar y dar fuerza; suelta para tirar.', roll: 'Las bolas ruedan…',
-    scratch: '¡Falta! +2 tiros de penalización.', potted: '¡Buena entronerada!', win: '¡Mesa limpia!',
-    winP: 'Metiste las nueve bolas en {n} tiros.', record: ' ¡Nuevo récord!', again: 'Jugar otra vez',
+    potted: '¡Buena! Tira otra vez.', win: '¡Mesa limpia!', winP: 'Metiste la bola 8 en {n} tiros.', record: ' ¡Nuevo récord!', again: 'Jugar otra vez',
     nolib: 'No se pudo cargar el motor 3D. Revisa tu conexión a internet y vuelve a abrir el juego.',
     you: 'Tú', ai: 'IA', menuT: 'Billar Low Poly', menuP: 'Elige cómo quieres jugar.', solo: 'Práctica en solitario', vsAi: 'Jugar contra la IA',
     easy: 'Fácil', normal: 'Normal', hard: 'Difícil', youTurn: 'Tu turno. Arrastra hacia atrás y suelta para tirar.', aiTurn: 'La IA está jugando…',
-    aiPotted: 'La IA metió una y vuelve a tirar…', foulTurn: '¡Falta! Pasa el turno.', youWin: '¡Ganas!', aiWin: 'Gana la IA',
-    scoreP: 'Marcador final {n}. Cada bola vale su número.' },
+    aiPotted: 'La IA metió una y vuelve a tirar…', youWin: '¡Ganas!', aiWin: 'Gana la IA', lose: 'Fin del juego',
+    soloHint: 'Mete todas las lisas (1-7) y luego la bola 8. Golpea primero solo tus bolas.',
+    solids: 'lisas', stripes: 'rayadas', youAre: 'Eres {n}.', aiIs: 'La IA es {n}.',
+    foulScratch: '¡Blanca embolsada!', foulNone: 'Falta: no tocaste ninguna bola.', foulWrong: 'Falta: golpeaste primero la bola equivocada.', penalty: '+2 tiros.',
+    placeHint: 'Bola en mano: arrastra para colocar la blanca y suelta.', aiHand: 'La IA tiene bola en mano.',
+    rWinMe: 'Metiste la bola 8 para ganar.', rWinAi: 'La IA metió la bola 8.',
+    rEarlyMe: 'Metiste la bola 8 de forma ilegal.', rEarlyAi: 'La IA metió la bola 8 de forma ilegal.' },
 };
 let lang = 'en';
 try { lang = localStorage.getItem(LANG_KEY) === 'es' ? 'es' : 'en'; } catch (e) {}
@@ -3232,7 +3240,8 @@ const HX = 10, HZ = 5;                 // playfield half sizes (cushion line)
 const LX = HX - R, LZ = HZ - R;        // limits for ball centres
 const POCKETS = [[-HX, -HZ, .66], [HX, -HZ, .66], [-HX, HZ, .66], [HX, HZ, .66], [0, -HZ, .58], [0, HZ, .58]];
 const MAXV = 26, DRAG_MAX = 5.5;
-const COLORS = [0xffffff, 0xf2c500, 0x1f5fd6, 0xd6243a, 0x6a2fb0, 0xf07a1c, 0x1f9e4a, 0x8a1f2a, 0x1a1a1a, 0xf2c500];
+const COLORS = [0xffffff, 0xf2c500, 0x1f5fd6, 0xd6243a, 0x6a2fb0, 0xf07a1c, 0x1f9e4a, 0x8a1f2a];
+const colorOf = n => n === 0 ? 0xffffff : n === 8 ? 0x1a1a1a : COLORS[n < 8 ? n : n - 8];   // 1-7 solids, 8 black, 9-15 stripes
 
 /* ---------- renderer / scene ---------- */
 const canvas = $('#c');
@@ -3294,17 +3303,17 @@ for (let i = -3; i <= 3; i++) if (i) {
 function ballGeometry(num) {
   const g = new THREE.IcosahedronGeometry(R, 1);
   const pos = g.attributes.position, col = new Float32Array(pos.count * 3);
-  const base = new THREE.Color(COLORS[num]), white = new THREE.Color(0xf4f4ee);
+  const base = new THREE.Color(colorOf(num)), white = new THREE.Color(0xf4f4ee);
   for (let f = 0; f < pos.count; f += 3) {
     const cy = (pos.getY(f) + pos.getY(f + 1) + pos.getY(f + 2)) / 3 / R;
-    const dot = num === 9 && Math.abs(cy) > 0.42;      // 9-ball: white caps, coloured stripe
-    const c = num === 0 ? white : dot ? white : base;
+    const cap = num > 8 && Math.abs(cy) > 0.42;        // stripes: white caps, coloured band
+    const c = num === 0 || cap ? white : base;
     for (let k = 0; k < 3; k++) { col[(f + k) * 3] = c.r; col[(f + k) * 3 + 1] = c.g; col[(f + k) * 3 + 2] = c.b; }
   }
   g.setAttribute('color', new THREE.BufferAttribute(col, 3));
   return g;
 }
-const geos = [...Array(10)].map((_, n) => ballGeometry(n));
+const geos = [...Array(16)].map((_, n) => ballGeometry(n));
 const balls = [];
 function makeBall(num) {
   const mesh = new THREE.Mesh(geos[num], new THREE.MeshPhongMaterial({ vertexColors: true, flatShading: true, shininess: 70, specular: 0x555555 }));
@@ -3329,21 +3338,28 @@ ghost.rotation.x = Math.PI / 2; scene.add(ghost);
 
 /* ---------- game state ---------- */
 let state = 'aim', shots = 0, best = null, potThisShot = 0, scratched = false, cueBall;
-let mode = 'solo', diff = 'normal', turn = 'me', score = { me: 0, ai: 0 }, pottedNums = [], ai = null, aiPull = 0;
+let mode = 'solo', diff = 'normal', turn = 'me', pottedNums = [], ai = null, aiPull = 0;
+let groups = { me: null, ai: null }, firstHit = null, clearedBefore = false;
 try { const b = +localStorage.getItem(BEST_KEY); if (b) best = b; } catch (e) {}
 
 function rack() {
   balls.forEach(b => scene.remove(b.mesh)); balls.length = 0;
   cueBall = makeBall(0); cueBall.x = -5; cueBall.z = 0; balls.push(cueBall);
-  const rest = [2, 3, 4, 5, 6, 7, 8].sort(() => Math.random() - 0.5);
-  const order = [1, rest[0], rest[1], rest[2], 9, rest[3], rest[4], rest[5], rest[6]];
-  const rows = [1, 2, 3, 2, 1]; let k = 0;
+  // 8-ball in the middle, one solid and one stripe in the back corners, the rest shuffled
+  const solids = [1, 2, 3, 4, 5, 6, 7].sort(() => Math.random() - 0.5), stripes = [9, 10, 11, 12, 13, 14, 15].sort(() => Math.random() - 0.5);
+  const corners = Math.random() < 0.5 ? [solids.pop(), stripes.pop()] : [stripes.pop(), solids.pop()];
+  const rest = [...solids, ...stripes].sort(() => Math.random() - 0.5);
+  const order = Array(15).fill(0); const rows = [1, 2, 3, 4, 5]; order[4] = 8; order[10] = corners[0]; order[14] = corners[1];
+  let r = 0; for (let i = 0; i < 15; i++) if (!order[i]) order[i] = rest[r++];
+  let k = 0;
   rows.forEach((n, i) => { for (let j = 0; j < n; j++) {
     const b = makeBall(order[k++]);
     b.x = 5 + i * (R * 1.74 + 0.005); b.z = (j - (n - 1) / 2) * (R * 2 + 0.012); balls.push(b);
   } });
-  shots = 0; state = 'aim'; score = { me: 0, ai: 0 }; turn = 'me'; ai = null; aiPull = 0;
-  $('#dots').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<i data-n="${n}" style="background:${n === 9 ? 'linear-gradient(#f4f4ee 25%,#f2c500 25% 75%,#f4f4ee 75%)' : '#' + COLORS[n].toString(16).padStart(6, '0')}"></i>`).join('');
+  shots = 0; state = 'aim'; turn = 'me'; ai = null; aiPull = 0; pottedNums = [];
+  groups = mode === 'solo' ? { me: 'solid', ai: 'stripe' } : { me: null, ai: null };
+  const dotBg = n => { const c = '#' + colorOf(n).toString(16).padStart(6, '0'); return n > 8 ? 'linear-gradient(#f4f4ee 25%,' + c + ' 25% 75%,#f4f4ee 75%)' : c; };
+  $('#dots').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(n => '<i data-n="' + n + '" style="background:' + dotBg(n) + '"></i>').join('');
   $('#ov').style.display = 'none';
   syncMeshes(); hud(); say('aim');
 }
@@ -3382,6 +3398,7 @@ function stepPhysics(dt) {
       const j2 = -(1 + 0.96) * vn / 2;
       a.vx -= j2 * nx; a.vz -= j2 * nz; b.vx += j2 * nx; b.vz += j2 * nz;
       sounds.push(['ball', -vn]);
+      if (firstHit === null && (a === cueBall || b === cueBall)) firstHit = (a === cueBall ? b : a).num;
     }
   }
   sounds.forEach(([k, v]) => sfx(k, v));
@@ -3466,20 +3483,29 @@ function worldPoint(e) {
   ray.setFromCamera(mouse, camera);
   return ray.ray.intersectPlane(plane, hitP) ? { x: hitP.x, z: hitP.z } : null;
 }
+let placing = false;
 canvas.addEventListener('pointerdown', e => {
-  if (state !== 'aim' || e.button > 0) return;
+  if (e.button > 0) return;
   const p = worldPoint(e); if (!p) return;
+  if (state === 'place') { canvas.setPointerCapture(e.pointerId); placing = true; movePlace(p); return; }
+  if (state !== 'aim') return;
   canvas.setPointerCapture(e.pointerId);
   dragging = true; dragStart = p; power = 0;
 });
 canvas.addEventListener('pointermove', e => {
-  if (!dragging) return;
+  if (!dragging && !placing) return;
   const p = worldPoint(e); if (!p) return;
+  if (placing) { movePlace(p); return; }
   const dx = dragStart.x - p.x, dz = dragStart.z - p.z, len = Math.hypot(dx, dz);
   if (len > 0.05) aimDir = { x: dx / len, z: dz / len };
   power = Math.min(1, len / DRAG_MAX);
 });
 const endDrag = shoot => {
+  if (placing) {
+    placing = false;
+    if (shoot && state === 'place') { state = 'aim'; defaultAim(); say(mode === 'solo' ? 'aim' : 'youTurn'); }
+    return;
+  }
   if (!dragging) return; dragging = false;
   if (shoot && power > 0.04 && state === 'aim') fire();
   power = 0;
@@ -3495,6 +3521,7 @@ addEventListener('keydown', e => {
 function fire() {
   const sp = MAXV * (0.12 + 0.88 * power * power);
   cueBall.vx = aimDir.x * sp; cueBall.vz = aimDir.z * sp;
+  const w = who0(); clearedBefore = !!groups[w] && remaining(groups[w]) === 0; firstHit = null;
   shots++; potThisShot = 0; pottedNums = []; scratched = false; state = 'rolling';
   sfx('ball', 4 + 12 * power); hud(); say('roll');
 }
@@ -3511,22 +3538,25 @@ function aimTarget() {
     const perp2 = fx * fx + fz * fz - proj * proj, m = 4 * R * R;
     if (perp2 >= m) continue;
     const t = proj - Math.sqrt(m - perp2);
-    if (t < tMin) { tMin = t; hitBall = true; }
+    if (t < tMin) { tMin = t; hitBall = b; }
   }
   return { t: Math.max(0, tMin), hitBall };
 }
 
 /* ---------- UI ---------- */
+const SYM = { solid: ' ●', stripe: ' ◐' };
 function hud() {
-  const vs = mode === 'vs';
-  $('#lShots').textContent = tr(vs ? 'you' : 'shots'); $('#lBest').textContent = tr(vs ? 'ai' : 'best');
+  const vs = mode === 'vs', sym = w => (vs && groups[w]) ? SYM[groups[w]] : '';
+  const n8 = balls.some(b => b.num === 8 && inPlay(b)) ? 1 : 0;
+  const leftOf = w => groups[w] ? remaining(groups[w]) + n8 : '-';
+  $('#lShots').textContent = vs ? tr('you') + sym('me') : tr('shots'); $('#lBest').textContent = vs ? tr('ai') + sym('ai') : tr('best');
   $('#shots').parentNode.style.borderColor = vs && turn === 'me' ? '#ffcf3f' : '';
   $('#best').parentNode.style.borderColor = vs && turn === 'ai' ? '#ffcf3f' : '';
-  $('#shots').textContent = vs ? score.me : shots;
-  $('#left').textContent = balls.filter(b => b !== cueBall && b.on && !b.sink).length;
-  $('#best').textContent = vs ? score.ai : (best || '-');
+  $('#shots').textContent = vs ? leftOf('me') : shots;
+  $('#left').textContent = vs ? balls.filter(b => b !== cueBall && inPlay(b)).length : leftOf('me');
+  $('#best').textContent = vs ? leftOf('ai') : (best || '-');
 }
-function say(k) { $('#msg').textContent = tr(k); }
+function say(k, v) { $('#msg').textContent = tr(k, v); }
 function applyLang() {
   document.documentElement.lang = lang;
   $('#lShots').textContent = tr('shots'); $('#lLeft').textContent = tr('left'); $('#lBest').textContent = tr('best');
@@ -3540,39 +3570,86 @@ function applyLang() {
 function showMenu() { $('#ov').style.display = 'none'; $('#menu').style.display = 'flex'; }
 document.querySelectorAll('#menu button').forEach(b => b.onclick = () => {
   mode = b.dataset.m; if (b.dataset.d) diff = b.dataset.d;
-  $('#menu').style.display = 'none'; rack(); if (mode === 'vs') say('youTurn');
+  $('#menu').style.display = 'none'; rack(); say(mode === 'vs' ? 'youTurn' : 'soloHint');
 });
 function toggleView() { viewTop = !viewTop; }
 $('#view').onclick = toggleView;
 $('#newg').onclick = showMenu;
-$('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); say(state === 'rolling' ? 'roll' : state === 'aiAim' ? 'aiTurn' : mode === 'vs' ? 'youTurn' : 'aim'); };
+$('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); say(state === 'rolling' ? 'roll' : state === 'aiAim' ? 'aiTurn' : state === 'place' ? 'placeHint' : mode === 'vs' ? 'youTurn' : 'soloHint'); };
 $('#mute').onclick = () => { muted = !muted; applyLang(); };
 $('#oB').onclick = rack;
 [$('#view'), $('#newg'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
 
-function endShot() {
-  if (scratched) {
-    if (mode === 'solo') shots += 2;
-    cueBall.sink = null; cueBall.on = true; cueBall.mesh.scale.setScalar(1);
-    let x = -5, z = 0;                      // re-spot, nudge if occupied
-    for (let i = 0; i < 40 && balls.some(b => b !== cueBall && b.on && Math.hypot(b.x - x, b.z - z) < 2 * R + .02); i++) { x = -5 + (i % 5) * 0.6 - 1; z = ((i / 5 | 0) - 3) * 0.8; }
-    Object.assign(cueBall, { x, z, vx: 0, vz: 0 });
-    say('scratch');
-  } else if (potThisShot) say('potted'); else say('aim');
-  if (mode === 'vs') {
-    const who = turn, keep = !scratched && potThisShot > 0;
-    pottedNums.forEach(n => { score[who] += n; });
-    if (!keep) turn = who === 'me' ? 'ai' : 'me';
-    say(scratched ? 'foulTurn' : keep ? (who === 'me' ? 'potted' : 'aiPotted') : (turn === 'ai' ? 'aiTurn' : 'youTurn'));
-  }
-  const left = balls.filter(b => b !== cueBall && b.on && !b.sink).length;
-  hud();
-  if (!left) return win();
-  state = (mode === 'vs' && turn === 'ai') ? 'aiAim' : 'aim';
-  // aim at the nearest ball by default
-  let nb = null, nd = 1e9; balls.forEach(b => { if (b !== cueBall && b.on) { const d = Math.hypot(b.x - cueBall.x, b.z - cueBall.z); if (d < nd) { nd = d; nb = b; } } });
+/* ---------- rules (8-ball) ---------- */
+const inPlay = b => b.on && !b.sink;
+const groupOf = n => n === 0 || n === 8 ? null : n < 8 ? 'solid' : 'stripe';
+const remaining = g => balls.filter(b => inPlay(b) && groupOf(b.num) === g).length;
+const who0 = () => mode === 'vs' ? turn : 'me';
+const clearedNow = () => !!groups[who0()] && remaining(groups[who0()]) === 0;
+/** May this player hit ball n first? Open table: anything but the 8. Own group first; the 8 only once the group is cleared. */
+function allowed(who, n, cleared) {
+  const g = groups[who];
+  if (n === 0) return false;
+  if (!g) return n !== 8;
+  if (cleared === undefined) cleared = remaining(g) === 0;
+  return cleared ? n === 8 : groupOf(n) === g;
+}
+function freeSpot() {
+  let x = -5, z = 0;
+  for (let i = 0; i < 60 && balls.some(b => b !== cueBall && inPlay(b) && Math.hypot(b.x - x, b.z - z) < 2 * R + .02); i++) { x = -7 + (i % 6) * 0.5; z = (((i / 6) | 0) - 3) * 0.8; }
+  Object.assign(cueBall, { x, z, vx: 0, vz: 0 });
+}
+function movePlace(p) {
+  const x = Math.max(-LX, Math.min(LX, p.x)), z = Math.max(-LZ, Math.min(LZ, p.z));
+  if (!balls.some(b => b !== cueBall && inPlay(b) && Math.hypot(b.x - x, b.z - z) < 2 * R + 0.02)) { cueBall.x = x; cueBall.z = z; }
+}
+function defaultAim() {                    // point at the nearest ball the current player may hit
+  let nb = null, nd = 1e9;
+  const w = who0(), cl = clearedNow();
+  balls.forEach(b => { if (b !== cueBall && inPlay(b) && allowed(w, b.num, cl)) { const d = Math.hypot(b.x - cueBall.x, b.z - cueBall.z); if (d < nd) { nd = d; nb = b; } } });
   if (nb) aimDir = { x: (nb.x - cueBall.x) / nd, z: (nb.z - cueBall.z) / nd };
+}
+function endShot() {
+  const who = who0(), opp = who === 'me' ? 'ai' : 'me', msgs = [];
+  const reason = scratched ? 'foulScratch' : firstHit === null ? 'foulNone' : !allowed(who, firstHit, clearedBefore) ? 'foulWrong' : null;
+  const foul = !!reason;
+  if (pottedNums.includes(8)) {            // the 8-ball decides the game
+    const ok = !foul && clearedBefore;
+    return finish(ok ? who : opp, ok ? (who === 'me' ? 'rWinMe' : 'rWinAi') : (who === 'me' ? 'rEarlyMe' : 'rEarlyAi'));
+  }
+  if (!groups[who] && !foul) {             // open table: first ball potted decides your group
+    const f = pottedNums.find(n => groupOf(n));
+    if (f) {
+      groups[who] = groupOf(f); groups[opp] = groups[who] === 'solid' ? 'stripe' : 'solid';
+      msgs.push(tr(who === 'me' ? 'youAre' : 'aiIs', tr(groups[who] === 'solid' ? 'solids' : 'stripes')));
+    }
+  }
+  const keep = !foul && pottedNums.some(n => groupOf(n) && groupOf(n) === groups[who]);
+  let hand = null;
+  if (foul) {
+    msgs.push(tr(reason));
+    if (mode === 'solo') { shots += 2; msgs.push(tr('penalty')); hand = 'me'; } else hand = opp;
+  }
+  if (mode === 'vs' && !keep) turn = opp;
+  if (scratched) { cueBall.sink = null; cueBall.on = true; cueBall.mesh.scale.setScalar(1); freeSpot(); }
+  if (!foul) msgs.push(tr(keep ? (who === 'me' ? 'potted' : 'aiPotted') : mode === 'solo' ? 'aim' : turn === 'ai' ? 'aiTurn' : 'youTurn'));
+  else msgs.push(tr(hand === 'me' ? 'placeHint' : 'aiHand'));
+  $('#msg').textContent = msgs.join(' ');
+  if (hand === 'ai') aiPlaceCue();
+  state = hand === 'me' ? 'place' : (mode === 'vs' && turn === 'ai') ? 'aiAim' : 'aim';
+  hud(); defaultAim();
   if (state === 'aiAim') planAI();
+}
+function finish(winner, reasonKey) {
+  state = 'won'; hud();
+  if (mode === 'vs') {
+    $('#oT').textContent = tr(winner === 'me' ? 'youWin' : 'aiWin'); $('#oP').textContent = tr(reasonKey);
+  } else if (winner === 'me') {
+    const rec = !best || shots < best;
+    if (rec) { best = shots; try { localStorage.setItem(BEST_KEY, shots); } catch (e) {} }
+    hud(); $('#oT').textContent = tr('win'); $('#oP').textContent = tr('winP', shots) + (rec ? tr('record') : '');
+  } else { $('#oT').textContent = tr('lose'); $('#oP').textContent = tr(reasonKey); }
+  $('#oB').textContent = tr('again'); $('#ov').style.display = 'flex';
 }
 
 /* ---------- AI opponent ---------- */
@@ -3581,31 +3658,49 @@ const DIFF = { easy: { ang: 0.05, pow: 0.16, pick: 0.45 }, normal: { ang: 0.02, 
 function segClear(ax, az, bx, bz, ignore) {
   const vx = bx - ax, vz = bz - az, L2 = vx * vx + vz * vz;
   return balls.every(o => {
-    if (!o.on || o.sink || o === cueBall || o === ignore) return true;
+    if (!inPlay(o) || o === cueBall || o === ignore) return true;
     const t = L2 ? Math.max(0, Math.min(1, ((o.x - ax) * vx + (o.z - az) * vz) / L2)) : 0;
     return Math.hypot(o.x - (ax + vx * t), o.z - (az + vz * t)) > 2 * R * 0.99;
   });
 }
-function planAI() {
-  const D = DIFF[diff], shotsList = [];
-  for (const b of balls) if (b !== cueBall && b.on && !b.sink) for (const [px, pz] of POCKETS) {
+/** Every clean "cue -> ghost ball -> pocket" shot the AI could take from (x0, z0) at a ball it is allowed to hit first. */
+function shotsFrom(x0, z0) {
+  const list = [];
+  for (const b of balls) if (b !== cueBall && inPlay(b) && allowed('ai', b.num)) for (const [px, pz] of POCKETS) {
     let ux = px - b.x, uz = pz - b.z; const d2 = Math.hypot(ux, uz); ux /= d2; uz /= d2;
     const gx = b.x - ux * 2 * R, gz = b.z - uz * 2 * R;
     if (Math.abs(gx) > LX || Math.abs(gz) > LZ) continue;
-    let cx = gx - cueBall.x, cz = gz - cueBall.z; const d1 = Math.hypot(cx, cz); if (d1 < 0.05) continue;
+    let cx = gx - x0, cz = gz - z0; const d1 = Math.hypot(cx, cz); if (d1 < 0.05) continue;
     cx /= d1; cz /= d1;
     const cos = cx * ux + cz * uz; if (cos < 0.3) continue;
-    if (!segClear(cueBall.x, cueBall.z, gx, gz, b) || !segClear(b.x, b.z, px, pz, b)) continue;
+    if (!segClear(x0, z0, gx, gz, b) || !segClear(b.x, b.z, px, pz, b)) continue;
     const vo = 3 + 0.42 * (d2 + 1.5), vc = vo / Math.max(cos, 0.5);
-    shotsList.push({ dx: cx, dz: cz, v: vc + 0.6 * d1, q: cos * 3 - (d1 + d2) * 0.08 + b.num * 0.02 });
+    list.push({ dx: cx, dz: cz, v: vc + 0.6 * d1, q: cos * 3 - (d1 + d2) * 0.08 });
   }
+  return list;
+}
+function aiPlaceCue() {                    // ball in hand: try spots, keep the one with the best shot
+  const tries = diff === 'easy' ? 6 : diff === 'normal' ? 40 : 90;
+  let bestPos = null, bq = -1e9;
+  for (let i = 0; i < tries; i++) {
+    const x = (Math.random() * 2 - 1) * (LX - 0.4), z = (Math.random() * 2 - 1) * (LZ - 0.4);
+    if (balls.some(b => b !== cueBall && inPlay(b) && Math.hypot(b.x - x, b.z - z) < 2 * R + 0.1)) continue;
+    const l = shotsFrom(x, z), q = l.length ? Math.max(...l.map(c => c.q)) : -5;
+    if (q > bq) { bq = q; bestPos = { x, z }; }
+  }
+  if (bestPos) Object.assign(cueBall, bestPos, { vx: 0, vz: 0 });
+}
+function planAI() {
+  const D = DIFF[diff], list = shotsFrom(cueBall.x, cueBall.z);
   let pick;
-  if (shotsList.length) {
-    shotsList.sort((a, b) => b.q - a.q);
-    pick = Math.random() < D.pick ? shotsList[Math.floor(Math.random() * shotsList.length)] : shotsList[0];
-  } else {                                 // nothing clean: tap the nearest ball
-    let nb = null, nd = 1e9; balls.forEach(b => { if (b !== cueBall && b.on && !b.sink) { const d = Math.hypot(b.x - cueBall.x, b.z - cueBall.z); if (d < nd) { nd = d; nb = b; } } });
-    pick = { dx: (nb.x - cueBall.x) / nd, dz: (nb.z - cueBall.z) / nd, v: 9 + nd * 0.4 };
+  if (list.length) {
+    list.sort((a, b) => b.q - a.q);
+    pick = Math.random() < D.pick ? list[Math.floor(Math.random() * list.length)] : list[0];
+  } else {                                 // nothing clean: tap the nearest legal ball (prefer one with a clear line)
+    const c = balls.filter(b => b !== cueBall && inPlay(b) && allowed('ai', b.num))
+      .map(b => ({ b, d: Math.hypot(b.x - cueBall.x, b.z - cueBall.z) })).sort((a, b) => a.d - b.d);
+    const t = c.find(o => segClear(cueBall.x, cueBall.z, o.b.x, o.b.z, o.b)) || c[0];
+    pick = { dx: (t.b.x - cueBall.x) / t.d, dz: (t.b.z - cueBall.z) / t.d, v: 9 + t.d * 0.4 };
   }
   const a1 = Math.atan2(pick.dz, pick.dx) + gauss() * D.ang;
   const v = Math.max(6, Math.min(MAXV * 0.97, pick.v * (1 + gauss() * D.pow)));
@@ -3620,19 +3715,6 @@ function runAI(dt) {
   aimDir = { x: Math.cos(a), z: Math.sin(a) };
   aiPull = ai.t < 0.9 ? 0 : ease(Math.min(1, (ai.t - 0.9) / 0.6)) * ai.p;
   if (ai.t > 1.7) { power = ai.p; aiPull = 0; ai = null; fire(); power = 0; }
-}
-function win() {
-  state = 'won';
-  if (mode === 'vs') {
-    $('#oT').textContent = tr(score.me > score.ai ? 'youWin' : 'aiWin');
-    $('#oP').textContent = tr('scoreP', score.me + ' - ' + score.ai);
-    $('#oB').textContent = tr('again'); $('#ov').style.display = 'flex'; hud(); return;
-  }
-  const rec = !best || shots < best;
-  if (rec) { best = shots; try { localStorage.setItem(BEST_KEY, shots); } catch (e) {} }
-  hud();
-  $('#oT').textContent = tr('win'); $('#oP').textContent = tr('winP', shots) + (rec ? tr('record') : '');
-  $('#oB').textContent = tr('again'); $('#ov').style.display = 'flex';
 }
 
 /* ---------- main loop ---------- */
@@ -3662,7 +3744,7 @@ function frame(now) {
     p.setXYZ(0, cueBall.x, R, cueBall.z); p.setXYZ(1, cueBall.x + aimDir.x * t, R, cueBall.z + aimDir.z * t);
     p.needsUpdate = true;
     ghost.position.set(cueBall.x + aimDir.x * t, R, cueBall.z + aimDir.z * t);
-    ghost.material.color.setHex(hitBall ? 0xffcf3f : 0xffffff);
+    ghost.material.color.setHex(hitBall ? (allowed(who0(), hitBall.num, clearedNow()) ? 0xffcf3f : 0xff4d5e) : 0xffffff);
   }
   renderer.render(scene, camera);
 }
@@ -3796,7 +3878,7 @@ class I18n {
       'embed.hint': 'Click inside the game to use the keyboard. It has its own sound and language buttons.', 'embed.full': 'Fullscreen',
       'td.title': 'Tower Defense Lite', 'td.desc': 'Tower defense campaign: 8 levels with their own maps and waves. Armored, fast, flying and healing enemies each need the right tower. Then an endless run: buy relics between stages and stack them into a build.', 'td.best': 'Best level {n}', 'td.stars': '★ {n}/24 stars',
       'sm.title': 'Spider-Man Demo', 'sm.desc': 'A one-level pixel platformer: run, jump the gaps, punch the thugs and beat the boss.',
-      'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly pool table. Drag back to aim and set power, then pot all nine balls in as few shots as you can. Scratches cost 2 shots.',
+      'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly 8-ball table. Pot your solids or stripes, then the 8-ball, and never scratch. Play solo or against an AI.',
       'ss.title': 'Space Shooter', 'ss.desc': 'Drag to fly while the ship fires on its own. Six random waves, a boss, and power-ups (one is a trap).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Play poker hands to beat rising targets. Buy jokers, level up hands, and survive nerfs and cursed jokers.',
       'bp.best': 'Best {n} shots', 'ss.best': 'Best score {n}', 'pp.best': 'Best level {n}',
@@ -3909,7 +3991,7 @@ class I18n {
       'embed.hint': 'Haz clic dentro del juego para usar el teclado. Tiene sus propios botones de sonido e idioma.', 'embed.full': 'Pantalla completa',
       'td.title': 'Defensa de Torres Lite', 'td.desc': 'Campaña de defensa de torres: 8 niveles con mapas y oleadas propias. Enemigos blindados, rápidos, voladores y sanadores necesitan la torre adecuada. Después, una partida infinita: compra reliquias entre fases y combínalas en una build.', 'td.best': 'Mejor nivel {n}', 'td.stars': '★ {n}/24 estrellas',
       'sm.title': 'Demo de Spider-Man', 'sm.desc': 'Un plataformas pixelado de un nivel: corre, salta los huecos, golpea a los matones y derrota al jefe.',
-      'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly. Arrastra hacia atrás para apuntar y dar fuerza, y mete las nueve bolas con los menos tiros posibles. Una falta cuesta 2 tiros.',
+      'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly de bola 8. Mete tus lisas o rayadas y luego la bola 8, sin embolsar la blanca. Juega solo o contra una IA.',
       'ss.title': 'Shooter Espacial', 'ss.desc': 'Arrastra para volar mientras la nave dispara sola. Seis oleadas aleatorias, un jefe y power-ups (uno es una trampa).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Juega manos de póker para superar objetivos cada vez más altos. Compra comodines, mejora manos y sobrevive a nerfs y comodines malditos.',
       'bp.best': 'Mejor {n} tiros', 'ss.best': 'Récord {n}', 'pp.best': 'Mejor nivel {n}',
@@ -5053,8 +5135,8 @@ const CATALOG = [
         return stars ? t('td.stars', { n: stars }) : get('towerLiteBest') ? t('td.best', { n: get('towerLiteBest') }) : '';
       } }) },
   { id: 'low-poly-pool', icon: '🎱', genre: 'sports', GameClass: EmbeddedGame.define({
-      id: 'low-poly-pool', key: 'bp', langKey: 'lowPolyPoolLang', saveKeys: ['lowPolyPoolBest'], thumb: EMBED_THUMBS.bp,
-      summary: get => get('lowPolyPoolBest') ? t('bp.best', { n: get('lowPolyPoolBest') }) : '' }) },
+      id: 'low-poly-pool', key: 'bp', langKey: 'lowPolyPoolLang', saveKeys: ['lowPolyPoolBest8'], thumb: EMBED_THUMBS.bp,
+      summary: get => get('lowPolyPoolBest8') ? t('bp.best', { n: get('lowPolyPoolBest8') }) : '' }) },
   { id: 'space-shooter', icon: '🚀', genre: 'action', GameClass: EmbeddedGame.define({
       id: 'space-shooter', key: 'ss', langKey: 'spaceShooterLang', saveKeys: ['spaceShooterHi'], thumb: EMBED_THUMBS.ss,
       summary: get => +get('spaceShooterHi') ? t('ss.best', { n: Fmt.num(+get('spaceShooterHi')) }) : '' }) },
