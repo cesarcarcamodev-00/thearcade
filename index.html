@@ -3304,6 +3304,8 @@ button.off{opacity:.5;text-decoration:line-through}
 .modal h2{margin:0 0 8px;font-size:26px;color:#ffcf3f}
 .modal p{margin:6px 0 14px;color:#cdd5ea;line-height:1.5}
 .modal button{background:#3a6df0;font-size:15px;padding:10px 20px}
+.modal input{font:inherit;font-size:16px;text-transform:uppercase;letter-spacing:.2em;text-align:center;width:6.5em;padding:9px;border-radius:9px;border:1px solid #fff3;background:#10172e;color:#fff}
+#mNet{min-height:1.4em;font-size:13px;margin:8px 0 0}
 .modal .row{display:flex;gap:8px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
 .modal .row button{background:#2c3550;font-size:14px;padding:9px 14px}
 .modal .row button:hover{background:#3a4670}
@@ -3329,10 +3331,15 @@ button.off{opacity:.5;text-decoration:line-through}
   <div class="row"><button id="mSolo" data-m="solo"></button></div>
   <h3 id="mV"></h3>
   <div class="row"><button data-m="vs" data-d="easy" id="mE"></button><button data-m="vs" data-d="normal" id="mN"></button><button data-m="vs" data-d="hard" id="mH"></button></div>
+  <h3 id="mO"></h3>
+  <div class="row"><button id="mHost"></button></div>
+  <div class="row"><input id="mCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false"><button id="mJoin"></button></div>
+  <p id="mNet"></p>
 </div></div>
 <div id="ov"><div class="modal"><h2 id="oT"></h2><p id="oP"></p><button id="oB"></button></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>
 <script>
 'use strict';
 const $ = s => document.querySelector(s);
@@ -3350,7 +3357,13 @@ const TXT = {
     foulScratch: 'Scratch!', foulNone: 'Foul: no ball was hit.', foulWrong: 'Foul: wrong ball hit first.', penalty: '+2 shots.',
     placeHint: 'Ball in hand: drag to place the cue ball, then release.', aiHand: 'The AI has ball in hand.',
     rWinMe: 'You sank the 8-ball to win.', rWinAi: 'The AI sank the 8-ball.',
-    rEarlyMe: 'You sank the 8-ball illegally.', rEarlyAi: 'The AI sank the 8-ball illegally.' },
+    rEarlyMe: 'You sank the 8-ball illegally.', rEarlyAi: 'The AI sank the 8-ball illegally.',
+    mO: 'Play with a friend', netHost: 'Create room', netJoin: 'Join', netCode: 'CODE',
+    netWait: 'Room code: {n}. Send it to your friend and keep this page open…', netConnecting: 'Connecting…',
+    netNotFound: 'Room not found. Check the code.', netErr: 'Could not connect. Try again.', netNoLib: 'Could not load the online library. Check your connection.',
+    netLeft: 'Friend disconnected', netLeftP: 'The match ended because the connection was lost.', toMenu: 'Back to menu', netWaitHost: 'Waiting for the host to start a new game…',
+    ai_o: 'Friend', aiTurn_o: 'Your friend is playing…', aiPotted_o: 'Your friend potted one and shoots again…', aiIs_o: 'Your friend is {n}.',
+    aiHand_o: 'Your friend has ball in hand.', aiWin_o: 'Your friend wins', rWinAi_o: 'Your friend sank the 8-ball.', rEarlyAi_o: 'Your friend sank the 8-ball illegally.' },
   es: { shots: 'Tiros', left: 'Faltan', best: 'Mejor', view: 'Vista', newg: 'Nueva', snd: 'Sonido',
     aim: 'Arrastra hacia atrás desde cualquier punto para apuntar y dar fuerza; suelta para tirar.', roll: 'Las bolas ruedan…',
     potted: '¡Buena! Tira otra vez.', win: '¡Mesa limpia!', winP: 'Metiste la bola 8 en {n} tiros.', record: ' ¡Nuevo récord!', again: 'Jugar otra vez',
@@ -3363,11 +3376,18 @@ const TXT = {
     foulScratch: '¡Blanca embolsada!', foulNone: 'Falta: no tocaste ninguna bola.', foulWrong: 'Falta: golpeaste primero la bola equivocada.', penalty: '+2 tiros.',
     placeHint: 'Bola en mano: arrastra para colocar la blanca y suelta.', aiHand: 'La IA tiene bola en mano.',
     rWinMe: 'Metiste la bola 8 para ganar.', rWinAi: 'La IA metió la bola 8.',
-    rEarlyMe: 'Metiste la bola 8 de forma ilegal.', rEarlyAi: 'La IA metió la bola 8 de forma ilegal.' },
+    rEarlyMe: 'Metiste la bola 8 de forma ilegal.', rEarlyAi: 'La IA metió la bola 8 de forma ilegal.',
+    mO: 'Jugar con un amigo', netHost: 'Crear sala', netJoin: 'Unirse', netCode: 'CÓDIGO',
+    netWait: 'Código de sala: {n}. Envíaselo a tu amigo y no cierres esta página…', netConnecting: 'Conectando…',
+    netNotFound: 'Sala no encontrada. Revisa el código.', netErr: 'No se pudo conectar. Inténtalo de nuevo.', netNoLib: 'No se pudo cargar la librería online. Revisa tu conexión.',
+    netLeft: 'Tu amigo se desconectó', netLeftP: 'La partida terminó porque se perdió la conexión.', toMenu: 'Volver al menú', netWaitHost: 'Esperando a que el anfitrión inicie otra partida…',
+    ai_o: 'Amigo', aiTurn_o: 'Tu amigo está jugando…', aiPotted_o: 'Tu amigo metió una y vuelve a tirar…', aiIs_o: 'Tu amigo es {n}.',
+    aiHand_o: 'Tu amigo tiene bola en mano.', aiWin_o: 'Gana tu amigo', rWinAi_o: 'Tu amigo metió la bola 8.', rEarlyAi_o: 'Tu amigo metió la bola 8 de forma ilegal.' },
 };
 let lang = 'en';
 try { lang = localStorage.getItem(LANG_KEY) === 'es' ? 'es' : 'en'; } catch (e) {}
-const tr = (k, v) => (TXT[lang][k] || k).replace('{n}', v);
+// In an online match the opponent is "your friend": use the <key>_o wording when there is one.
+const tr = (k, v) => ((mode === 'online' && TXT[lang][k + '_o']) || TXT[lang][k] || k).replace('{n}', v);
 let muted = false;
 
 if (typeof THREE === 'undefined') {
@@ -3479,11 +3499,12 @@ ghost.rotation.x = Math.PI / 2; scene.add(ghost);
 
 /* ---------- game state ---------- */
 let state = 'aim', shots = 0, best = null, potThisShot = 0, scratched = false, cueBall;
-let mode = 'solo', diff = 'normal', turn = 'me', pottedNums = [], ai = null, aiPull = 0;
+var mode = 'solo';                     // 'solo' | 'vs' (AI) | 'online'; var so tr() can read it before this line runs
+let diff = 'normal', turn = 'me', pottedNums = [], ai = null, aiPull = 0, lastOrder = [];
 let groups = { me: null, ai: null }, firstHit = null, clearedBefore = false;
 try { const b = +localStorage.getItem(BEST_KEY); if (b) best = b; } catch (e) {}
 
-function rack() {
+function rack(fixed) {
   balls.forEach(b => scene.remove(b.mesh)); balls.length = 0;
   cueBall = makeBall(0); cueBall.x = -5; cueBall.z = 0; balls.push(cueBall);
   // 8-ball in the middle, one solid and one stripe in the back corners, the rest shuffled
@@ -3492,6 +3513,8 @@ function rack() {
   const rest = [...solids, ...stripes].sort(() => Math.random() - 0.5);
   const order = Array(15).fill(0); const rows = [1, 2, 3, 4, 5]; order[4] = 8; order[10] = corners[0]; order[14] = corners[1];
   let r = 0; for (let i = 0; i < 15; i++) if (!order[i]) order[i] = rest[r++];
+  if (Array.isArray(fixed) && fixed.length === 15) fixed.forEach((n, i) => { order[i] = n; });   // online guest: the host's rack
+  lastOrder = order.slice();
   let k = 0;
   rows.forEach((n, i) => { for (let j = 0; j < n; j++) {
     const b = makeBall(order[k++]);
@@ -3585,7 +3608,7 @@ function syncMeshes(dt) {
       if (k >= 1) { b.on = false; b.mesh.visible = false; }
       continue;
     }
-    b.mesh.position.set(b.x, R, b.z);
+    b.mesh.position.set(b.x, R, b.z); b.mesh.visible = true;
     const sp = Math.hypot(b.vx, b.vz);
     if (dt && sp > 0.01) {
       axis.set(b.vz, 0, -b.vx).normalize();
@@ -3640,28 +3663,35 @@ canvas.addEventListener('pointermove', e => {
   const dx = dragStart.x - p.x, dz = dragStart.z - p.z, len = Math.hypot(dx, dz);
   if (len > 0.05) aimDir = { x: dx / len, z: dz / len };
   power = Math.min(1, len / DRAG_MAX);
+  if (mode === 'online') netThrottle({ t: 'aim', x: aimDir.x, z: aimDir.z, p: power });
 });
 const endDrag = shoot => {
   if (placing) {
     placing = false;
-    if (shoot && state === 'place') { state = 'aim'; defaultAim(); say(mode === 'solo' ? 'aim' : 'youTurn'); }
+    if (shoot && state === 'place') {
+      state = 'aim'; defaultAim(); say(mode === 'solo' ? 'aim' : 'youTurn');
+      if (mode === 'online') { netSend({ t: 'place', x: cueBall.x, z: cueBall.z }); netSend({ t: 'aim', x: aimDir.x, z: aimDir.z, p: 0 }); }
+    }
     return;
   }
   if (!dragging) return; dragging = false;
   if (shoot && power > 0.04 && state === 'aim') fire();
+  else if (mode === 'online') netSend({ t: 'aim', x: aimDir.x, z: aimDir.z, p: 0 });
   power = 0;
 };
 canvas.addEventListener('pointerup', () => endDrag(true));
 canvas.addEventListener('pointercancel', () => endDrag(false));
 addEventListener('keydown', e => {
+  if (e.target && e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape') { dragging = false; power = 0; }
   else if (e.key === 'v' || e.key === 'V') toggleView();
-  else if (e.key === 'r' || e.key === 'R') rack();
+  else if ((e.key === 'r' || e.key === 'R') && mode !== 'online') rack();
 });
 
 function fire() {
   const sp = MAXV * (0.12 + 0.88 * power * power);
   cueBall.vx = aimDir.x * sp; cueBall.vz = aimDir.z * sp;
+  if (mode === 'online' && who0() === 'me') netSend({ t: 'shot', x: aimDir.x, z: aimDir.z, p: power, cx: cueBall.x, cz: cueBall.z });
   const w = who0(); clearedBefore = !!groups[w] && remaining(groups[w]) === 0; firstHit = null;
   shots++; potThisShot = 0; pottedNums = []; scratched = false; state = 'rolling';
   sfx('ball', 4 + 12 * power); hud(); say('roll');
@@ -3687,7 +3717,7 @@ function aimTarget() {
 /* ---------- UI ---------- */
 const SYM = { solid: ' ●', stripe: ' ◐' };
 function hud() {
-  const vs = mode === 'vs', sym = w => (vs && groups[w]) ? SYM[groups[w]] : '';
+  const vs = versus(), sym = w => (vs && groups[w]) ? SYM[groups[w]] : '';
   const n8 = balls.some(b => b.num === 8 && inPlay(b)) ? 1 : 0;
   const leftOf = w => groups[w] ? remaining(groups[w]) + n8 : '-';
   $('#lShots').textContent = vs ? tr('you') + sym('me') : tr('shots'); $('#lBest').textContent = vs ? tr('ai') + sym('ai') : tr('best');
@@ -3706,26 +3736,38 @@ function applyLang() {
   $('#lang').textContent = lang === 'en' ? 'ES' : 'EN';
   $('#mT').textContent = tr('menuT'); $('#mP').textContent = tr('menuP'); $('#mSolo').textContent = tr('solo'); $('#mV').textContent = tr('vsAi');
   $('#mE').textContent = tr('easy'); $('#mN').textContent = tr('normal'); $('#mH').textContent = tr('hard');
+  $('#mO').textContent = tr('mO'); $('#mHost').textContent = tr('netHost'); $('#mJoin').textContent = tr('netJoin'); $('#mCode').placeholder = tr('netCode');
   hud();
 }
-function showMenu() { $('#ov').style.display = 'none'; $('#menu').style.display = 'flex'; }
-document.querySelectorAll('#menu button').forEach(b => b.onclick = () => {
+function showMenu() { netClose(); netStatus(''); netGone = false; $('#ov').style.display = 'none'; $('#menu').style.display = 'flex'; }
+document.querySelectorAll('#menu button[data-m]').forEach(b => b.onclick = () => {
+  netClose(); netStatus('');
   mode = b.dataset.m; if (b.dataset.d) diff = b.dataset.d;
-  $('#menu').style.display = 'none'; rack(); say(mode === 'vs' ? 'youTurn' : 'soloHint');
+  $('#menu').style.display = 'none'; rack(); say(versus() ? 'youTurn' : 'soloHint');
 });
 function toggleView() { viewTop = !viewTop; }
 $('#view').onclick = toggleView;
 $('#newg').onclick = showMenu;
-$('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); say(state === 'rolling' ? 'roll' : state === 'aiAim' ? 'aiTurn' : state === 'place' ? 'placeHint' : mode === 'vs' ? 'youTurn' : 'soloHint'); };
+$('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); say(state === 'rolling' ? 'roll' : state === 'aiAim' ? 'aiTurn' : state === 'place' ? 'placeHint' : versus() ? 'youTurn' : 'soloHint'); };
 $('#mute').onclick = () => { muted = !muted; applyLang(); };
-$('#oB').onclick = rack;
+$('#oB').onclick = () => {
+  if (netGone) return showMenu();
+  if (mode === 'online') {                 // rematch: the host re-racks, the guest asks for it
+    if (isHost) startOnline(); else { netSend({ t: 'rematch' }); $('#oP').textContent = tr('netWaitHost'); }
+    return;
+  }
+  rack();
+};
+$('#mHost').onclick = () => netHost();
+$('#mJoin').onclick = () => { const c = $('#mCode').value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (c.length !== 4) return netStatus('netNotFound'); netJoin(c); };
+$('#mCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#mJoin').click(); });
 [$('#view'), $('#newg'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
 
 /* ---------- rules (8-ball) ---------- */
 const inPlay = b => b.on && !b.sink;
 const groupOf = n => n === 0 || n === 8 ? null : n < 8 ? 'solid' : 'stripe';
 const remaining = g => balls.filter(b => inPlay(b) && groupOf(b.num) === g).length;
-const who0 = () => mode === 'vs' ? turn : 'me';
+const who0 = () => versus() ? turn : 'me';
 const clearedNow = () => !!groups[who0()] && remaining(groups[who0()]) === 0;
 /** May this player hit ball n first? Open table: anything but the 8. Own group first; the 8 only once the group is cleared. */
 function allowed(who, n, cleared) {
@@ -3742,7 +3784,7 @@ function freeSpot() {
 }
 function movePlace(p) {
   const x = Math.max(-LX, Math.min(LX, p.x)), z = Math.max(-LZ, Math.min(LZ, p.z));
-  if (!balls.some(b => b !== cueBall && inPlay(b) && Math.hypot(b.x - x, b.z - z) < 2 * R + 0.02)) { cueBall.x = x; cueBall.z = z; }
+  if (!balls.some(b => b !== cueBall && inPlay(b) && Math.hypot(b.x - x, b.z - z) < 2 * R + 0.02)) { cueBall.x = x; cueBall.z = z; if (mode === 'online') netThrottle({ t: 'place', x, z }); }
 }
 function defaultAim() {                    // point at the nearest ball the current player may hit
   let nb = null, nd = 1e9;
@@ -3771,19 +3813,19 @@ function endShot() {
     msgs.push(tr(reason));
     if (mode === 'solo') { shots += 2; msgs.push(tr('penalty')); hand = 'me'; } else hand = opp;
   }
-  if (mode === 'vs' && !keep) turn = opp;
+  if (versus() && !keep) turn = opp;
   if (scratched) { cueBall.sink = null; cueBall.on = true; cueBall.mesh.scale.setScalar(1); freeSpot(); }
   if (!foul) msgs.push(tr(keep ? (who === 'me' ? 'potted' : 'aiPotted') : mode === 'solo' ? 'aim' : turn === 'ai' ? 'aiTurn' : 'youTurn'));
   else msgs.push(tr(hand === 'me' ? 'placeHint' : 'aiHand'));
   $('#msg').textContent = msgs.join(' ');
-  if (hand === 'ai') aiPlaceCue();
-  state = hand === 'me' ? 'place' : (mode === 'vs' && turn === 'ai') ? 'aiAim' : 'aim';
+  if (hand === 'ai' && mode !== 'online') aiPlaceCue();
+  state = hand === 'me' ? 'place' : (versus() && turn === 'ai') ? 'aiAim' : 'aim';
   hud(); defaultAim();
-  if (state === 'aiAim') planAI();
+  if (state === 'aiAim' && mode !== 'online') planAI();      // online: the friend is the one aiming
 }
 function finish(winner, reasonKey) {
   state = 'won'; hud();
-  if (mode === 'vs') {
+  if (versus()) {
     $('#oT').textContent = tr(winner === 'me' ? 'youWin' : 'aiWin'); $('#oP').textContent = tr(reasonKey);
   } else if (winner === 'me') {
     const rec = !best || shots < best;
@@ -3858,6 +3900,104 @@ function runAI(dt) {
   if (ai.t > 1.7) { power = ai.p; aiPull = 0; ai = null; fire(); power = 0; }
 }
 
+/* ---------- online play ----------
+ * PeerJS: a 4-letter room code pairs two browsers through a free public broker, then they talk directly.
+ * Only small messages travel: the shooter sends the shot (aim, power, cue-ball spot); both browsers run the same
+ * physics for the visuals, and when the balls stop the shooter sends the final positions plus what happened
+ * (first ball hit, balls potted, scratch) so both sides apply the same rules and can never drift apart.
+ * The local player is always "me" and the friend is "ai" internally, so all the AI-match rules are reused. */
+const versus = () => mode !== 'solo';
+const NET_PREFIX = 'lpp-', CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+let peer = null, conn = null, isHost = false, netGone = false, lastNet = 0;
+const num = (...v) => v.every(Number.isFinite);
+const netSend = m => { try { if (conn && conn.open) conn.send(m); } catch (e) {} };
+const netThrottle = m => { const n = performance.now(); if (n - lastNet > 60) { lastNet = n; netSend(m); } };
+const netStatus = (k, v) => { $('#mNet').textContent = k ? tr(k, v) : ''; };
+function netClose() {
+  try { if (conn) { conn.removeAllListeners(); conn.close(); } } catch (e) {}
+  try { if (peer) { peer.removeAllListeners(); peer.destroy(); } } catch (e) {}
+  peer = conn = null;
+}
+function netHost() {
+  netClose(); netStatus('');
+  if (typeof Peer === 'undefined') return netStatus('netNoLib');
+  isHost = true; netGone = false;
+  const attempt = n => {
+    const code = Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
+    const pr = peer = new Peer(NET_PREFIX + code);
+    pr.on('open', () => netStatus('netWait', code));
+    pr.on('error', e => { if (e.type === 'unavailable-id' && n < 6) attempt(n + 1); else netStatus('netErr'); });
+    pr.on('connection', c => { if (conn) { c.close(); return; } setupConn(c); });
+  };
+  attempt(0);
+}
+function netJoin(code) {
+  netClose(); netStatus('');
+  if (typeof Peer === 'undefined') return netStatus('netNoLib');
+  isHost = false; netGone = false; netStatus('netConnecting');
+  const pr = peer = new Peer();
+  pr.on('open', () => setupConn(pr.connect(NET_PREFIX + code, { reliable: true })));
+  pr.on('error', e => netStatus(e.type === 'peer-unavailable' ? 'netNotFound' : 'netErr'));
+}
+function setupConn(c) {
+  conn = c;
+  const ready = () => { if (isHost) startOnline(); };
+  c.on('open', ready); if (c.open) ready();
+  c.on('data', onNet);
+  c.on('close', onNetClose); c.on('error', onNetClose);
+}
+function startOnline() {                   // host: fresh rack, random breaker, tell the guest
+  mode = 'online'; netGone = false; $('#menu').style.display = 'none';
+  rack();
+  const hostBreaks = Math.random() < 0.5;
+  netSend({ t: 'start', order: lastOrder, hostBreaks });
+  beginOnline(hostBreaks);
+}
+function beginOnline(iBreak) {
+  turn = iBreak ? 'me' : 'ai'; state = iBreak ? 'aim' : 'aiAim';
+  hud(); defaultAim(); say(iBreak ? 'youTurn' : 'aiTurn');
+}
+function onNet(m) {
+  if (!m || typeof m.t !== 'string') return;
+  if (m.t === 'start' && !isHost) {
+    if (!Array.isArray(m.order) || m.order.length !== 15 || !m.order.every(Number.isInteger)) return;
+    mode = 'online'; netGone = false; $('#menu').style.display = 'none';
+    rack(m.order); beginOnline(!m.hostBreaks);
+  } else if (m.t === 'rematch' && isHost && mode === 'online') startOnline();
+  else if (mode !== 'online') return;
+  else if (m.t === 'aim' && state === 'aiAim' && num(m.x, m.z, m.p)) { aimDir = { x: m.x, z: m.z }; aiPull = Math.max(0, Math.min(1, m.p)); }
+  else if (m.t === 'place' && state === 'aiAim' && num(m.x, m.z)) { cueBall.x = Math.max(-LX, Math.min(LX, m.x)); cueBall.z = Math.max(-LZ, Math.min(LZ, m.z)); }
+  else if (m.t === 'shot' && state === 'aiAim' && num(m.x, m.z, m.p, m.cx, m.cz)) {
+    cueBall.x = Math.max(-LX, Math.min(LX, m.cx)); cueBall.z = Math.max(-LZ, Math.min(LZ, m.cz));
+    aimDir = { x: m.x, z: m.z }; power = Math.max(0, Math.min(1, m.p)); aiPull = 0; fire(); power = 0;
+  } else if (m.t === 'end' && (state === 'rolling' || state === 'await')) applyEnd(m);
+}
+/** The balls stopped on this screen: the shooter publishes the result; the watcher waits for it. */
+function onlineSettled() {
+  if (who0() !== 'me') { state = 'await'; return; }
+  netSend({ t: 'end', b: balls.map(b => ({ n: b.num, x: +b.x.toFixed(4), z: +b.z.toFixed(4), on: b.on ? 1 : 0 })),
+    fh: firstHit, pn: pottedNums, sc: scratched, cb: clearedBefore });
+  endShot();
+}
+function applyEnd(m) {                     // snap to the shooter's result, then run the same rules they did
+  if (!Array.isArray(m.b)) return;
+  m.b.forEach(e => {
+    const b = balls.find(o => o.num === e.n); if (!b || !num(e.x, e.z)) return;
+    b.x = e.x; b.z = e.z; b.vx = b.vz = 0; b.sink = null; b.on = !!e.on; b.mesh.scale.setScalar(1);
+    if (b.num) { const d = $('#dots i[data-n="' + b.num + '"]'); if (d) d.classList.toggle('gone', !b.on); }
+  });
+  firstHit = Number.isInteger(m.fh) ? m.fh : null; pottedNums = Array.isArray(m.pn) ? m.pn.filter(Number.isInteger) : [];
+  scratched = !!m.sc; clearedBefore = !!m.cb;
+  syncMeshes(0); endShot();
+}
+function onNetClose() {
+  if ($('#menu').style.display === 'flex') { netStatus('netErr'); return; }
+  if (mode !== 'online' || netGone) return;
+  netGone = true; state = 'won'; dragging = false; placing = false;
+  $('#oT').textContent = tr('netLeft'); $('#oP').textContent = tr('netLeftP'); $('#oB').textContent = tr('toMenu');
+  $('#ov').style.display = 'flex';
+}
+
 /* ---------- main loop ---------- */
 let last = performance.now(), acc = 0;
 function frame(now) {
@@ -3868,7 +4008,7 @@ function frame(now) {
     acc += dt; const h = 1 / 240;
     while (acc >= h) { stepPhysics(h); acc -= h; }
     const moving = balls.some(b => b.on && (b.sink || b.vx || b.vz));
-    if (!moving) endShot();
+    if (!moving) { if (mode === 'online') onlineSettled(); else endShot(); }
   }
   syncMeshes(dt);
   camT += ((viewTop ? 1 : 0) - camT) * Math.min(1, dt * 6); placeCamera();
@@ -4019,7 +4159,7 @@ class I18n {
       'embed.hint': 'Click inside the game to use the keyboard. It has its own sound and language buttons.', 'embed.full': 'Fullscreen',
       'td.title': 'Tower Defense Lite', 'td.desc': 'Tower defense campaign: 8 levels with their own maps and waves. Armored, fast, flying and healing enemies each need the right tower. Then an endless run: buy relics between stages and stack them into a build.', 'td.best': 'Best level {n}', 'td.stars': '★ {n}/24 stars',
       'sm.title': 'Spider-Man Demo', 'sm.desc': 'A one-level pixel platformer: run, jump the gaps, punch the thugs and beat the boss.',
-      'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly 8-ball table. Pot your solids or stripes, then the 8-ball, and never scratch. Play solo or against an AI.',
+      'bp.title': 'Low Poly Pool', 'bp.desc': 'A 3D low-poly 8-ball table. Pot your solids or stripes, then the 8-ball, and never scratch. Play solo, against an AI, or online with a friend.',
       'ss.title': 'Space Shooter', 'ss.desc': 'Drag to fly while the ship fires on its own. Six random waves, a boss, and power-ups (one is a trap).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Play poker hands to beat rising targets. Buy jokers, level up hands, and survive nerfs and cursed jokers.',
       'bp.best': 'Best {n} shots', 'ss.best': 'Best score {n}', 'pp.best': 'Best level {n}',
@@ -4134,7 +4274,7 @@ class I18n {
       'embed.hint': 'Haz clic dentro del juego para usar el teclado. Tiene sus propios botones de sonido e idioma.', 'embed.full': 'Pantalla completa',
       'td.title': 'Defensa de Torres Lite', 'td.desc': 'Campaña de defensa de torres: 8 niveles con mapas y oleadas propias. Enemigos blindados, rápidos, voladores y sanadores necesitan la torre adecuada. Después, una partida infinita: compra reliquias entre fases y combínalas en una build.', 'td.best': 'Mejor nivel {n}', 'td.stars': '★ {n}/24 estrellas',
       'sm.title': 'Demo de Spider-Man', 'sm.desc': 'Un plataformas pixelado de un nivel: corre, salta los huecos, golpea a los matones y derrota al jefe.',
-      'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly de bola 8. Mete tus lisas o rayadas y luego la bola 8, sin embolsar la blanca. Juega solo o contra una IA.',
+      'bp.title': 'Billar Low Poly', 'bp.desc': 'Una mesa de billar 3D low poly de bola 8. Mete tus lisas o rayadas y luego la bola 8, sin embolsar la blanca. Juega solo, contra una IA o en línea con un amigo.',
       'ss.title': 'Shooter Espacial', 'ss.desc': 'Arrastra para volar mientras la nave dispara sola. Seis oleadas aleatorias, un jefe y power-ups (uno es una trampa).',
       'pp.title': 'Pixel Poker Rogue', 'pp.desc': 'Juega manos de póker para superar objetivos cada vez más altos. Compra comodines, mejora manos y sobrevive a nerfs y comodines malditos.',
       'bp.best': 'Mejor {n} tiros', 'ss.best': 'Récord {n}', 'pp.best': 'Mejor nivel {n}',
