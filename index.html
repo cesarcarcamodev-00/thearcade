@@ -744,7 +744,7 @@ let LANG='es';try{LANG=localStorage.getItem(langKey)==='en'?'en':'es'}catch(e){}
 const T={
 en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
  sub:'Defend the base across 8 levels. Every enemy type needs the right tower.',
- how:'Tap a tile to build the selected tower, tap a tower to upgrade or sell it. Each extra tower of the same type costs more. After each wave, pick 1 of 3 upgrades - some are cursed!',
+ how:'Tap a tile to preview a tower, tap it again to build. Towers and walls block the way: enemies take the shortest open route, so build a maze. You can never fully block it. Each extra tower of the same type costs more. After each wave, pick 1 of 3 upgrades - some are cursed!',
  endless:'ENDLESS RUN',endless_lock:'Clear level 3 to unlock the Endless Run',
  run_unlocked:'Endless Run unlocked! Combine relics into a build and see how far it goes.',
  stage:'STAGE',relics:'RELICS',stage_clear:'STAGE {0} CLEARED!',interest:'Interest +${0}',stage_bonus:'Stage bonus +${0}',
@@ -754,9 +754,11 @@ en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
  rar_c:'Common',rar_u:'Uncommon',rar_r:'Rare',best_stage:'Best stage: {0}',reached:'Reached stage {0} · {1} waves',dmg_by:'DAMAGE BY TOWER',
  wave_bonus:'Wave cleared +${0}',
  lives:'LIVES',gold:'GOLD',wave:'WAVE',level:'LEVEL',
- tw_arrow:'Arrow',tw_cannon:'Cannon',tw_frost:'Frost',gnd:'ground only',
+ tw_arrow:'Arrow',tw_cannon:'Cannon',tw_frost:'Frost',tw_wall:'Wall',gnd:'ground only',wall_d:'Blocks the way, does not shoot',
+ pv_path:'PATH {0}>{1}',pv_hits:'COVERS {0}',pv_block:'BLOCKS THE PATH',pv_tap:'TAP AGAIN',toast_block:'That would block the path!',toast_enemy:'An enemy is in the way!',
+ tip_maze:'No road here: enemies walk the shortest open route to the base. Towers and cheap walls block tiles, so build a maze to make the route longer. Tap a tile to preview the new route first.',
  go:'START WAVE',early:'EARLY +${0}',lvl:'Lv {0}',up:'Upgrade ${0}',sell:'Sell ${0}',maxlv:'MAX',x2:'x{0}',ups:'UPGRADES',close:'Close',
- noups:'No upgrades yet.',toast_gold:'Not enough gold!',toast_spot:'Cannot build on the path!',toast_pad:'Build only on stone pads!',
+ noups:'No upgrades yet.',toast_gold:'Not enough gold!',toast_spot:'Cannot build there!',toast_pad:'Build only on stone pads!',
  pick:'PICK AN UPGRADE',cursed:'CURSED',cleared:'WAVE CLEARED',bonus:'Bonus: +${0}',
  c_dmg:'Damage',c_dmg_d:'+{0}% damage on all towers',c_range:'Eagle Eye',c_range_d:'+{0}% range on all towers',
  c_rate:'Quick Hands',c_rate_d:'+{0}% fire rate on all towers',c_gold:'Treasure',c_gold_d:'+${0} gold now',
@@ -774,7 +776,7 @@ en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
  tip_mix:'Mix tower types: each new tower of the same type costs 15% more.',
  tip_two:'Two entrances: enemies come from both sides and meet in the middle.',
  tip_pads:'Rocky ground: you can only build on the grey stone pads.',
- tip_split:'Two separate roads, two exits. Guard both!',
+ tip_split:'A rock ridge splits the valley: two entrances, two bases. Guard both!',
  e_runner:'Runner',e_runner_d:'Very fast. Cannon shells often miss it - use Arrow and Frost.',
  e_brute:'Brute',e_brute_d:'Armored: every hit loses {0} damage. Arrows barely scratch it - use Cannons.',
  e_flyer:'Flyer',e_flyer_d:'Flies straight over the map to the base (dotted line). Cannons cannot hit it.',
@@ -782,7 +784,7 @@ en:{title:'TOWER DEFENSE LITE',snd:'SND',menu:'MENU',
  e_boss:'Boss',e_boss_d:'Huge HP and armor {0}. Costs 3 lives if it reaches the base.'},
 es:{title:'DEFENSA DE TORRES LITE',snd:'SON',menu:'MENÚ',
  sub:'Defiende la base en 8 niveles. Cada tipo de enemigo necesita la torre adecuada.',
- how:'Toca una casilla para construir la torre elegida; toca una torre para mejorarla o venderla. Cada torre extra del mismo tipo cuesta más. Tras cada oleada, elige 1 de 3 mejoras. ¡Algunas están malditas!',
+ how:'Toca una casilla para ver la torre y vuelve a tocarla para construir. Las torres y los muros bloquean el paso: los enemigos toman la ruta libre más corta, así que construye un laberinto. Nunca puedes bloquearlo del todo. Cada torre extra del mismo tipo cuesta más. Tras cada oleada, elige 1 de 3 mejoras. ¡Algunas están malditas!',
  endless:'PARTIDA INFINITA',endless_lock:'Supera el nivel 3 para desbloquear la partida infinita',
  run_unlocked:'¡Partida infinita desbloqueada! Combina reliquias en una build y mira hasta dónde llegas.',
  stage:'FASE',relics:'RELIQUIAS',stage_clear:'¡FASE {0} SUPERADA!',interest:'Interés +${0}',stage_bonus:'Bono de fase +${0}',
@@ -792,9 +794,11 @@ es:{title:'DEFENSA DE TORRES LITE',snd:'SON',menu:'MENÚ',
  rar_c:'Común',rar_u:'Poco común',rar_r:'Rara',best_stage:'Mejor fase: {0}',reached:'Llegaste a la fase {0} · {1} oleadas',dmg_by:'DAÑO POR TORRE',
  wave_bonus:'Oleada superada +${0}',
  lives:'VIDAS',gold:'ORO',wave:'OLEADA',level:'NIVEL',
- tw_arrow:'Flecha',tw_cannon:'Cañón',tw_frost:'Hielo',gnd:'solo terrestres',
+ tw_arrow:'Flecha',tw_cannon:'Cañón',tw_frost:'Hielo',tw_wall:'Muro',gnd:'solo terrestres',wall_d:'Bloquea el paso, no dispara',
+ pv_path:'RUTA {0}>{1}',pv_hits:'CUBRE {0}',pv_block:'BLOQUEA EL PASO',pv_tap:'TOCA OTRA VEZ',toast_block:'¡Eso bloquearía el camino!',toast_enemy:'¡Hay un enemigo ahí!',
+ tip_maze:'Aquí no hay camino: los enemigos van a la base por la ruta libre más corta. Las torres y los muros baratos bloquean casillas, así que construye un laberinto para alargar la ruta. Toca una casilla para ver antes la ruta nueva.',
  go:'INICIAR OLEADA',early:'ANTICIPAR +${0}',lvl:'Niv {0}',up:'Mejorar ${0}',sell:'Vender ${0}',maxlv:'MÁX',x2:'x{0}',ups:'MEJORAS',close:'Cerrar',
- noups:'Aún no tienes mejoras.',toast_gold:'¡Oro insuficiente!',toast_spot:'¡No se puede construir en el camino!',toast_pad:'¡Solo puedes construir en las losas de piedra!',
+ noups:'Aún no tienes mejoras.',toast_gold:'¡Oro insuficiente!',toast_spot:'¡No se puede construir ahí!',toast_pad:'¡Solo puedes construir en las losas de piedra!',
  pick:'ELIGE UNA MEJORA',cursed:'MALDITA',cleared:'OLEADA SUPERADA',bonus:'Bono: +${0}',
  c_dmg:'Daño',c_dmg_d:'+{0}% de daño en todas las torres',c_range:'Ojo de águila',c_range_d:'+{0}% de alcance en todas las torres',
  c_rate:'Manos rápidas',c_rate_d:'+{0}% de cadencia en todas las torres',c_gold:'Tesoro',c_gold_d:'+${0} de oro ahora',
@@ -812,7 +816,7 @@ es:{title:'DEFENSA DE TORRES LITE',snd:'SON',menu:'MENÚ',
  tip_mix:'Combina tipos de torre: cada torre nueva del mismo tipo cuesta un 15% más.',
  tip_two:'Dos entradas: los enemigos llegan por ambos lados y se juntan en el centro.',
  tip_pads:'Terreno rocoso: solo puedes construir en las losas de piedra grises.',
- tip_split:'Dos caminos separados y dos salidas. ¡Protege ambos!',
+ tip_split:'Una cresta de roca divide el valle: dos entradas y dos bases. ¡Protege ambas!',
  e_runner:'Corredor',e_runner_d:'Muy rápido. Las balas de cañón suelen fallarle: usa Flecha y Hielo.',
  e_brute:'Bruto',e_brute_d:'Blindado: cada golpe pierde {0} de daño. Las flechas apenas le hacen nada: usa Cañones.',
  e_flyer:'Volador',e_flyer_d:'Vuela en línea recta hasta la base (línea punteada). Los cañones no pueden darle.',
@@ -839,8 +843,10 @@ const vib=n=>{try{navigator.vibrate&&!muted&&navigator.vibrate(n)}catch(e){}};
 const TW={
  arrow:{cost:50,dmg:8,range:62,cd:.5,col:'#c9d1e0',spd:220,air:1,ud:.3,uc:.18},
  cannon:{cost:90,dmg:30,range:56,cd:1.5,splash:24,col:'#555566',spd:100,air:0,ud:.6,uc:.08},
- frost:{cost:70,dmg:3,range:50,cd:.9,slow:.5,col:'#6ec6ff',spd:170,air:1,ud:.5,uc:.1}
+ frost:{cost:70,dmg:3,range:50,cd:.9,slow:.5,col:'#6ec6ff',spd:170,air:1,ud:.5,uc:.1},
+ wall:{cost:6,wall:1,col:'#8d8172',range:0}   // cheap blocker for shaping the maze: no shooting, sells for its full price
 };
+const BUILDS=['arrow','cannon','frost','wall'];
 // armor: flat damage removed from every hit (a hit always deals at least 25%). fly: straight line to the base.
 // heal: share of max HP restored to nearby enemies each second. dmg: lives lost when it reaches the base.
 const EN={
@@ -854,38 +860,37 @@ const EN={
 const armorHit=(d,a)=>a?Math.max(d*.25,d-a):d;
 
 /* ---------- campaign levels ---------- */
-// paths: waypoint lists in tiles, entering from off the grid and ending below the bottom row (the base).
-// Enemies alternate between paths unless a wave group names one. waves: [type, count, seconds between, path?]
-// hp: enemy HP multiplier for the level (+6% per wave inside it). pads: if set, the only buildable tiles.
+// Open fields: entries are spots just outside the grid where enemies appear, exits are the columns of the
+// base below the bottom row, rocks block walking and building. Enemies take the shortest open route.
+// pads: if set, the only buildable tiles. waves: [type, count, seconds between, entry?]
+// hp: enemy HP multiplier for the level (+6% per wave inside it).
 const N=(en,es)=>({en,es});
+const rowOf=(y,xs)=>xs.map(x=>[x,y]),colOf=(x,ys)=>ys.map(y=>[x,y]);
 const LEVELS=[
- {name:N('Meadow','Pradera'),gold:150,lives:15,hp:1.5,tips:['tip_mix'],
-  paths:[[[-1,1],[7,1],[7,4],[1,4],[1,7],[7,7],[7,10],[2,10],[2,12]]],
+ {name:N('Meadow','Pradera'),gold:150,lives:15,hp:1.3,tips:['tip_maze','tip_mix'],
+  map:{entries:[[4,-1]],exits:[4],rocks:[]},
   waves:[[['slime',6,1]],[['slime',10,.8]],[['slime',14,.6]],[['slime',18,.5]]]},
- {name:N('Crossroads','Encrucijada'),gold:170,lives:12,hp:1.2,intro:'runner',
-  paths:[[[4,-1],[4,2],[1,2],[1,6],[7,6],[7,9],[4,9],[4,12]]],
+ {name:N('Crossroads','Encrucijada'),gold:170,lives:12,hp:1.9,intro:'runner',
+  map:{entries:[[-1,1]],exits:[7],rocks:[...rowOf(4,[2,3,4,5,6]),...rowOf(8,[2,3,4,5,6])]},
   waves:[[['slime',8,.8]],[['runner',8,.6]],[['slime',10,.6],['runner',8,.45]],[['runner',16,.35]],[['slime',14,.5],['runner',12,.35]]]},
- {name:N('Iron Road','Camino de hierro'),gold:200,lives:12,hp:1.4,intro:'brute',
-  paths:[[[9,2],[1,2],[1,5],[7,5],[7,8],[1,8],[1,10],[5,10],[5,12]]],
+ {name:N('Iron Road','Camino de hierro'),gold:200,lives:12,hp:1.7,intro:'brute',
+  map:{entries:[[9,1]],exits:[1],rocks:colOf(4,[3,4,5,6,7,8])},
   waves:[[['slime',10,.7]],[['brute',3,2.2]],[['slime',10,.5],['brute',4,1.8]],[['runner',10,.4],['brute',5,1.5]],[['brute',8,1.2],['slime',12,.4]]]},
- {name:N('Twin Gates','Puertas gemelas'),gold:230,lives:12,hp:1.8,tips:['tip_two'],
-  paths:[[[-1,1],[2,1],[2,4],[4,4],[4,7],[1,7],[1,10],[7,10],[7,12]],
-         [[9,1],[6,1],[6,4],[4,4],[4,7],[1,7],[1,10],[7,10],[7,12]]],
+ {name:N('Twin Gates','Puertas gemelas'),gold:230,lives:12,hp:1.05,tips:['tip_two'],
+  map:{entries:[[-1,1],[9,1]],exits:[4],rocks:rowOf(6,[1,2,3,5,6,7])},
   waves:[[['slime',12,.5]],[['runner',12,.4]],[['brute',6,1.2],['slime',10,.4]],[['runner',14,.3],['brute',4,1.5]],[['slime',20,.3],['brute',8,1]]]},
- {name:N('Sky Watch','Vigía del cielo'),gold:230,lives:12,hp:1.15,intro:'flyer',
-  paths:[[[1,-1],[1,3],[7,3],[7,6],[1,6],[1,9],[7,9],[7,12]]],
+ {name:N('Sky Watch','Vigía del cielo'),gold:230,lives:12,hp:1.3,intro:'flyer',
+  map:{entries:[[1,-1]],exits:[7],rocks:rowOf(5,[0,1,2,3,5,6,7,8])},
   waves:[[['slime',12,.5],['runner',6,.4]],[['flyer',8,.8]],[['brute',6,1.2],['flyer',6,.8]],[['runner',14,.3],['flyer',10,.6]],[['brute',8,1],['flyer',12,.5],['slime',12,.4]]]},
  {name:N('Stone Garden','Jardín de piedra'),gold:260,lives:12,hp:1.2,intro:'healer',tips:['tip_pads'],
-  paths:[[[9,2],[1,2],[1,6],[7,6],[7,10],[3,10],[3,12]]],
-  pads:[[4,0],[2,4],[4,4],[6,4],[8,4],[0,8],[3,8],[5,8],[8,8],[1,11],[5,11]],
+  map:{entries:[[9,2]],exits:[3],rocks:[],
+   pads:[...rowOf(4,[1,2,3,4,5,6,7]),...rowOf(8,[1,2,3,4,5,6,7]),[4,1],[4,6],[2,10],[6,10]]},
   waves:[[['slime',14,.5]],[['healer',3,2],['slime',12,.4]],[['brute',6,1.2],['healer',3,2]],[['flyer',10,.6],['runner',10,.35]],[['brute',8,1],['healer',5,1.5],['runner',10,.3]]]},
- {name:N('Split Valley','Valle dividido'),gold:280,lives:10,hp:.95,tips:['tip_split'],
-  paths:[[[1,-1],[1,2],[3,2],[3,5],[1,5],[1,8],[3,8],[3,12]],
-         [[7,-1],[7,2],[5,2],[5,5],[7,5],[7,8],[5,8],[5,12]]],
+ {name:N('Split Valley','Valle dividido'),gold:280,lives:10,hp:.5,tips:['tip_split'],
+  map:{entries:[[2,-1],[6,-1]],exits:[2,6],rocks:colOf(4,[0,1,2,3,4,5,6,7,8,9,10,11])},
   waves:[[['slime',16,.4],['runner',8,.4]],[['brute',8,1]],[['flyer',12,.5],['healer',4,1.5]],[['runner',20,.25],['brute',6,1]],[['brute',8,1],['flyer',10,.5],['healer',4,1.5]]]},
- {name:N('Fortress','Fortaleza'),gold:320,lives:10,hp:.8,intro:'boss',tips:['tip_two'],
-  paths:[[[-1,1],[2,1],[2,4],[4,4],[4,6],[1,6],[1,9],[7,9],[7,12]],
-         [[9,1],[6,1],[6,4],[4,4],[4,6],[1,6],[1,9],[7,9],[7,12]]],
+ {name:N('Fortress','Fortaleza'),gold:320,lives:10,hp:.75,intro:'boss',tips:['tip_two'],
+  map:{entries:[[-1,1],[9,1]],exits:[4],rocks:[[1,5],[7,5],[3,10],[5,10],[3,11],[5,11]]},
   waves:[[['slime',20,.35],['runner',10,.3]],[['brute',10,.9],['healer',4,1.5]],[['flyer',16,.4],['runner',14,.25]],
          [['brute',9,1],['healer',4,1.5],['flyer',10,.5]],[['boss',1,1],['brute',8,1],['runner',16,.25]],
          [['boss',2,6],['flyer',14,.4],['healer',6,1.2],['brute',10,.8]]]}
@@ -956,56 +961,111 @@ function genWave(g,L,wi){
  if(wi===WPL&&L%3===0)w.push(['boss',1+Math.floor((L-3)/6),Math.max(4,8-L*.3)]);   // boss enemies close each boss stage
  return w;
 }
-// Snakes in from the left or right edge and down to the base below the bottom row.
-function genPath(){
- const fromLeft=Math.random()<.5,pts=[];
- let y=ri(0,2),x=fromLeft?ri(5,7):ri(1,3);
- pts.push([fromLeft?-1:COLS,y],[x,y]);
+// A random open field (entries on the edges, scattered rocks), or a campaign map, maybe mirrored.
+function genMap(){
  for(;;){
-  const ny=y+ri(2,3);
-  if(ny>ROWS-3)break;
-  pts.push([x,ny]);y=ny;
-  x=x>4?ri(1,3):ri(5,7);
-  pts.push([x,y]);
+  const side=()=>pick([[ri(1,7),-1],[-1,ri(0,4)],[COLS,ri(0,4)]]);
+  const entries=[side()];if(Math.random()<.4)entries.push(side());
+  const exits=[ri(1,7)];
+  const rocks=[];for(let i=ri(3,9);i>0;i--)rocks.push([ri(0,COLS-1),ri(1,ROWS-2)]);
+  const m={entries,exits,rocks};
+  if(mapOK(m))return m;
  }
- pts.push([x,ROWS]);
- return pts;
 }
-const tiles=p=>p.slice(1).reduce((n,q,i)=>n+Math.abs(q[0]-p[i][0])+Math.abs(q[1]-p[i][1]),0);
-// A fresh random snake, or one of the campaign maps (maybe mirrored), so endless runs keep changing shape.
 function randomMap(){
- if(Math.random()<.4){let p;do{p=genPath()}while(tiles(p)<26);return[p]}
- const L=pick(LEVELS.slice(1)),flip=Math.random()<.5;
- return L.paths.map(wp=>flip?wp.map(([x,y])=>[COLS-1-x,y]):wp);
+ if(Math.random()<.5)return genMap();
+ const m=pick(LEVELS.slice(1)).map,f=Math.random()<.5?(x=>COLS-1-x):(x=>x);
+ return{entries:m.entries.map(([x,y])=>[f(x),y]),exits:m.exits.map(f),rocks:m.rocks.map(([x,y])=>[f(x),y])};
 }
 
-/* ---------- map ---------- */
-let LAND,AIR,blocked,buildable,pads,showAir=false;
+/* ---------- map: open field, towers form the maze ---------- */
+// rock: blocked for walking and building. occ: tower on a tile. FLOW: steps from each tile to the base
+// (multi-source BFS from the exits); enemies always step to the neighbour with the lowest value.
+let MAP,rock,occ,padOK,reserved,FLOW,ROUTES=[],AIR,showAir=false;
+const inG=(x,y)=>x>=0&&x<COLS&&y>=0&&y<ROWS;
+const DIRS=[[0,1],[1,0],[-1,0],[0,-1]];
+const grid=v=>Array.from({length:ROWS},()=>Array(COLS).fill(v));
+const entryTile=([x,y])=>[Math.min(COLS-1,Math.max(0,x)),Math.min(ROWS-1,Math.max(0,y))];
+const INF=1e9;
 function mkPath(wp){
  const pts=wp.map(([x,y])=>[(x+.5)*TS,(y+.5)*TS]),cum=[0];
  for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
  return{wp,pts,cum,len:cum[cum.length-1]};
 }
-function setMap(paths,padList,air){
- LAND=paths.map(mkPath);
- AIR=paths.map(wp=>mkPath([wp[0],wp[wp.length-1]]));   // flyers go straight from the entrance to the base
- pads=padList||null;showAir=!!air;
- const grid=v=>Array.from({length:ROWS},()=>Array(COLS).fill(v));
- blocked=grid(false);
- for(const wp of paths)for(let i=1;i<wp.length;i++){
-  const [x0,y0]=wp[i-1],[x1,y1]=wp[i];
-  for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x++)for(let y=Math.min(y0,y1);y<=Math.max(y0,y1);y++)
-   if(x>=0&&x<COLS&&y>=0&&y<ROWS)blocked[y][x]=true;
- }
- buildable=grid(!pads);
- for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(blocked[y][x])buildable[y][x]=false;
- if(pads)for(const [x,y] of pads)if(!blocked[y][x])buildable[y][x]=true;
- drawBG();
-}
 function posAt(p,d){
  const c=p.cum;let i=1;while(i<c.length-1&&c[i]<d)i++;
  const f=(d-c[i-1])/(c[i]-c[i-1]),a=p.pts[i-1],b=p.pts[i];
  return[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];
+}
+// block: an extra tile treated as built on (for previews and build checks).
+function flow(block,m){
+ m=m||MAP;const D=grid(INF),q=[],R=m===MAP?rock:rocksOf(m);
+ const free=(x,y)=>inG(x,y)&&!R[y][x]&&!(m===MAP&&occ[y][x])&&!(block&&block[0]===x&&block[1]===y);
+ for(const ex of m.exits)if(free(ex,ROWS-1)&&D[ROWS-1][ex]>1){D[ROWS-1][ex]=1;q.push([ex,ROWS-1])}
+ for(let i=0;i<q.length;i++){const [x,y]=q[i];
+  for(const [dx,dy] of DIRS){const nx=x+dx,ny=y+dy;if(free(nx,ny)&&D[ny][nx]>D[y][x]+1){D[ny][nx]=D[y][x]+1;q.push([nx,ny])}}}
+ return D;
+}
+function rocksOf(m){const R=grid(false);for(const [x,y] of m.rocks)if(inG(x,y))R[y][x]=true;return R}
+function nextTile(D,x,y){
+ if(y===ROWS-1&&D[y][x]===1)return[x,ROWS];   // step into the base
+ let b=null,bd=D[y][x];
+ for(const [dx,dy] of DIRS){const nx=x+dx,ny=y+dy;if(inG(nx,ny)&&D[ny][nx]<bd){bd=D[ny][nx];b=[nx,ny]}}
+ return b;
+}
+// The tiles an enemy from this entry walks, ending at the base (empty if blocked).
+function routeFrom(D,entry){
+ let [x,y]=entryTile(entry);if(D[y][x]>=INF)return[];
+ const out=[[x,y]];
+ for(let g=0;g<200;g++){const n=nextTile(D,x,y);if(!n||n[1]>=ROWS)break;[x,y]=n;out.push(n)}
+ return out;
+}
+const mapOK=m=>{const D=flow(null,m);return m.entries.every(e=>{const [x,y]=entryTile(e);return D[y][x]<INF&&!rocksOf(m)[y][x]})};
+function setMap(m,air){
+ MAP={entries:m.entries,exits:m.exits,rocks:m.rocks||[],pads:m.pads||null};
+ rock=rocksOf(MAP);occ=grid(null);reserved=grid(false);showAir=!!air;
+ for(const e of MAP.entries){const [x,y]=entryTile(e);reserved[y][x]=true}
+ for(const ex of MAP.exits)reserved[ROWS-1][ex]=true;
+ padOK=grid(!MAP.pads);if(MAP.pads)for(const [x,y] of MAP.pads)if(inG(x,y))padOK[y][x]=true;
+ // flyers go straight from each entry to the nearest base
+ AIR=MAP.entries.map(e=>{const ex=MAP.exits.reduce((b,x)=>Math.abs(x-e[0])<Math.abs(b-e[0])?x:b);return mkPath([e,[ex,ROWS]])});
+ for(const tw of towers)if(inG(tw.x,tw.y))occ[tw.y][tw.x]=tw;
+ refresh();drawBG();
+}
+// Recompute the flow field and the drawn routes after any build, sale or map change.
+function refresh(){FLOW=flow();ROUTES=MAP.entries.map(e=>routeFrom(FLOW,e));ghostInfo()}
+const canPlace=(x,y)=>inG(x,y)&&!rock[y][x]&&!reserved[y][x]&&padOK[y][x];
+// Why a build at (x,y) is not allowed, or '' if it is. The route must stay open for every entry and every enemy.
+function buildIssue(x,y){
+ if(!canPlace(x,y))return MAP.pads&&!rock[y][x]&&!reserved[y][x]?'toast_pad':'toast_spot';
+ if(occ[y][x])return'toast_spot';
+ for(const e of enemies){if(EN[e.ty].fly)continue;
+  if((e.tx===x&&e.ty_===y)||(Math.floor(e.x/TS)===x&&Math.floor(e.y/TS)===y))return'toast_enemy'}
+ const D=flow([x,y]);
+ if(MAP.entries.some(e=>{const [ex,ey]=entryTile(e);return D[ey][ex]>=INF}))return'toast_block';
+ for(const e of enemies)if(!EN[e.ty].fly&&inG(e.tx,e.ty_)&&D[e.ty_][e.tx]>=INF)return'toast_block';
+ return'';
+}
+function placeTower(x,y,type,inv){const tw={x,y,type,lv:1,cd:0,ang:0,inv};towers.push(tw);occ[y][x]=tw;refresh();return tw}
+function removeTower(tw){towers=towers.filter(q=>q!==tw);if(inG(tw.x,tw.y)&&occ[tw.y][tw.x]===tw)occ[tw.y][tw.x]=null;refresh()}
+// Ground enemies: where they are, the tile they walk to, and how far they still are from the base.
+const epos=e=>[e.x,e.y];
+const remaining=e=>EN[e.ty].fly?e.p.len-e.d:(e.ty_>=ROWS?0:(FLOW[e.ty_]?FLOW[e.ty_][e.tx]:0)*TS)+Math.hypot((e.tx+.5)*TS-e.x,(e.ty_+.5)*TS-e.y);
+
+/* ---------- placement preview ---------- */
+// ghost: the tile being previewed (tap once to preview, again to build). Shows the new route, its length
+// and how many route tiles the tower would cover.
+let ghost=null,GI=null;
+function ghostInfo(){
+ if(!ghost){GI=null;return}
+ const [x,y]=ghost,issue=buildIssue(x,y);
+ if(issue&&issue!=='toast_block'){GI={issue};return}
+ const D=flow([x,y]),routes=MAP.entries.map(e=>routeFrom(D,e));
+ const len=r=>r.reduce((a,b)=>Math.max(a,b.length),0);
+ const rng=TW[build].wall?0:stat({type:build,lv:1}).range,cx=(x+.5)*TS,cy=(y+.5)*TS;
+ const seen=new Set();let hits=0;
+ for(const r of routes)for(const [tx,ty] of r){const k=tx+','+ty;if(seen.has(k))continue;seen.add(k);if(Math.hypot((tx+.5)*TS-cx,(ty+.5)*TS-cy)<=rng)hits++}
+ GI={issue,routes,from:len(ROUTES),to:len(routes),hits,rng};
 }
 
 /* ---------- upgrade cards (random, buffs and curses) ---------- */
@@ -1045,13 +1105,13 @@ function resetRun(mode,gold,lives){
 // Campaign levels start fresh: their own gold, lives and map, no towers or upgrades carried over.
 function initLevel(i){
  const L=LEVELS[i];resetRun('camp',L.gold,L.lives);S.li=i;S.level=i+1;
- setMap(L.paths,L.pads,hasType(L,'flyer'));
+ ghost=null;setMap(L.map,hasType(L,'flyer'));
 }
 function playLevel(i){initLevel(i);state='intro';showIntro();renderHud();renderBar();beep(440,.1,'triangle')}
 function closeIntro(){hide();state='build';renderHud();renderBar()}
 // Endless run: pick a free starting relic, then stages of 3 waves with a shop after each stage.
 function playEndless(){
- resetRun('endless',160,10);setMap(LEVELS[0].paths,null,false);
+ resetRun('endless',160,10);ghost=null;setMap(LEVELS[0].map,false);
  S.offers=rollRelics(3,true);state='shop';showStart();renderHud();renderBar();beep(440,.1,'triangle');
 }
 const nWaves=()=>S.mode==='camp'?LEVELS[S.li].waves.length:WPL;
@@ -1073,15 +1133,21 @@ function nextLevel(){
  S.level++;S.lw=0;
  if(!has('glass')||S.lives<3)S.lives++;
  if(S.level%3===0){S.rule=S.nextRule;S.nextRule=pick(RULES.filter(r=>r.id!==S.rule)).id}else S.rule=null;
- setMap(randomMap(),null,S.wave>=6||S.rule==='sky');
- let refund=0;
- towers=towers.filter(tw=>{if(!buildable[tw.y][tw.x]){refund+=tw.inv;return false}return true});
+ // towers keep their tiles; ones on rocks or entries are refunded, then walls (and if needed towers) until the route is open
+ const m=randomMap();let refund=0;const R=rocksOf(m);ghost=null;
+ const bad=tw=>R[tw.y][tw.x]||m.entries.some(e=>{const [x,y]=entryTile(e);return x===tw.x&&y===tw.y})||(tw.y===ROWS-1&&m.exits.includes(tw.x));
+ towers=towers.filter(tw=>{if(bad(tw)){refund+=tw.inv;return false}return true});
+ setMap(m,S.wave>=6||S.rule==='sky');
+ const blockedNow=()=>MAP.entries.some(e=>{const [x,y]=entryTile(e);return FLOW[y][x]>=INF});
+ for(const tw of [...towers].sort((a,b)=>(TW[b.type].wall?1:0)-(TW[a.type].wall?1:0))){if(!blockedNow())break;refund+=tw.inv;removeTower(tw)}
  S.gold+=refund;sel=null;saveBest();
  return refund;
 }
 // Every extra tower of a type costs 15% more, so spamming the best tower stops paying off.
 const tcount=ty=>towers.reduce((n,tw)=>n+(tw.type===ty),0);
-const tcost=ty=>Math.round(TW[ty].cost*M.cost*(1+.15*tcount(ty))*(has('overclock')?1.2:1));
+const tcost=ty=>TW[ty].wall?TW[ty].cost:Math.round(TW[ty].cost*M.cost*(1+.15*tcount(ty))*(has('overclock')?1.2:1));
+const sellValue=tw=>TW[tw.type].wall?tw.inv:Math.floor(tw.inv*.6);
+const shooters=()=>towers.filter(q=>!TW[q.type].wall);
 const upCost=tw=>Math.round(TW[tw.type].cost*(tw.lv===1?.7:1.1)*M.cost);
 function stat(tw){
  const b=TW[tw.type],l=tw.lv-1,R=relicStat(tw);
@@ -1092,7 +1158,7 @@ function stat(tw){
 function relicStat(tw){
  const R={dmg:1,range:1,rate:1,slow:0};if(!S.relics.length)return R;
  if(has('hoarder'))R.dmg*=1+Math.min(.6,Math.floor(S.gold/10)*.01);
- if(has('mono')&&towers.every(q=>q.type===tw.type))R.dmg*=1.4;
+ if(has('mono')&&shooters().every(q=>q.type===tw.type))R.dmg*=1.4;
  if(has('blood'))R.dmg*=1+.01*(tw.kills||0);
  if(has('glass'))R.dmg*=2;
  if(has('heavy')&&tw.type==='cannon')R.dmg*=1.3;
@@ -1124,12 +1190,15 @@ function spawn(ty,pi){
  if(S.rule==='sky'&&ty!=='boss'&&Math.random()<.5)ty='flyer';
  const E=EN[ty];
  if(pi===undefined)pi=S.rr++;
- pi%=LAND.length;
+ pi%=MAP.entries.length;
  let hs,rs=1;
  if(S.mode==='camp')hs=LEVELS[S.li].hp*(1+.06*(S.lw-1));
- else{const g=S.wave-1;hs=1+.25*g+.03*g*g;rs=1+.08*g}
+ else{const g=S.wave-1;hs=.8*(1+.25*g+.03*g*g);rs=1+.08*g}   // unmazed open fields are shorter than the old roads
  const hp=E.hp*M.hp*hs;
- enemies.push({ty,p:E.fly?AIR[pi]:LAND[pi],hp,max:hp,rw:Math.round(E.rw*rs),d:0,slowT:0,slowA:0,dead:0,ph:Math.random()*6,healT:1});
+ const en=MAP.entries[pi],[tx,ty_]=entryTile(en);
+ const e={ty,hp,max:hp,rw:Math.round(E.rw*rs),slowT:0,slowA:0,dead:0,ph:Math.random()*6,healT:1,x:(en[0]+.5)*TS,y:(en[1]+.5)*TS,tx,ty_};
+ if(E.fly){e.p=AIR[pi];e.d=0}
+ enemies.push(e);
 }
 function waveClear(){
  if(S.mode==='endless'){runWaveClear();return}
@@ -1141,7 +1210,7 @@ function waveClear(){
 }
 // Endless: wave bonus; after the 3rd wave the stage bonus, interest (10% of gold, capped) and the shop.
 function runWaveClear(){
- let bonus=has('bounty')?0:20+S.lw*5;if(has('landlord'))bonus+=3*towers.length;
+ let bonus=has('bounty')?0:20+S.lw*5;if(has('landlord'))bonus+=3*shooters().length;
  S.gold+=bonus;S.streak++;beep(660,.15,'triangle',.05);beep(880,.25,'triangle',.05);
  if(S.lw<nWaves()){state='build';toast(t('wave_bonus',bonus));renderHud();renderBar();return}
  const lb=levelBonus(S.level+1),inter=Math.min(has('piggy')?50:25,Math.floor(S.gold*.1));
@@ -1164,11 +1233,11 @@ function damage(e,d,tw){
  const dealt=Math.min(e.hp,tw&&tw.type==='arrow'&&has('pierce')?d:armorHit(d,armor));
  e.hp-=dealt;
  if(tw)S.dmg[tw.type]=(S.dmg[tw.type]||0)+dealt;
- if(dealt>=60){const [x,y]=posAt(e.p,e.d);parts.push({x:x-6,y:y-14,vx:0,vy:-30,life:.5,txt:''+Math.round(dealt),col:'#fff'})}
+ if(dealt>=60){const [x,y]=epos(e);parts.push({x:x-6,y:y-14,vx:0,vy:-30,life:.5,txt:''+Math.round(dealt),col:'#fff'})}
  if(e.hp<=0){
   e.dead=1;S.kills++;if(tw)tw.kills=(tw.kills||0)+1;
   let g=S.rule==='broke'?0:e.rw;if(has('bounty'))g+=2;
-  const [x,y]=posAt(e.p,e.d);
+  const [x,y]=epos(e);
   if(has('lucky')&&g&&Math.random()<.1){g*=3;parts.push({x:x-6,y:y-16,vx:0,vy:-25,life:.7,txt:'x3',col:'#5be37d'})}
   S.gold+=g;
   for(let i=0;i<8;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:(Math.random()-.5)*90,life:.35,col:E.col});
@@ -1178,19 +1247,32 @@ function damage(e,d,tw){
   if(tw&&tw.type==='cannon'&&has('shrapnel')){
    for(let i=0;i<12;i++)parts.push({x,y,vx:(Math.random()-.5)*140,vy:(Math.random()-.5)*140,life:.3,col:'#ff6b3f'});
    parts.push({x:x-10,y:y-18,vx:0,vy:-20,life:.6,txt:'BOOM',col:'#ff6b3f'});
-   for(const o of enemies){if(o.dead||EN[o.ty].fly)continue;const [ox,oy]=posAt(o.p,o.d);if(Math.hypot(ox-x,oy-y)<=30)damage(o,e.max*.3,tw)}
+   for(const o of enemies){if(o.dead||EN[o.ty].fly)continue;const [ox,oy]=epos(o);if(Math.hypot(ox-x,oy-y)<=30)damage(o,e.max*.3,tw)}
   }
  }
 }
 function hit(p,x,y){
  if(p.splash>0){
-  for(const e of enemies){if(e.dead||EN[e.ty].fly)continue;const [ex,ey]=posAt(e.p,e.d);if(Math.hypot(ex-x,ey-y)<=p.splash+EN[e.ty].r)damage(e,p.dmg,p.src)}
+  for(const e of enemies){if(e.dead||EN[e.ty].fly)continue;const [ex,ey]=epos(e);if(Math.hypot(ex-x,ey-y)<=p.splash+EN[e.ty].r)damage(e,p.dmg,p.src)}
   for(let i=0;i<10;i++)parts.push({x,y,vx:(Math.random()-.5)*110,vy:(Math.random()-.5)*110,life:.3,col:'#ffb347'});
   beep(90,.15,'sawtooth',.05,-30);
  }else{
   if(p.slow>0&&p.tgt&&!p.tgt.dead&&S.rule!=='thaw'){p.tgt.slowT=has('permafrost')?3.2:1.6;p.tgt.slowA=p.slow}
   if(p.tgt)damage(p.tgt,p.dmg,p.src);
  }
+}
+// Walk a ground enemy toward the base, one tile centre at a time; the next tile is picked from the current
+// flow field, so enemies re-route as soon as the maze changes. Returns true when it reaches the base.
+function walk(e,step){
+ for(let g=0;g<4&&step>0;g++){
+  const cx=(e.tx+.5)*TS,cy=(e.ty_+.5)*TS,dx=cx-e.x,dy=cy-e.y,d=Math.hypot(dx,dy);
+  if(d>step){e.x+=dx/d*step;e.y+=dy/d*step;return false}
+  e.x=cx;e.y=cy;step-=d;
+  if(e.ty_>=ROWS)return true;
+  const n=nextTile(FLOW,e.tx,e.ty_);if(!n)return false;
+  e.tx=n[0];e.ty_=n[1];
+ }
+ return false;
 }
 function update(dt){
  tick+=dt;
@@ -1207,16 +1289,19 @@ function update(dt){
   if(e.dead)continue;
   const E=EN[e.ty];
   if(e.slowT>0)e.slowT-=dt;
-  e.d+=E.sp*(S.rule==='swift'?1.4:1)*(e.slowT>0?1-e.slowA:1)*dt;
+  const step=E.sp*(S.rule==='swift'?1.4:1)*(e.slowT>0?1-e.slowA:1)*dt;
+  let leaked=false;
+  if(E.fly){e.d+=step;[e.x,e.y]=posAt(e.p,Math.min(e.d,e.p.len));leaked=e.d>=e.p.len}
+  else leaked=walk(e,step);
   if(S.rule==='leech'&&e.hp<e.max)e.hp=Math.min(e.max,e.hp+e.max*.02*dt);
   if(E.heal&&(e.healT-=dt)<=0){
-   e.healT=1;const [hx,hy]=posAt(e.p,e.d);
+   e.healT=1;const [hx,hy]=epos(e);
    for(const o of enemies){
-    if(o.dead||o.hp>=o.max||tick-(o.healedAt||-9)<.9)continue;const [ox,oy]=posAt(o.p,o.d);   // heals from several healers do not stack
+    if(o.dead||o.hp>=o.max||tick-(o.healedAt||-9)<.9)continue;const [ox,oy]=epos(o);   // heals from several healers do not stack
     if(Math.hypot(ox-hx,oy-hy)<=34){o.hp=Math.min(o.max,o.hp+o.max*E.heal);o.healedAt=tick;parts.push({x:ox-1,y:oy-6,vx:0,vy:-18,life:.4,col:'#7dff9a'})}
    }
   }
-  if(e.d>=e.p.len){
+  if(leaked){
    e.dead=1;S.lives-=E.dmg||1;S.streak=0;beep(110,.25,'sawtooth',.06,-50);vib(40);renderHud();
    if(S.lives<=0){S.lives=0;state='over';renderHud();showOver();return}
   }
@@ -1225,11 +1310,12 @@ function update(dt){
  // towers: shoot the enemy closest to the base that this tower can hit; anti-air towers take flyers first,
  // since nothing else can stop them
  for(const tw of towers){
+  if(TW[tw.type].wall)continue;
   tw.cd-=dt;const b=TW[tw.type],st=stat(tw),cx=(tw.x+.5)*TS,cy=(tw.y+.5)*TS;
   let best=null,br=1e9,bx=0,by=0;
   for(const e of enemies){
    const fly=EN[e.ty].fly;if(fly&&!b.air)continue;
-   const [ex,ey]=posAt(e.p,e.d),rem=e.p.len-e.d-(fly?1e5:0);
+   const [ex,ey]=epos(e),rem=remaining(e)-(fly?1e5:0);
    if(rem<br&&Math.hypot(ex-cx,ey-cy)<=st.range){br=rem;best=e;bx=ex;by=ey}
   }
   if(best){
@@ -1240,7 +1326,7 @@ function update(dt){
     shot(best,bx,by);
     if(tw.type==='arrow'&&has('volley')&&(tw.shots=(tw.shots||0)+1)%4===0){
      let n=0;
-     for(const e of enemies){if(n>=2)break;if(e===best||e.dead||(EN[e.ty].fly&&!b.air))continue;const [ex,ey]=posAt(e.p,e.d);if(Math.hypot(ex-cx,ey-cy)<=st.range){shot(e,ex,ey);n++}}
+     for(const e of enemies){if(n>=2)break;if(e===best||e.dead||(EN[e.ty].fly&&!b.air))continue;const [ex,ey]=epos(e);if(Math.hypot(ex-cx,ey-cy)<=st.range){shot(e,ex,ey);n++}}
     }
     beep(tw.type==='cannon'?110:tw.type==='frost'?600:420,.04,'square',.015);
    }
@@ -1248,7 +1334,7 @@ function update(dt){
  }
  // projectiles (cannon shells fly to where the target was)
  for(const p of projs){
-  if(p.home&&p.tgt&&!p.tgt.dead){const [ex,ey]=posAt(p.tgt.p,p.tgt.d);p.lx=ex;p.ly=ey}
+  if(p.home&&p.tgt&&!p.tgt.dead){const [ex,ey]=epos(p.tgt);p.lx=ex;p.ly=ey}
   const dx=p.lx-p.x,dy=p.ly-p.y,dist=Math.hypot(dx,dy),step=p.spd*dt;
   if(dist<=step+2){p.done=1;hit(p,p.lx,p.ly)}else{p.x+=dx/dist*step;p.y+=dy/dist*step}
  }
@@ -1262,27 +1348,20 @@ const BG=document.createElement('canvas');BG.width=VW;BG.height=VH;
 function drawBG(){
  const g=BG.getContext('2d');g.clearRect(0,0,VW,VH);let s=11;const r=()=>((s=(s*1664525+1013904223)>>>0)/4294967296);
  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
-  if(blocked[y][x]){
-   g.fillStyle='#b58a56';g.fillRect(x*TS,y*TS,TS,TS);
-   g.fillStyle='#a37a49';for(let i=0;i<5;i++)g.fillRect(x*TS+ri(1,16),y*TS+ri(1,16),3,2);
-  }else if(pads&&!buildable[y][x]){
-   // rocky ground: cannot build here
-   g.fillStyle=(x+y)%2?'#2e6b3b':'#2b6638';g.fillRect(x*TS,y*TS,TS,TS);
-   if(r()<.6){g.fillStyle='#5d6470';const rx=x*TS+ri(3,12),ry=y*TS+ri(3,12);g.fillRect(rx,ry,5,4);g.fillStyle='#7b8390';g.fillRect(rx,ry,3,2)}
-  }else{
-   g.fillStyle=(x+y)%2?'#3f8f4f':'#3b8749';g.fillRect(x*TS,y*TS,TS,TS);
-   if(pads){g.fillStyle='#000';g.fillRect(x*TS+2,y*TS+2,TS-4,TS-4);g.fillStyle='#9aa3b0';g.fillRect(x*TS+3,y*TS+3,TS-6,TS-6);g.fillStyle='#b7bfca';g.fillRect(x*TS+3,y*TS+3,TS-6,2)}
-   else if(r()<.25){g.fillStyle=r()<.5?'#ffd86b':'#ff9fb2';g.fillRect(x*TS+ri(3,15),y*TS+ri(3,15),2,2)}
-   else if(r()<.3){g.fillStyle='#2f7a3f';g.fillRect(x*TS+ri(2,14),y*TS+ri(2,14),2,3)}
-  }
- }
- // path borders
- g.fillStyle='#7a5a34';
- for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(blocked[y][x]){
-  if(y>0&&!blocked[y-1][x])g.fillRect(x*TS,y*TS,TS,2);
-  if(y<ROWS-1&&!blocked[y+1][x])g.fillRect(x*TS,y*TS+TS-2,TS,2);
-  if(x>0&&!blocked[y][x-1])g.fillRect(x*TS,y*TS,2,TS);
-  if(x<COLS-1&&!blocked[y][x+1])g.fillRect(x*TS+TS-2,y*TS,2,TS);
+  const X=x*TS,Y=y*TS;
+  if(MAP.pads&&!padOK[y][x]&&!rock[y][x]){g.fillStyle=(x+y)%2?'#2e6b3b':'#2b6638'}else g.fillStyle=(x+y)%2?'#3f8f4f':'#3b8749';
+  g.fillRect(X,Y,TS,TS);
+  if(rock[y][x]){
+   g.fillStyle='#000';g.fillRect(X+1,Y+2,TS-2,TS-3);g.fillStyle='#6b7280';g.fillRect(X+2,Y+3,TS-4,TS-5);
+   g.fillStyle='#8b93a1';g.fillRect(X+3,Y+4,TS-9,4);g.fillStyle='#4b515c';g.fillRect(X+2,Y+TS-5,TS-4,2);
+  }else if(reserved[y][x]){
+   g.fillStyle='#b58a56';g.fillRect(X+1,Y+1,TS-2,TS-2);g.fillStyle='#a37a49';g.fillRect(X+4,Y+6,3,2);g.fillRect(X+11,Y+12,3,2);
+  }else if(MAP.pads&&padOK[y][x]){
+   g.fillStyle='#000';g.fillRect(X+2,Y+2,TS-4,TS-4);g.fillStyle='#9aa3b0';g.fillRect(X+3,Y+3,TS-6,TS-6);g.fillStyle='#b7bfca';g.fillRect(X+3,Y+3,TS-6,2);
+  }else if(MAP.pads){
+   if(r()<.5){g.fillStyle='#5d6470';const rx=X+ri(3,12),ry=Y+ri(3,12);g.fillRect(rx,ry,5,4);g.fillStyle='#7b8390';g.fillRect(rx,ry,3,2)}
+  }else if(r()<.25){g.fillStyle=r()<.5?'#ffd86b':'#ff9fb2';g.fillRect(X+ri(3,15),Y+ri(3,15),2,2)}
+  else if(r()<.3){g.fillStyle='#2f7a3f';g.fillRect(X+ri(2,14),Y+ri(2,14),2,3)}
  }
  // flyer routes
  if(showAir){
@@ -1290,20 +1369,24 @@ function drawBG(){
   for(const p of AIR){g.beginPath();g.moveTo(p.pts[0][0],p.pts[0][1]);g.lineTo(p.pts[1][0],p.pts[1][1]);g.stroke()}
   g.restore();
  }
- // entrance arrows and base markers
- const seen={};
- for(const p of LAND){
-  const [x0,y0]=p.wp[0],[x1,y1]=p.wp[1],dx=Math.sign(x1-x0),dy=Math.sign(y1-y0);
-  const cx=(x0+dx+.5)*TS,cy=(y0+dy+.5)*TS;
-  g.fillStyle='rgba(255,255,255,.7)';g.beginPath();
+ // entrance arrows and bases
+ for(const e of MAP.entries){
+  const [tx,ty]=entryTile(e),dx=Math.sign(tx-e[0]),dy=Math.sign(ty-e[1]),cx=(tx+.5)*TS,cy=(ty+.5)*TS;
+  g.fillStyle='rgba(255,255,255,.85)';g.beginPath();
   g.moveTo(cx+dx*5,cy+dy*5);g.lineTo(cx-dx*3-dy*4,cy-dy*3+dx*4);g.lineTo(cx-dx*3+dy*4,cy-dy*3-dx*4);g.fill();
-  const ex=p.wp[p.wp.length-1][0];if(seen[ex])continue;seen[ex]=1;
-  const bx=ex*TS;g.fillStyle='#e63946';g.fillRect(bx+2,VH-8,TS-4,8);g.fillStyle='#fff';g.fillRect(bx+6,VH-6,TS-12,4);
  }
+ for(const ex of MAP.exits){const bx=ex*TS;g.fillStyle='#e63946';g.fillRect(bx+2,VH-8,TS-4,8);g.fillStyle='#fff';g.fillRect(bx+6,VH-6,TS-12,4)}
 }
 
 function drawTower(tw,hl){
  const cx=Math.round((tw.x+.5)*TS),cy=Math.round((tw.y+.5)*TS),b=TW[tw.type];
+ if(b.wall){
+  ctx.fillStyle='#000';ctx.fillRect(cx-10,cy-10,20,20);ctx.fillStyle='#8d8172';ctx.fillRect(cx-9,cy-9,18,18);
+  ctx.fillStyle='#6f6457';ctx.fillRect(cx-9,cy-1,18,2);ctx.fillRect(cx-1,cy-9,2,8);ctx.fillRect(cx-5,cy+1,2,8);ctx.fillRect(cx+4,cy+1,2,8);
+  ctx.fillStyle='#a89b8a';ctx.fillRect(cx-9,cy-9,18,2);
+  if(hl){ctx.strokeStyle='#ffcf3f';ctx.lineWidth=1;ctx.strokeRect(cx-9.5,cy-9.5,19,19)}
+  return;
+ }
  ctx.fillStyle='#000';ctx.fillRect(cx-9,cy-9,18,18);
  ctx.fillStyle='#6b6b80';ctx.fillRect(cx-8,cy-8,16,16);
  ctx.fillStyle=b.col;ctx.fillRect(cx-6,cy-6,12,12);
@@ -1315,7 +1398,7 @@ function drawTower(tw,hl){
  if(hl){ctx.strokeStyle='#ffcf3f';ctx.lineWidth=1;ctx.strokeRect(cx-9.5,cy-9.5,19,19)}
 }
 function drawEnemy(e){
- const [x,y]=posAt(e.p,e.d),E=EN[e.ty],r=E.r,bob=Math.sin(tick*8+e.ph)*1;
+ const [x,y]=epos(e),E=EN[e.ty],r=E.r,bob=Math.sin(tick*8+e.ph)*1;
  const X=Math.round(x),Y=Math.round(y+bob)-(E.fly?5:0);
  ctx.fillStyle='#0006';ctx.fillRect(X-r,Y+r-1+(E.fly?7:0),r*2,2);
  if(E.fly){const f=Math.sin(tick*22+e.ph)>0?2:0;ctx.fillStyle='#000';ctx.fillRect(X-r-5,Y-3-f,5,4);ctx.fillRect(X+r,Y-3-f,5,4);
@@ -1329,12 +1412,35 @@ function drawEnemy(e){
  if(e.ty==='boss'){ctx.fillStyle='#ffcf3f';ctx.fillRect(X-r+1,Y-r-3,r*2-2,2);ctx.fillRect(X-r+1,Y-r-5,2,2);ctx.fillRect(X+r-3,Y-r-5,2,2)}
  if(e.hp<e.max){ctx.fillStyle='#000';ctx.fillRect(X-r,Y-r-4,r*2,3);ctx.fillStyle='#ff4d5e';ctx.fillRect(X-r+1,Y-r-3,Math.max(0,(r*2-2)*e.hp/e.max),1)}
 }
+// Dotted route: where ground enemies will walk right now (yellow when previewing a build).
+function drawRoutes(routes,col,sz){
+ ctx.fillStyle=col;
+ for(const r of routes)for(let i=0;i<r.length;i++){const [x,y]=r[i];ctx.fillRect(Math.round((x+.5)*TS)-sz/2,Math.round((y+.5)*TS)-sz/2,sz,sz)}
+}
+function drawGhost(){
+ if(!ghost)return;ghostInfo();if(!GI)return;
+ const [x,y]=ghost,cx=(x+.5)*TS,cy=(y+.5)*TS,bad=!!GI.issue;
+ if(GI.routes&&!bad)drawRoutes(GI.routes,'rgba(255,214,90,.9)',3);
+ if(GI.rng){ctx.fillStyle=bad?'rgba(255,77,94,.12)':'rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(cx,cy,GI.rng,0,6.3);ctx.fill();
+  ctx.strokeStyle=bad?'rgba(255,77,94,.6)':'rgba(255,255,255,.55)';ctx.lineWidth=1;ctx.stroke()}
+ ctx.globalAlpha=.55;drawTower({x,y,type:build,lv:1},false);ctx.globalAlpha=1;
+ ctx.strokeStyle=bad?'#ff4d5e':'#ffcf3f';ctx.lineWidth=1;ctx.strokeRect(x*TS+.5,y*TS+.5,TS-1,TS-1);
+ // label on the canvas so the layout never jumps
+ const lines=bad?[t(GI.issue==='toast_block'?'pv_block':GI.issue)]
+  :[t('pv_path',GI.from,GI.to)+(GI.to>GI.from?' +'+(GI.to-GI.from):''),...(GI.rng?[t('pv_hits',GI.hits)]:[]),t('pv_tap')];
+ ctx.font='6px "Press Start 2P",monospace';ctx.textBaseline='top';
+ const w=Math.max(...lines.map(l=>ctx.measureText(l).width))+6,bh=lines.length*9+4,bx=Math.min(VW-w-2,Math.max(2,cx-w/2)),by=y>ROWS/2?2:VH-bh-10;
+ ctx.fillStyle='rgba(0,0,0,.78)';ctx.fillRect(bx,by,w,bh);
+ lines.forEach((l,i)=>{ctx.fillStyle=bad?'#ff9aa5':i===0?'#ffd65a':'#fff';ctx.fillText(l,bx+3,by+3+i*9)});
+}
 function render(){
  ctx.drawImage(BG,0,0);
- if(sel){const tw=sel,st=stat(tw),cx=(tw.x+.5)*TS,cy=(tw.y+.5)*TS;
+ if(!ghost||!GI||!GI.routes||GI.issue)drawRoutes(ROUTES,'rgba(255,236,170,.45)',2);
+ if(sel&&!TW[sel.type].wall){const tw=sel,st=stat(tw),cx=(tw.x+.5)*TS,cy=(tw.y+.5)*TS;
   ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(cx,cy,st.range,0,6.3);ctx.fill();
   ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=1;ctx.stroke()}
  towers.forEach(tw=>drawTower(tw,tw===sel));
+ drawGhost();
  enemies.filter(e=>!EN[e.ty].fly).forEach(drawEnemy);
  enemies.filter(e=>EN[e.ty].fly).forEach(drawEnemy);
  for(const p of projs){
@@ -1358,39 +1464,40 @@ function renderHud(){
 }
 function renderBar(){
  const bar=$('#bar');
- if(!inGame()){bar.innerHTML='';return}
+ if(!inGame()){bar.innerHTML='';layout();return}
  let top;
  if(sel){
-  const tw=sel,max=tw.lv>=3,uc=upCost(tw),val=Math.floor(tw.inv*.6);
-  top=`<div class="row"><div class="info">${t('tw_'+tw.type)} - ${t('lvl',tw.lv)}${TW[tw.type].air?'':' · '+t('gnd')}</div></div>
-   <div class="row"><button class="btn gold" id="bup" ${max||S.gold<uc?'disabled':''}>${max?t('maxlv'):t('up',uc)}</button>
+  const tw=sel,wall=TW[tw.type].wall,max=wall||tw.lv>=3,uc=upCost(tw),val=sellValue(tw);
+  top=`<div class="row"><div class="info">${wall?t('tw_wall')+' - '+t('wall_d'):t('tw_'+tw.type)+' - '+t('lvl',tw.lv)+(TW[tw.type].air?'':' · '+t('gnd'))}</div></div>
+   <div class="row">${wall?'':`<button class="btn gold" id="bup" ${max||S.gold<uc?'disabled':''}>${max?t('maxlv'):t('up',uc)}</button>`}
    <button class="btn red" id="bsell">${t('sell',val)}</button><button class="btn" id="bx">X</button></div>`;
  }else{
-  top=`<div class="row">${['arrow','cannon','frost'].map(ty=>`<button class="tb ${build===ty?'sel':''} ${S.gold<tcost(ty)?'no':''}" data-t="${ty}">
+  top=`<div class="row">${BUILDS.map(ty=>`<button class="tb ${build===ty?'sel':''} ${S.gold<tcost(ty)?'no':''}" data-t="${ty}">
    <i style="background:${TW[ty].col}"></i>${t('tw_'+ty)}<br><span style="color:var(--gold)">$${tcost(ty)}</span></button>`).join('')}</div>`;
  }
  const early=canEarly(),canGo=state==='build'||early;
  bar.innerHTML=top+`<div class="row"><button class="btn green" id="bgo" ${canGo?'':'disabled'} style="flex:2">${early?t('early',earlyBonus()):t('go')}</button>
   <button class="btn" id="bsp">${t('x2',speed)}</button><button class="btn" id="bups">${S.mode==='endless'?t('relics')+' '+S.relics.length:t('ups')}</button></div>`;
- bar.querySelectorAll('.tb').forEach(b=>b.onclick=()=>{build=b.dataset.t;beep(500,.04);renderBar()});
+ bar.querySelectorAll('.tb').forEach(b=>b.onclick=()=>{build=b.dataset.t;beep(500,.04);ghostInfo();renderBar()});
  const g=id=>bar.querySelector(id);
  if(g('#bup'))g('#bup').onclick=()=>{
   const tw=sel,c=upCost(tw);if(S.gold<c||tw.lv>=3)return;
   S.gold-=c;tw.inv+=c;tw.lv++;beep(700,.12,'triangle',.04,300);renderHud();renderBar();
  };
  if(g('#bsell'))g('#bsell').onclick=()=>{
-  S.gold+=Math.floor(sel.inv*.6);towers=towers.filter(x=>x!==sel);sel=null;beep(250,.1);renderHud();renderBar();
+  S.gold+=sellValue(sel);removeTower(sel);sel=null;beep(250,.1);renderHud();renderBar();
  };
  if(g('#bx'))g('#bx').onclick=()=>{sel=null;renderBar()};
  g('#bgo').onclick=startWave;
  g('#bsp').onclick=()=>{speed=speed===1?2:1;renderBar()};
  g('#bups').onclick=S.mode==='endless'?showRelics:showUps;
+ layout();
 }
 function show(html){$('#ov').innerHTML=`<div class="modal">${html}</div>`;$('#ov').style.display='flex'}
 function hide(){$('#ov').style.display='none';cur=null}
 let cur=null;
 function showMenu(){
- cur=showMenu;state='menu';enemies=[];projs=[];queue=[];sel=null;renderBar();
+ cur=showMenu;state='menu';enemies=[];projs=[];queue=[];sel=null;ghost=null;GI=null;renderBar();
  show(`<h2>${t('title')}</h2><p>${t('sub')}</p><div class="lv">${LEVELS.map((L,i)=>{const ok=unlocked(i);
   return`<button class="lvb" ${ok?'':'disabled'} onclick="playLevel(${i})"><b>${ok?i+1:'🔒'}</b>${lname(L)}${starStr(STARS[i]||0)}</button>`}).join('')}</div>
   ${endlessOpen()?`<button class="btn gold" onclick="playEndless()">${t('endless')}</button><p style="color:var(--gold)">${t('best_stage',best)}</p>`:`<p style="color:var(--grey)">${t('endless_lock')}</p>`}
@@ -1494,22 +1601,40 @@ function showRelics(){
 }
 
 /* ---------- input ---------- */
+const canEdit=()=>state==='build'||state==='wave'||state==='clearing';
+function tileAt(e){
+ const r=cv.getBoundingClientRect(),w=cv.clientWidth,hh=cv.clientHeight;
+ const px=(e.clientX-r.left-cv.clientLeft)*VW/w,py=(e.clientY-r.top-cv.clientTop)*VH/hh;
+ const tx=Math.floor(px/TS),ty=Math.floor(py/TS);
+ return inG(tx,ty)?[tx,ty]:null;
+}
+function tryBuild(tx,ty){
+ const issue=buildIssue(tx,ty);
+ if(issue){toast(t(issue));beep(120,.1,'sawtooth');return false}
+ const c=tcost(build);
+ if(S.gold<c){toast(t('toast_gold'));beep(120,.1,'sawtooth');return false}
+ S.gold-=c;placeTower(tx,ty,build,c);
+ beep(380,.08,'triangle',.05,200);vib(10);renderHud();renderBar();return true;
+}
 cv.addEventListener('pointerdown',e=>{
  e.preventDefault();
- if(state!=='build'&&state!=='wave'&&state!=='clearing')return;
- const r=cv.getBoundingClientRect(),w=cv.clientWidth,h=cv.clientHeight;
- const px=(e.clientX-r.left-cv.clientLeft)*VW/w,py=(e.clientY-r.top-cv.clientTop)*VH/h;
- const tx=Math.floor(px/TS),ty=Math.floor(py/TS);
- if(tx<0||ty<0||tx>=COLS||ty>=ROWS)return;
- const ex=towers.find(q=>q.x===tx&&q.y===ty);
- if(ex){sel=ex===sel?null:ex;beep(600,.04);renderBar();return}
+ if(!canEdit())return;
+ const p=tileAt(e);if(!p)return;const [tx,ty]=p;
+ const ex=occ[ty][tx];
+ if(ex){ghost=null;GI=null;sel=ex===sel?null:ex;beep(600,.04);renderBar();return}
  if(sel){sel=null;renderBar();return}
- if(!buildable[ty][tx]){toast(t(blocked[ty][tx]?'toast_spot':'toast_pad'));return}
- const c=tcost(build);
- if(S.gold<c){toast(t('toast_gold'));beep(120,.1,'sawtooth');return}
- S.gold-=c;towers.push({x:tx,y:ty,type:build,lv:1,cd:0,ang:0,inv:c});
- beep(380,.08,'triangle',.05,200);vib(10);renderHud();renderBar();
+ // a mouse already previewed this tile on hover, so one click builds; touch needs a second tap
+ const same=ghost&&ghost[0]===tx&&ghost[1]===ty&&(e.pointerType==='mouse'||ghost.tapped);
+ if(same){if(tryBuild(tx,ty)){ghost=null;GI=null}return}
+ ghost=[tx,ty];ghost.tapped=true;ghostInfo();beep(520,.03);
 });
+cv.addEventListener('pointermove',e=>{
+ if(e.pointerType!=='mouse'||!canEdit()||sel)return;
+ const p=tileAt(e);
+ if(!p||occ[p[1]][p[0]]){if(ghost&&!ghost.tapped){ghost=null;GI=null}return}
+ if(!ghost||ghost[0]!==p[0]||ghost[1]!==p[1]){ghost=p;ghostInfo()}
+});
+cv.addEventListener('pointerleave',()=>{if(ghost&&!ghost.tapped){ghost=null;GI=null}});
 
 /* ---------- language / sound / layout ---------- */
 function applyLang(){
