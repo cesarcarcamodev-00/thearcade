@@ -289,6 +289,11 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .odds-head{color:var(--g-muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
 .odds-sum{display:flex;justify-content:space-between;font-size:.85rem;padding:4px 6px;margin-top:2px;border-top:1px solid rgba(255,255,255,.1)}
 .odds-note{font-size:.72rem;margin-top:8px;font-weight:500}
+.odds-strip{display:none;flex-wrap:wrap;justify-content:center;gap:5px;max-width:100%}
+.odds-strip span{display:inline-flex;align-items:center;gap:3px;background:rgba(0,0,0,.28);border-radius:99px;padding:2px 9px 2px 4px;font-size:.78rem;font-weight:700}
+.odds-strip svg{width:20px;height:20px}
+.odds-strip .win{background:rgba(255,182,39,.2);color:var(--g-accent)}
+@media(max-width:820px){.odds-strip{display:flex}}
 
 /* 8. Dice Pit -------------------------------------------------------- */
 .g-dice{
@@ -4802,6 +4807,13 @@ class ScratchLotto extends RunGame {
       });
     });
   }
+  /** One compact row of per-spot chances, shown right under the ticket on small screens (the full panel is further down). */
+  oddsStrip(run){
+    const S = ScratchLotto, tier = S.TIERS.find(x => x.id === this.oddsTier) || S.TIERS[0];
+    const o = S.odds(tier, run.upgrades, this.perkLevel('luck'), 1 + 0.25 * this.level('pay'));
+    const pct = x => (x * 100 < 10 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
+    return `<div class="odds-strip" title="${this.tr('odds')}">${o.spot.map(sp => `<span>${Art.symbol(sp.id)}${pct(sp.p)}</span>`).join('')}<span class="win">${this.tr('oddsWin')} ${pct(o.win)}</span></div>`;
+  }
   oddsHtml(run){
     const S = ScratchLotto, tiers = S.TIERS.filter(x => this.tierUnlocked(x));
     if (!tiers.some(x => x.id === this.oddsTier)) this.oddsTier = tiers[0].id;
@@ -4880,6 +4892,7 @@ class ScratchLotto extends RunGame {
   viewPlay(run){
     const tk = run.ticket, S = ScratchLotto;
     const settled = !tk || tk.paid !== null, over = this.roundOver(run);
+    if (tk) this.oddsTier = tk.tier;          // odds follow the ticket in your hands
 
     let msg = `<div class="sc-msg">${this.tr('pick')}</div>`;
     if (tk && !settled) msg = tk.freeSwipe && !tk.rev.some(Boolean)
@@ -4907,7 +4920,7 @@ class ScratchLotto extends RunGame {
       .map(s => `<div>${Art.symbol(s.id)}<span>${s.id === 'joker' ? this.tr('any') : '×3'}</span><b>${s.value}</b></div>`).join('');
 
     return `<div class="sc-play">
-      <div class="sc-stage">${pop}${this.viewTicket(run)}${msg}${action}</div>
+      <div class="sc-stage">${pop}${this.viewTicket(run)}${msg}${action}${this.oddsStrip(run)}</div>
       <div class="booth">
         <div class="g-panel"><h3>${this.tr('booth')}</h3><div class="stubs">${stubs}</div>
           <div class="left-box"><h3>${this.tr('left')}</h3><div class="tickets-left">${left}</div></div></div>
