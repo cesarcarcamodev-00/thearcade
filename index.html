@@ -3242,7 +3242,6 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x14171f);
-scene.fog = new THREE.Fog(0x14171f, 30, 60);
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 120);
 
 scene.add(new THREE.HemisphereLight(0xcfe0ff, 0x2a2438, 0.75));
@@ -3443,11 +3442,16 @@ function placeCamera() {
   const w = innerWidth, h = innerHeight, aspect = w / h;
   renderer.setSize(w, h, false); camera.aspect = aspect;
   const vf = camera.fov * Math.PI / 180, hf = 2 * Math.atan(Math.tan(vf / 2) * aspect);
-  const need = Math.max(7.2 / Math.tan(vf / 2) * 1.2, 12.2 / Math.tan(hf / 2));
+  // Portrait screens (phones): turn the camera 90 degrees so the long side of the table runs up the screen.
+  const portrait = aspect < 1;
+  const need = portrait
+    ? Math.max(12 / Math.tan(vf / 2) * 0.95, 6.8 / Math.tan(hf / 2))
+    : Math.max(7.2 / Math.tan(vf / 2) * 1.2, 12.2 / Math.tan(hf / 2));
   const dist = Math.max(need, 17);
   const k = camT, ang = (1 - k) * 0.95 + k * 1.5;        // elevation angle from the table plane
-  camera.position.set(0, Math.sin(ang) * dist, Math.cos(ang) * dist * (1 - k * 0.0) + (k > 0.98 ? 0.01 : 0));
-  camera.lookAt(0, 0, k > 0.5 ? 0 : 0.4);
+  const flat = Math.cos(ang) * dist + (k > 0.98 ? 0.01 : 0), look = k > 0.5 ? 0 : 0.4;
+  if (portrait) { camera.position.set(-flat, Math.sin(ang) * dist, 0); camera.lookAt(look, 0, 0); }
+  else { camera.position.set(0, Math.sin(ang) * dist, flat); camera.lookAt(0, 0, look); }
   camera.updateProjectionMatrix();
 }
 addEventListener('resize', placeCamera);
