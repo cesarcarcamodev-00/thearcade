@@ -278,6 +278,17 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .paytable svg{width:30px;height:30px}
 .paytable span{color:var(--g-muted);font-size:.8rem}
 .paytable b{margin-left:auto;color:var(--g-accent)}
+.odds{margin-top:14px}
+.odds-tabs{display:flex;gap:6px;margin:6px 0 8px}
+.odds-tab{border:0;border-radius:8px;padding:4px 12px;background:rgba(0,0,0,.25);color:var(--g-muted);font-weight:600;font-size:.8rem;cursor:pointer}
+.odds-tab.on{background:var(--g-accent);color:#fff}
+.odds-table[hidden]{display:none}
+.odds-row{display:grid;grid-template-columns:34px 1fr 1fr;align-items:center;gap:6px;font-size:.85rem;padding:2px 6px}
+.odds-row svg{width:24px;height:24px}
+.odds-row b,.odds-head span{text-align:right}
+.odds-head{color:var(--g-muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em}
+.odds-sum{display:flex;justify-content:space-between;font-size:.85rem;padding:4px 6px;margin-top:2px;border-top:1px solid rgba(255,255,255,.1)}
+.odds-note{font-size:.72rem;margin-top:8px;font-weight:500}
 
 /* 8. Dice Pit -------------------------------------------------------- */
 .g-dice{
@@ -4039,6 +4050,8 @@ class I18n {
       'sc.noMatch': 'No match', 'sc.refunded': ' · refunded {n}', 'sc.revealAll': 'Reveal all', 'sc.cashIn': 'Cash in round ▶',
       'sc.unlock': '🔒 Unlock in perk shop', 'sc.pays': 'WINS PAY ×{mult}', 'sc.noTickets': 'No tickets left this round',
       'sc.booth': 'Ticket booth', 'sc.left': 'Tickets left', 'sc.board': 'Prize board', 'sc.any': 'any', 'sc.wild': 'Wild',
+      'sc.odds': 'Your odds', 'sc.oddsSpot': 'Per spot', 'sc.oddsMatch': '3+ on ticket', 'sc.oddsWin': 'Ticket wins', 'sc.oddsAvg': 'Avg payout / cost',
+      'sc.oddsNote': 'Chances include your upgrades, luck perk and the ticket tier. Jokers count as wilds.',
       'sc.boardHint': 'Each match beyond 3 pays again. Multiplied by the ticket tier.', 'sc.spot': 'Scratch spot {n}',
       'sc.perk.coins.name': 'Deep pockets', 'sc.perk.coins.desc': 'Start each run with +10 coins',
       'sc.perk.tickets.name': 'Bulk buyer', 'sc.perk.tickets.desc': '+1 ticket every round',
@@ -4152,6 +4165,8 @@ class I18n {
       'sc.noMatch': 'Sin premio', 'sc.refunded': ' · reembolso de {n}', 'sc.revealAll': 'Destapar todo', 'sc.cashIn': 'Cobrar ronda ▶',
       'sc.unlock': '🔒 Desbloquéalo en la tienda', 'sc.pays': 'PREMIOS ×{mult}', 'sc.noTickets': 'No quedan boletos esta ronda',
       'sc.booth': 'Taquilla', 'sc.left': 'Boletos restantes', 'sc.board': 'Tabla de premios', 'sc.any': 'cualquiera', 'sc.wild': 'Comodín',
+      'sc.odds': 'Tus probabilidades', 'sc.oddsSpot': 'Por casilla', 'sc.oddsMatch': '3+ en el boleto', 'sc.oddsWin': 'Boleto ganador', 'sc.oddsAvg': 'Premio medio / costo',
+      'sc.oddsNote': 'Las probabilidades incluyen tus mejoras, el perk de suerte y el tipo de boleto. Los comodines cuentan como wild.',
       'sc.boardHint': 'Cada coincidencia extra después de 3 vuelve a pagar. Se multiplica según el tipo de boleto.', 'sc.spot': 'Casilla {n} para rascar',
       'sc.perk.coins.name': 'Bolsillos hondos', 'sc.perk.coins.desc': 'Empieza cada partida con +10 monedas',
       'sc.perk.tickets.name': 'Compra al por mayor', 'sc.perk.tickets.desc': '+1 boleto cada ronda',
@@ -4667,6 +4682,36 @@ class ScratchLotto extends RunGame {
     return { payout: Math.round(best.total * tier.mult * payMult), wins: best.wins };
   }
 
+  /**
+   * Exact odds for one ticket tier: chance a single spot shows each symbol, chance each symbol ends up in a winning
+   * set (3+ on the ticket, jokers counted), chance the ticket wins at all, and the average payout.
+   * Enumerates every way 6 spots can split across the symbols (a few hundred cases) so there is no randomness.
+   */
+  static odds(tier, upgrades, luckPerk, payMult){
+    const key = [tier.id, JSON.stringify(upgrades), luckPerk, payMult].join('|');
+    ScratchLotto._odds = ScratchLotto._odds || new Map();
+    if (ScratchLotto._odds.has(key)) return ScratchLotto._odds.get(key);
+    const entries = ScratchLotto.weights(tier, upgrades, luckPerk), n = ScratchLotto.CELLS;
+    const total = entries.reduce((a, e) => a + e.w, 0), p = entries.map(e => e.w / total);
+    const fact = [1]; for (let i = 1; i <= n; i++) fact[i] = fact[i - 1] * i;
+    const out = { spot: entries.map((e, i) => ({ id: e.id, p: p[i] })), hit: {}, win: 0, ev: 0 }, counts = Array(entries.length).fill(0);
+    const visit = () => {
+      let prob = fact[n]; const cells = [];
+      counts.forEach((c, i) => { prob *= p[i] ** c / fact[c]; for (let k = 0; k < c; k++) cells.push(entries[i].id) });
+      const r = ScratchLotto.evaluate(cells, tier, payMult);
+      if (!r.wins.length) return;
+      out.win += prob; out.ev += prob * r.payout;
+      r.wins.forEach(id => { out.hit[id] = (out.hit[id] || 0) + prob });
+    };
+    const rec = (i, left) => {
+      if (i === entries.length - 1){ counts[i] = left; return visit() }
+      for (let c = 0; c <= left; c++){ counts[i] = c; rec(i + 1, left - c) }
+    };
+    rec(0, n);
+    ScratchLotto._odds.set(key, out);
+    return out;
+  }
+
   /* ---- run rules ---- */
   newRun(){ return { coins: 20 + 10 * this.perkLevel('coins'), tickets: 0, ticket: null, biggest: 0, swipes: 0 } }
   startRound(run){
@@ -4748,6 +4793,30 @@ class ScratchLotto extends RunGame {
   afterRender(){
     const tool = this.tool();
     this.root.querySelectorAll('canvas.foil').forEach(c => this.initFoil(c, tool));
+    // Odds tier tabs only toggle visibility, so a half-scratched ticket is never re-rendered.
+    this.root.querySelectorAll('.odds-tab').forEach(b => b.onclick = () => {
+      this.oddsTier = b.dataset.odds;
+      this.root.querySelectorAll('[data-odds]').forEach(el => {
+        const on = el.dataset.odds === this.oddsTier;
+        if (el.classList.contains('odds-tab')) el.classList.toggle('on', on); else el.hidden = !on;
+      });
+    });
+  }
+  oddsHtml(run){
+    const S = ScratchLotto, tiers = S.TIERS.filter(x => this.tierUnlocked(x));
+    if (!tiers.some(x => x.id === this.oddsTier)) this.oddsTier = tiers[0].id;
+    const payMult = 1 + 0.25 * this.level('pay'), luck = this.perkLevel('luck');
+    const pct = x => x > 0 && x < 0.001 ? '<0.1%' : (x * 100 < 10 ? (x * 100).toFixed(1) : Math.round(x * 100)) + '%';
+    const tabs = tiers.length > 1 ? `<div class="odds-tabs">${tiers.map(x => `<button type="button" class="odds-tab ${x.id === this.oddsTier ? 'on' : ''}" data-odds="${x.id}">${this.tierName(x.id)}</button>`).join('')}</div>` : '';
+    const tables = tiers.map(x => {
+      const o = S.odds(x, run.upgrades, luck, payMult);
+      const rows = o.spot.map(sp => `<div class="odds-row"><span>${Art.symbol(sp.id)}</span><b>${pct(sp.p)}</b><b>${sp.id === 'joker' ? '·' : pct(o.hit[sp.id] || 0)}</b></div>`).join('');
+      return `<div class="odds-table" data-odds="${x.id}" ${x.id === this.oddsTier ? '' : 'hidden'}>
+        <div class="odds-row odds-head"><span></span><span>${this.tr('oddsSpot')}</span><span>${this.tr('oddsMatch')}</span></div>${rows}
+        <div class="odds-sum"><span>${this.tr('oddsWin')}</span><b>${pct(o.win)}</b></div>
+        <div class="odds-sum"><span>${this.tr('oddsAvg')}</span><b>${o.ev.toFixed(1)} / ${x.cost}</b></div></div>`;
+    }).join('');
+    return `<div class="odds"><h3>${this.tr('odds')}</h3>${tabs}${tables}<p class="g-muted odds-note">${this.tr('oddsNote')}</p></div>`;
   }
   /** Mouse cursor showing the current tool (the emoji drawn into a tiny SVG). */
   static cursor(tool){
@@ -4842,7 +4911,7 @@ class ScratchLotto extends RunGame {
       <div class="booth">
         <div class="g-panel"><h3>${this.tr('booth')}</h3><div class="stubs">${stubs}</div>
           <div class="left-box"><h3>${this.tr('left')}</h3><div class="tickets-left">${left}</div></div></div>
-        <div class="g-panel"><h3>${this.tr('board')}</h3><div class="paytable">${pays}</div>
+        <div class="g-panel"><h3>${this.tr('board')}</h3><div class="paytable">${pays}</div>${this.oddsHtml(run)}
           <p class="g-muted board-hint">${this.tr('boardHint')}</p></div>
       </div></div>`;
   }
