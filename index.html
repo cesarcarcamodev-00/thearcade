@@ -4269,7 +4269,9 @@ const num = (...v) => v.every(Number.isFinite);
 const netSend = m => { try { if (conn && conn.open) conn.send(m); } catch (e) {} };
 const netThrottle = m => { const n = performance.now(); if (n - lastNet > 60) { lastNet = n; netSend(m); } };
 const netStatus = (k, v) => { $('#mNet').textContent = k ? tr(k, v) : ''; };
+let roomT = 0, joinT = 0;
 function netClose() {
+  clearTimeout(roomT); clearTimeout(joinT);
   try { if (conn) { conn.removeAllListeners(); conn.close(); } } catch (e) {}
   try { if (peer) { peer.removeAllListeners(); peer.destroy(); } } catch (e) {}
   peer = conn = null; hostCode = ''; $('#mShare').style.display = 'none';
@@ -4278,22 +4280,47 @@ function netHost() {
   netClose(); netStatus('');
   if (typeof Peer === 'undefined') return netStatus('netNoLib');
   isHost = true; netGone = false;
-  const attempt = n => {
-    const code = Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
-    const pr = peer = new Peer(NET_PREFIX + code);
-    pr.on('open', () => { hostCode = code; netStatus('netWait', code); $('#mShare').style.display = ''; });
-    pr.on('error', e => { if (e.type === 'unavailable-id' && n < 6) attempt(n + 1); else netStatus('netErr'); });
-    pr.on('connection', c => { if (conn) { c.close(); return; } setupConn(c); });
-  };
-  attempt(0);
+  hostPeer(null, 0);
 }
-function netJoin(code) {
+/* Phones cut the link to the PeerJS broker as soon as the page goes to the background (switching to a chat app to send
+ * the invite, for example), and while it is cut nobody can find the room. So once a room exists its code is kept:
+ * the host reconnects with the same id whenever the link drops and whenever the page comes back to the front. */
+function hostPeer(keep, n) {
+  const code = keep || Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
+  const pr = peer = new Peer(NET_PREFIX + code);
+  pr.on('open', () => { if (pr !== peer) return; hostCode = code; if (!conn) { netStatus('netWait', code); $('#mShare').style.display = ''; } });
+  pr.on('error', e => {
+    if (pr !== peer) return;
+    if (hostCode) { roomRetry(); return; }                           // room already shared: keep trying the same code
+    if (e.type === 'unavailable-id' && n < 6) hostPeer(null, n + 1); else netStatus('netErr');
+  });
+  pr.on('disconnected', () => { if (pr === peer) roomRetry(); });
+  pr.on('connection', c => { if (conn) { c.close(); return; } setupConn(c); });
+}
+function roomRetry(now) {
+  clearTimeout(roomT);
+  if (!isHost || !hostCode || !peer) return;
+  roomT = setTimeout(() => {
+    if (!peer || !hostCode) return;
+    if (peer.destroyed) hostPeer(hostCode, 0);                     // the broker dropped us for good: register the same code again
+    else if (peer.disconnected) { try { peer.reconnect(); } catch (e) { roomRetry(); } }
+  }, now ? 0 : document.hidden ? 4000 : 1500);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && peer && (peer.disconnected || peer.destroyed)) roomRetry(true); });
+/** Guests retry for a little while before giving up, in case the host is still switching back from another app. */
+function netJoin(code, tries = 0) {
   netClose(); netStatus('');
   if (typeof Peer === 'undefined') return netStatus('netNoLib');
   isHost = false; netGone = false; netStatus('netConnecting');
   const pr = peer = new Peer();
   pr.on('open', () => setupConn(pr.connect(NET_PREFIX + code, { reliable: true })));
-  pr.on('error', e => netStatus(e.type === 'peer-unavailable' ? 'netNotFound' : 'netErr'));
+  pr.on('error', e => {
+    if (pr !== peer) return;
+    if ((e.type === 'peer-unavailable' || e.type === 'network' || e.type === 'server-error') && tries < 6) {
+      netStatus('netConnecting'); joinT = setTimeout(() => { if (peer === pr) netJoin(code, tries + 1); }, 2500); return;
+    }
+    netStatus(e.type === 'peer-unavailable' ? 'netNotFound' : 'netErr');
+  });
 }
 function setupConn(c) {
   conn = c;
@@ -5676,7 +5703,9 @@ const netSend = m => { try { if (conn && conn.open) conn.send(m); } catch (e) {}
 const sendTo = (c, m) => { try { if (c && c.open) c.send(m); } catch (e) {} };
 const broadcast = (m, except) => guests.forEach((c, id) => { if (id !== except) sendTo(c, m); });
 const netStatus = (k, v) => { $('#mNet').textContent = k ? tr(k, v) : ''; };
+let roomT = 0, joinT = 0;
 function netClose() {
+  clearTimeout(roomT); clearTimeout(joinT);
   guests.forEach(c => { try { c.removeAllListeners(); c.close(); } catch (e) {} }); guests.clear();
   try { if (conn) { conn.removeAllListeners(); conn.close(); } } catch (e) {}
   try { if (peer) { peer.removeAllListeners(); peer.destroy(); } } catch (e) {}
@@ -5693,19 +5722,39 @@ function netHost(name) {
   netClose(); netStatus('');
   if (typeof Peer === 'undefined') return netStatus('noLib');
   isHost = true; myId = 0;
-  const attempt = n => {
-    const code = Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
-    const pr = peer = new Peer(NET_PREFIX + code);
-    pr.on('open', () => {
-      hostCode = code; mode = 'online'; players = [{ id: 0, name }]; scores = {};
-      syncGhosts(); showLobby();
-    });
-    pr.on('error', e => { if (e.type === 'unavailable-id' && n < 6) attempt(n + 1); else netStatus('netErr'); });
-    pr.on('connection', hostAccept);
-  };
   netStatus('connecting');
-  attempt(0);
+  hostPeer(null, 0, name);
 }
+/* Phones cut the link to the PeerJS broker as soon as the page goes to the background (switching to a chat app to send
+ * the invite, for example), and while it is cut nobody can find the room. So once a room exists its code is kept:
+ * the host reconnects with the same id whenever the link drops and whenever the page comes back to the front.
+ * Guests already in the room talk to the host directly and are not affected. */
+function hostPeer(keep, n, name) {
+  const code = keep || Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
+  const pr = peer = new Peer(NET_PREFIX + code);
+  pr.on('open', () => {
+    if (pr !== peer || hostCode) return;                              // a reconnect: the room is already set up
+    hostCode = code; mode = 'online'; players = [{ id: 0, name }]; scores = {};
+    syncGhosts(); showLobby();
+  });
+  pr.on('error', e => {
+    if (pr !== peer) return;
+    if (hostCode) { roomRetry(); return; }                           // room already shared: keep trying the same code
+    if (e.type === 'unavailable-id' && n < 6) hostPeer(null, n + 1, name); else netStatus('netErr');
+  });
+  pr.on('disconnected', () => { if (pr === peer) roomRetry(); });
+  pr.on('connection', hostAccept);
+}
+function roomRetry(now) {
+  clearTimeout(roomT);
+  if (!isHost || !hostCode || !peer) return;
+  roomT = setTimeout(() => {
+    if (!peer || !hostCode) return;
+    if (peer.destroyed) hostPeer(hostCode, 0);                     // the broker dropped us for good: register the same code again
+    else if (peer.disconnected) { try { peer.reconnect(); } catch (e) { roomRetry(); } }
+  }, now ? 0 : document.hidden ? 4000 : 1500);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && peer && (peer.disconnected || peer.destroyed)) roomRetry(true); });
 function hostAccept(c) {
   let id = -1;
   c.on('data', m => {
@@ -5828,7 +5877,8 @@ function hostToLobby() {
   hostLobbyUpdate(); showLobby();
 }
 /* guest side */
-function netJoin(code, name) {
+/** Guests retry for a little while before giving up, in case the host is still switching back from another app. */
+function netJoin(code, name, tries = 0) {
   netClose(); netStatus('');
   if (typeof Peer === 'undefined') return netStatus('noLib');
   isHost = false; netStatus('connecting'); roomCode = code;
@@ -5839,7 +5889,13 @@ function netJoin(code, name) {
     c.on('data', onNet);
     c.on('close', onHostGone); c.on('error', onHostGone);
   });
-  pr.on('error', e => netStatus(e.type === 'peer-unavailable' ? 'notFound' : 'netErr'));
+  pr.on('error', e => {
+    if (pr !== peer) return;
+    if ((e.type === 'peer-unavailable' || e.type === 'network' || e.type === 'server-error') && tries < 6) {
+      netStatus('connecting'); joinT = setTimeout(() => { if (peer === pr) netJoin(code, name, tries + 1); }, 2500); return;
+    }
+    netStatus(e.type === 'peer-unavailable' ? 'notFound' : 'netErr');
+  });
 }
 function validScores(s) {
   if (!s || typeof s !== 'object') return null;
