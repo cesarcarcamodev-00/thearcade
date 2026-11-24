@@ -6211,12 +6211,13 @@ body.touch #pad{display:block}
 #stick i{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:#fffc;box-shadow:0 2px 8px #0008}
 #acts{position:fixed;right:calc(14px + var(--sr));bottom:calc(16px + var(--sb));display:none;z-index:3;width:210px;height:190px}
 body.touch #acts{display:block}
-.ab{position:absolute;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;letter-spacing:.04em;color:#fff;border:3px solid #fff8;box-shadow:0 3px 10px #0008;touch-action:none;user-select:none}
-.ab.on{filter:brightness(1.35);transform:scale(.94)}
-#bShoot{right:0;bottom:0;width:92px;height:92px;background:#d6283acc}
-#bPass{right:100px;bottom:8px;width:64px;height:64px;background:#2a62d8cc;font-size:11px}
-#bTackle{right:14px;bottom:102px;width:66px;height:66px;background:#7b4fc0cc;font-size:11px}
-#bSprint{right:100px;bottom:90px;width:62px;height:62px;background:#e8a317cc;font-size:11px}
+.ab{position:absolute;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;letter-spacing:.04em;color:#fff;border:3px solid #ffffff70;box-shadow:0 2px 6px #0005;touch-action:none;user-select:none;text-shadow:0 1px 3px #000a;opacity:.72}
+.ab.on{filter:brightness(1.35);transform:scale(.94);opacity:1}
+@media (max-width:620px){#acts{transform:scale(.86);transform-origin:100% 100%}}
+#bShoot{right:0;bottom:0;width:92px;height:92px;background:#d6283a99}
+#bPass{right:100px;bottom:8px;width:64px;height:64px;background:#2a62d899;font-size:11px}
+#bTackle{right:14px;bottom:102px;width:66px;height:66px;background:#7b4fc099;font-size:11px}
+#bSprint{right:100px;bottom:90px;width:62px;height:62px;background:#e8a31799;font-size:11px}
 #hint{position:fixed;left:50%;bottom:calc(8px + var(--sb));transform:translateX(-50%);font-size:12px;color:#e6ebf7;background:#000a;border-radius:99px;padding:5px 12px;z-index:2;pointer-events:none;white-space:nowrap;max-width:96vw;overflow:hidden;text-overflow:ellipsis}
 body.touch #hint{display:none}
 #ban{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);font-size:min(15vw,90px);font-weight:900;font-style:italic;text-shadow:0 5px 0 #0007;opacity:0;pointer-events:none;z-index:2;white-space:nowrap;transition:opacity .2s,transform .35s cubic-bezier(.2,1.6,.4,1)}
@@ -7104,14 +7105,17 @@ function frame(now) {
       }
     }
   }
-  // camera: follow the ball, look a little ahead of it, stay over the pitch
+  // camera: follow the ball, look a little ahead of it, stay over the pitch. On touch screens the ball is kept in the
+  // open space above the buttons (not the true centre), and the view may run past the near end so nothing hides under them.
   const b = S.ball;
   if (b) {
-    const lead = 0.35, tx = b.x + b.vx * lead, ty = b.y + b.vy * lead, k = Math.min(1, dt * 4);
+    const reserve = touchMode ? (portrait ? 235 : 130) : 0, off = Math.max(0, (reserve - 56) / 2 / SC), past = reserve / SC;
+    const lead = 0.35, k = Math.min(1, dt * 4);
+    const tx = b.x + b.vx * lead - (portrait ? off : 0), ty = b.y + b.vy * lead + (portrait ? 0 : off);
     cam.x += (tx - cam.x) * k; cam.y += (ty - cam.y) * k;
     const halfA = (portrait ? VH : VW) / 2 / SC, halfC = (portrait ? VW : VH) / 2 / SC;
-    cam.x = halfA * 2 > L + 3 ? 0 : clamp(cam.x, -HL - 1.5 + halfA, HL + 1.5 - halfA);
-    cam.y = halfC * 2 > W + 3 ? 0 : clamp(cam.y, -HW - 1.5 + halfC, HW + 1.5 - halfC);
+    cam.x = halfA * 2 > L + 3 ? 0 : clamp(cam.x, -HL - 1.5 + halfA - (portrait ? past : 0), HL + 1.5 - halfA);
+    cam.y = halfC * 2 > W + 3 ? 0 : clamp(cam.y, -HW - 1.5 + halfC, HW + 1.5 - halfC + (portrait ? 0 : past));
   }
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   drawPitch();
