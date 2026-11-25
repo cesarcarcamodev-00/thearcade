@@ -6298,6 +6298,20 @@ body.touch #hint{display:none}
 .modal .main{background:#1f5c3d;font-size:16px;padding:11px 26px;font-weight:800}
 .modal ul{text-align:left;font-size:13px;color:#cdd5ea;line-height:1.5;padding-left:18px;margin:8px 0}
 .big{font-size:44px;font-weight:900;margin:2px 0}
+.modal input{font:inherit;font-size:16px;text-align:center;padding:9px;border-radius:3px;border:2px solid #26314f;background:#05070d;color:#f4f2ea;min-height:40px;min-width:0}
+#mCode{text-transform:uppercase;letter-spacing:.2em;width:6.5em}
+#nIn{flex:1;max-width:14em}
+.net{min-height:1.4em;font-size:13px;margin:8px 0 0;color:#cdd5ea}
+#lCode{font-size:30px;font-weight:800;letter-spacing:.25em;color:#f4f2ea;margin:4px 0}
+#lTeams{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px;text-align:left}
+#lTeams h4{margin:0 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+#lTeams ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+#lTeams li{background:#05070d;border:2px solid #26314f;border-radius:3px;padding:7px 8px;font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lTeams li small{color:#9aa3b8;font-weight:600;font-size:10px;text-transform:uppercase;margin-left:4px}
+#lTeams li.cpu{color:#6e7390;font-weight:600}
+#lFill{font-size:12px;margin:4px 0}
+#tags{position:fixed;inset:0;pointer-events:none;z-index:2}
+#tags span{position:absolute;transform:translate(-50%,-100%);font-size:11px;font-weight:800;color:#f4f2ea;background:#05070dcc;border:2px solid;border-radius:3px;padding:1px 5px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -6314,11 +6328,34 @@ body.touch #hint{display:none}
   <h3 id="mD"></h3><div class="r" id="rD"></div>
   <h3 id="mL"></h3><div class="r" id="rL"></div>
   <div class="r"><button class="main" id="mGo"></button></div>
+  <h3 id="mO"></h3>
+  <div class="r"><button id="mHost"></button></div>
+  <div class="r"><input id="mCode" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go"><button id="mJoin"></button></div>
+  <p class="net" id="mNet"></p>
   <h3 id="mH"></h3><ul id="mHelp"></ul>
   <p id="mRec"></p>
 </div></div>
+<div id="tags"></div>
+<div class="ov" id="nameDlg"><div class="modal">
+  <h2 id="nT"></h2><p id="nP"></p>
+  <div class="r"><input id="nIn" maxlength="12" autocomplete="nickname" spellcheck="false" enterkeyhint="done"></div>
+  <div class="r"><button class="main" id="nOk"></button><button id="nCancel"></button></div>
+</div></div>
+<div class="ov" id="lobby"><div class="modal">
+  <h2 id="lT"></h2>
+  <div id="lCode"></div>
+  <p id="lP"></p>
+  <div class="r"><button id="lShare"></button></div>
+  <div id="lTeams"></div>
+  <p id="lFill"></p>
+  <div class="r"><button id="lTeam"></button></div>
+  <h3 id="lLenT"></h3><div class="r" id="lLen"></div>
+  <div class="r"><button class="main" id="lStart"></button><button id="lLeave"></button></div>
+  <p class="net" id="lNet"></p>
+</div></div>
 <div class="ov" id="ov"><div class="modal"><h2 id="oT"></h2><div class="big" id="oS"></div><p id="oP"></p><div class="r"><button class="main" id="oB"></button><button id="oB2"></button></div></div></div>
 
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>
 <script>
 'use strict';
 const $ = s => document.querySelector(s);
@@ -6326,20 +6363,38 @@ const LANG_KEY = 'pocketPitchLang', STATS_KEY = 'pocketPitchStats';
 const TXT = {
   en: { title: 'Pocket Pitch', menuP: '3-a-side cage football. The ball flies, spins and bounces off the boards; your players have weight and stamina.',
     diff: 'Opponent', easy: 'Easy', normal: 'Normal', hard: 'Hard', len: 'Match length', min: '{n} min', play: 'Kick off!', how: 'How to play',
-    helpT: ["Move with the stick (left side of the screen). Push it all the way to the edge to sprint: it knocks the ball a little further ahead and uses stamina.","KICK: hold to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it or play it into space. Turn the stick while charging to curl it.","When the other team has the ball, KICK turns purple and becomes SWEEP: a long sliding sweep where you push the stick (or straight at the ball). Win it or trip the man and he is slowed down for a few seconds.","PASS: tap for a ground pass to the teammate with the blue ring (aim with the stick to choose), hold for a lofted pass over defenders.","SWITCH changes player. The smiley button opens the reaction panel. The camera button switches between the 2D and 3D view."],
-    helpK: ["Move: WASD or arrow keys. Sprint: hold L or Shift (knocks the ball a little further ahead and uses stamina).","Kick: hold J or Space to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it. Change direction while charging to curl it.","When the other team has the ball, J / Space is SWEEP: a long sliding sweep in the direction you move (or straight at the ball). Win it or trip the man and he is slowed down for a few seconds.","Pass: U. Tap for a ground pass to the teammate with the blue ring, hold for a lofted pass.","K or Q switches player. E opens the reaction panel (1-8 pick the first row). V switches between the 2D and 3D view."],
+    helpT: ["Move with the stick (left side of the screen). Push it all the way to the edge to sprint: it knocks the ball a little further ahead and uses stamina.","KICK: hold to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it or play it into space. Turn the stick while charging to curl it.","When the other team has the ball, KICK turns purple and becomes SWEEP: a long sliding sweep where you push the stick (or straight at the ball). Win it or trip the man and he is slowed down for a few seconds.","PASS: tap for a ground pass to the teammate with the blue ring (aim with the stick to choose), hold for a lofted pass over defenders.","SWITCH changes player. The smiley button opens the reaction panel. The camera button switches between the 2D and 3D view. Online: Create room, share the code, pick teams."],
+    helpK: ["Move: WASD or arrow keys. Sprint: hold L or Shift (knocks the ball a little further ahead and uses stamina).","Kick: hold J or Space to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it. Change direction while charging to curl it.","When the other team has the ball, J / Space is SWEEP: a long sliding sweep in the direction you move (or straight at the ball). Win it or trip the man and he is slowed down for a few seconds.","Pass: U. Tap for a ground pass to the teammate with the blue ring, hold for a lofted pass.","K or Q switches player. E opens the reaction panel (1-8 pick the first row). V switches between the 2D and 3D view. Online: Create room, share the code, pick teams."],
     you: 'YOU', cpu: 'CPU', kick: 'KICK', shoot: 'SHOOT', tackle: 'SWEEP', pass: 'PASS', sw: 'SWITCH', sprint: 'SPRINT', menu: 'Menu', snd: 'Sound',
     goal: 'GOAL!', own: 'OWN GOAL!', post: 'Off the post', bar: 'Off the bar', save: 'Saved!', kickoff: 'Kick off', golden: 'GOLDEN GOAL', goldenP: 'Next goal wins',
     full: 'Full time', win: 'You win!', lose: 'You lose', draw: 'Draw', again: 'Play again', toMenu: 'Menu', record: 'Won {w} · Drawn {d} · Lost {l} · Goals {gf}-{ga}',
-    hint: "WASD move · J kick / sweep · U pass · L sprint · K switch · E react · V 3D", swept: "Swept! Slowed down", react: "React" },
+    hint: "WASD move · J kick / sweep · U pass · L sprint · K switch · E react · V 3D", swept: "Swept! Slowed down", react: "React",
+    online: 'Play online (2-6 players)', host: 'Create room', join: 'Join', code: 'CODE',
+    namePh: 'Your name', nameT: 'What should we call you?', nameP: 'Other players will see this name.', ok: 'OK', cancel: 'Cancel', player: 'Player',
+    lobby: 'Lobby', lobbyHost: 'Share this code or the invite link. Pick teams, then start.', lobbyGuest: 'You are in! Pick a team and wait for the host to start…',
+    share: 'Share invite link', shareText: 'Join my Pocket Pitch match!', copied: 'Link copied! Send it to your friends.',
+    start: 'Start match', needTwo: 'Waiting for at least one more player…', leave: 'Leave', hostTag: 'host', youTag: 'you', cpuTag: 'Computer',
+    red: 'RED', blue: 'BLUE', switchTeam: 'Switch team', teamFull: 'That team is full (3 players).', fill: 'Empty places are played by the computer. A third player on a team goes in goal.',
+    connecting: 'Connecting…', notFound: 'Room not found. Check the code.', netErr: 'Could not connect. Try again.', noLib: 'Could not load the online library. Check your connection.',
+    fullRoom: 'That room is full (6 players).', busy: 'That match already started. Wait for the next one.',
+    hostLeft: 'The host left', hostLeftP: 'The match ended because the host disconnected.', toLobby: 'Back to lobby', waitHost: 'Waiting for the host…', redWins: 'Red wins!', blueWins: 'Blue wins!' },
   es: { title: 'Pocket Pitch', menuP: 'Fútbol de jaula 3 contra 3. El balón vuela, gira y rebota en las bandas; tus jugadores tienen peso y resistencia.',
     diff: 'Rival', easy: 'Fácil', normal: 'Normal', hard: 'Difícil', len: 'Duración', min: '{n} min', play: '¡Saque inicial!', how: 'Cómo jugar',
-    helpT: ["Muévete con el joystick (lado izquierdo de la pantalla). Empújalo hasta el borde para esprintar: adelanta un poco el balón y gasta resistencia.","PATEAR: mantén para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar o jugar al espacio. Gira el joystick mientras cargas para darle efecto.","Cuando el rival tiene el balón, PATEAR se vuelve morado y es BARRIDA: una barrida larga hacia donde empujas el joystick (o directa al balón). Si se lo quitas o lo derribas, va lento unos segundos.","PASE: toca para un pase raso al compañero del anillo azul (apunta con el joystick para elegir), mantén para un pase por alto.","CAMBIO cambia de jugador. El botón de la carita abre el panel de reacciones. El botón de la cámara cambia entre la vista 2D y 3D."],
-    helpK: ["Moverse: WASD o flechas. Sprint: mantén L o Shift (adelanta un poco el balón y gasta resistencia).","Patear: mantén J o Espacio para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar. Cambia de dirección mientras cargas para darle efecto.","Cuando el rival tiene el balón, J / Espacio es BARRIDA: una barrida larga hacia donde te mueves (o directa al balón). Si se lo quitas o lo derribas, va lento unos segundos.","Pase: U. Toca para un pase raso al compañero del anillo azul, mantén para un pase por alto.","K o Q cambia de jugador. E abre el panel de reacciones (1-8 eligen la primera fila). V cambia entre la vista 2D y 3D."],
+    helpT: ["Muévete con el joystick (lado izquierdo de la pantalla). Empújalo hasta el borde para esprintar: adelanta un poco el balón y gasta resistencia.","PATEAR: mantén para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar o jugar al espacio. Gira el joystick mientras cargas para darle efecto.","Cuando el rival tiene el balón, PATEAR se vuelve morado y es BARRIDA: una barrida larga hacia donde empujas el joystick (o directa al balón). Si se lo quitas o lo derribas, va lento unos segundos.","PASE: toca para un pase raso al compañero del anillo azul (apunta con el joystick para elegir), mantén para un pase por alto.","CAMBIO cambia de jugador. El botón de la carita abre el panel de reacciones. El botón de la cámara cambia entre la vista 2D y 3D. En línea: crea una sala, comparte el código y elijan equipos."],
+    helpK: ["Moverse: WASD o flechas. Sprint: mantén L o Shift (adelanta un poco el balón y gasta resistencia).","Patear: mantén J o Espacio para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar. Cambia de dirección mientras cargas para darle efecto.","Cuando el rival tiene el balón, J / Espacio es BARRIDA: una barrida larga hacia donde te mueves (o directa al balón). Si se lo quitas o lo derribas, va lento unos segundos.","Pase: U. Toca para un pase raso al compañero del anillo azul, mantén para un pase por alto.","K o Q cambia de jugador. E abre el panel de reacciones (1-8 eligen la primera fila). V cambia entre la vista 2D y 3D. En línea: crea una sala, comparte el código y elijan equipos."],
     you: 'TÚ', cpu: 'CPU', kick: 'PATEAR', shoot: 'TIRO', tackle: 'BARRIDA', pass: 'PASE', sw: 'CAMBIO', sprint: 'SPRINT', menu: 'Menú', snd: 'Sonido',
     goal: '¡GOL!', own: '¡AUTOGOL!', post: 'Al palo', bar: 'Al larguero', save: '¡Parada!', kickoff: 'Saque', golden: 'GOL DE ORO', goldenP: 'El próximo gol gana',
     full: 'Final', win: '¡Ganas!', lose: 'Pierdes', draw: 'Empate', again: 'Jugar otra vez', toMenu: 'Menú', record: 'Ganados {w} · Empates {d} · Perdidos {l} · Goles {gf}-{ga}',
-    hint: "WASD moverse · J patear / barrida · U pase · L sprint · K cambio · E reacción · V 3D", swept: "¡Barrido! Va lento", react: "Reacción" },
+    hint: "WASD moverse · J patear / barrida · U pase · L sprint · K cambio · E reacción · V 3D", swept: "¡Barrido! Va lento", react: "Reacción",
+    online: 'Jugar en línea (2-6 jugadores)', host: 'Crear sala', join: 'Unirse', code: 'CÓDIGO',
+    namePh: 'Tu nombre', nameT: '¿Cómo te llamamos?', nameP: 'Los demás jugadores verán este nombre.', ok: 'Aceptar', cancel: 'Cancelar', player: 'Jugador',
+    lobby: 'Sala', lobbyHost: 'Comparte este código o el enlace. Elijan equipos y empieza.', lobbyGuest: '¡Ya estás dentro! Elige equipo y espera a que el anfitrión empiece…',
+    share: 'Compartir invitación', shareText: '¡Únete a mi partido de Pocket Pitch!', copied: '¡Enlace copiado! Envíaselo a tus amigos.',
+    start: 'Empezar partido', needTwo: 'Esperando al menos a otro jugador…', leave: 'Salir', hostTag: 'anfitrión', youTag: 'tú', cpuTag: 'Computadora',
+    red: 'ROJO', blue: 'AZUL', switchTeam: 'Cambiar de equipo', teamFull: 'Ese equipo está lleno (3 jugadores).', fill: 'Los lugares vacíos los juega la computadora. Un tercer jugador en un equipo va a la portería.',
+    connecting: 'Conectando…', notFound: 'Sala no encontrada. Revisa el código.', netErr: 'No se pudo conectar. Inténtalo de nuevo.', noLib: 'No se pudo cargar la librería online. Revisa tu conexión.',
+    fullRoom: 'Esa sala está llena (6 jugadores).', busy: 'Ese partido ya empezó. Espera al siguiente.',
+    hostLeft: 'El anfitrión se fue', hostLeftP: 'El partido terminó porque el anfitrión se desconectó.', toLobby: 'Volver a la sala', waitHost: 'Esperando al anfitrión…', redWins: '¡Gana el rojo!', blueWins: '¡Gana el azul!' },
 };
 let lang = 'en';
 try { lang = localStorage.getItem(LANG_KEY) === 'es' ? 'es' : 'en'; } catch (e) {}
@@ -6361,7 +6416,7 @@ const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const hyp = Math.hypot;
 let fx = () => {};                        // sound / effect hook, set by the page
 let rnd = Math.random;
-const S = { ball: null, players: [], score: [0, 0], t: 0, phase: 'play', freeze: 0, last: null, owner: null, events: [], kickTeam: 0, human: -1 };
+const S = { ball: null, players: [], score: [0, 0], t: 0, phase: 'play', freeze: 0, last: null, owner: null, events: [], kickTeam: 0, humans: new Set() };
 
 function newBall() { return { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, spin: 0, held: null }; }
 function newPlayer(team, role, num) {
@@ -6467,7 +6522,7 @@ const TOP = 6.6, SPRINT = 8.4, ACC = 30, BRAKE = 34, DRIB = 0.92;   // top speed
 const SWEPT = 0.6, SWEPT_T = 2.8;         // speed factor and seconds for an opponent beaten by your sweep
 /** Your sweep won the ball or took the man: he is slowed down for a few seconds. */
 function sweepPenalty(s, v) {
-  if (s !== human() || !v || v.team === s.team) return;
+  if (!S.humans.has(s) || !v || v.team === s.team) return;
   if (v.slowT < SWEPT_T - 0.5) S.events.push({ k: 'swept', p: v, by: s });
   v.slowT = SWEPT_T;
 }
@@ -6548,7 +6603,7 @@ function ballContacts() {
     // don't nick it off him. An opponent who only brushes it can't take it from the side or behind; from YOUR player
     // he can't take it by running into it at all (he has to poke, slide, or pin it until it runs away from you).
     const o = S.owner;
-    if (o && dribbling(o) && (o === p || o.team === p.team || d > hyp(b.x - o.x, b.y - o.y) * (o === human() ? 0.6 : 0.85))) {
+    if (o && dribbling(o) && (o === p || o.team === p.team || d > hyp(b.x - o.x, b.y - o.y) * (S.humans.has(o) ? 0.6 : 0.85))) {
       if (d < PR + BR) { b.x = p.x + nx * (PR + BR); b.y = p.y + ny * (PR + BR); }
       if (o === p && p.touchCD <= 0) { p.touchCD = 0.28; fx('touch'); }
       continue;
@@ -6693,7 +6748,8 @@ function steer(p, x, y, run, slowR = 1.5) {
   const m = d < 0.15 ? 0 : Math.min(1, d / slowR);
   p.ctrl.mx = d > 0 ? dx / d * m : 0; p.ctrl.my = d > 0 ? dy / d * m : 0; p.ctrl.sprint = run && d > 4;
 }
-function aiKeeper(p, prof) {
+/** assist: a person controls this keeper; he only gets the automatic dive and throw-out. */
+function aiKeeper(p, prof, assist = false) {
   const b = S.ball, d = attackDir(p.team), gx = -d * HL;
   if (b.held === p) {                              // distribute: roll it to a free teammate, or boot it long
     p.holdT -= H; steer(p, gx + d * 2.5, 0, false);
@@ -6721,6 +6777,7 @@ function aiKeeper(p, prof) {
       }
     }
   }
+  if (assist) return;
   // loose ball in the area and nobody closer: come and claim it
   const opp = S.players.filter(q => q.team !== p.team).reduce((m, q) => Math.min(m, hyp(q.x - b.x, q.y - b.y)), 99);
   if (inOwnBox(p, b) && b.z < 2 && hyp(b.x - p.x, b.y - p.y) < opp + 0.5 && sp < 12) { steer(p, b.x, b.y, true, 0.3); return; }
@@ -6757,8 +6814,8 @@ function aiTeam(team, prof, humanP) {
   S.chase[team] = chaser;
   for (const p of mine) {
     p.prof = prof;
-    if (p.role === 'gk') { aiKeeper(p, prof); continue; }
-    if (p === humanP || p === recv) continue;
+    if (p.role === 'gk') { aiKeeper(p, prof, S.humans.has(p)); continue; }
+    if (S.humans.has(p) || p === recv) continue;
     p.goT -= H;
     if (p === chaser) { if (oppHas) aiPress(p, prof, d); else aiChaser(p, prof, d); continue; }
     // possession changed: drop the old plan after a moment's reaction instead of finishing a run the wrong way
@@ -6890,10 +6947,12 @@ function aiChaser(p, prof, d) {
 }
 
 /** One fixed step of the whole match. ai(team) gives the brain profile, humanP is the player steered by input. */
-function step(profs, humanP) {
+/** humans: the Set of players people control this step (the computer runs everyone else). */
+function step(profs, humans) {
+  S.humans = humans instanceof Set ? humans : new Set(humans ? [humans] : []);
   if (S.freeze > 0) { S.freeze -= H; for (const p of S.players) { p.vx *= 0.8; p.vy *= 0.8; } return; }
   S.t += H;
-  aiTeam(0, profs[0], humanP); aiTeam(1, profs[1], null);
+  aiTeam(0, profs[0], null); aiTeam(1, profs[1], null);
   for (const p of S.players) stepPlayer(p, p.prof || MATE);
   collidePlayers();
   stepBall(S.ball);
@@ -6934,14 +6993,17 @@ function resize() {
 addEventListener('resize', resize);
 /** World point -> screen in the 3D view: [sx, sy, pixels per metre there, distance in front of the camera]. */
 function proj(x, y, z = 0) {
+  x *= FL; y *= FL;
   const u = portrait ? y - cam.y : x - cam.x, dep = portrait ? x - cam.x : cam.y - y;
   const c = Math.cos(CAM3.th), s = Math.sin(CAM3.th), zc = dep * c - z * s + CAM3.D, f = CAM3.sc * CAM3.D / Math.max(0.5, zc);
   return [CAM3.cx + u * f, CAM3.cy - (dep * s + z * c) * f, f, zc];
 }
 /** How far a ground point is from the 3D camera (bigger = further away): the painter's order. */
-const depthOf = (x, y) => portrait ? x - cam.x : cam.y - y;
+const depthOf = (x, y) => portrait ? FL * x - cam.x : cam.y - FL * y;
+/** 1 normally, -1 when you play for Blue online: the view turns round so your team always attacks up / right. cam is in turned (view) coordinates. */
+let FL = 1;
 /** World (x, y) on the ground -> screen. In 2D portrait the pitch is turned so the long side runs up the screen. */
-const toS = (x, y) => view3d ? proj(x, y, 0) : portrait ? [VW / 2 + (y - cam.y) * SC, VH / 2 - (x - cam.x) * SC] : [VW / 2 + (x - cam.x) * SC, VH / 2 + (y - cam.y) * SC];
+const toS = (x, y) => view3d ? proj(x, y, 0) : portrait ? [VW / 2 + (FL * y - cam.y) * SC, VH / 2 - (FL * x - cam.x) * SC] : [VW / 2 + (FL * x - cam.x) * SC, VH / 2 + (FL * y - cam.y) * SC];
 /** Pixels per metre on the ground at (x, y). */
 const pxm = (x, y) => view3d ? proj(x, y, 0)[2] : SC;
 
@@ -7056,7 +7118,7 @@ function drawCrowd(now, mode) {
   const t = now / 1000;
   if (mode === 'far') crowd.sort((a, c) => depthOf(c.x, c.y) - depthOf(a.x, a.y));
   for (const f of crowd) {
-    if (mode !== '2d' && (mode === 'near') !== (portrait ? f.x < -HL : f.y > HW)) continue;
+    if (mode !== '2d' && (mode === 'near') !== (portrait ? FL * f.x < -HL : FL * f.y > HW)) continue;
     const jump = cheerT > 0 ? Math.abs(Math.sin(t * 9 + f.ph)) * (cheerSad ? 0.12 : 0.45) : Math.max(0, Math.sin(t * 1.3 + f.ph)) * 0.06;
     let sx, sy, px;
     if (mode === '2d') { [sx, sy] = toS(f.x, f.y); px = SC * 0.8; sy -= jump * SC; }
@@ -7075,7 +7137,7 @@ function drawCrowd(now, mode) {
 function drawPitch() {
   ctx.fillStyle = '#1e1236'; ctx.fillRect(0, 0, VW, VH);
   ctx.save();
-  { const [ox, oy] = toS(0, 0); ctx.translate(ox, oy); if (portrait) ctx.rotate(-Math.PI / 2); ctx.scale(SC, SC); }   // world space
+  { const [ox, oy] = toS(0, 0); ctx.translate(ox, oy); if (portrait) ctx.rotate(-Math.PI / 2); if (FL < 0) ctx.rotate(Math.PI); ctx.scale(SC, SC); }   // world space
   const rr = (x, y, w, h, r) => { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); };
   rr(-HL - GD - 4, -HW - 4, L + 2 * GD + 8, W + 8, CORNER + 3); ctx.fillStyle = '#33204f'; ctx.fill();     // the stands
   // boards
@@ -7136,7 +7198,7 @@ function pose(g, k) {
 /* -- 2D: seen from straight above -- */
 function drawPlayer(p, isHuman, now) {
   const [sx, sy] = toS(p.x, p.y), r = PR * SC * 1.25, T = TEAMC[p.team], col = p.role === 'gk' ? T.gk : T.body;
-  const fang = portrait ? Math.atan2(-Math.cos(p.face), Math.sin(p.face)) : p.face;
+  const fang = (portrait ? Math.atan2(-Math.cos(p.face), Math.sin(p.face)) : p.face) + (FL < 0 ? Math.PI : 0);
   ctx.save(); ctx.translate(sx, sy);
   ctx.fillStyle = 'rgba(30,18,54,.4)'; ctx.beginPath(); ctx.ellipse(r * 0.22, r * 0.28, r * 0.75, r * 0.55, 0, 0, Math.PI * 2); ctx.fill();
   if (isHuman) {                                   // ring + stamina arc
@@ -7312,7 +7374,7 @@ function circlePts(x, y, r, n = 28, a0 = 0, a1 = Math.PI * 2) { const o = []; fo
 const groundDisc = (x, y, r, fill) => { path3(circlePts(x, y, r, 18)); ctx.fillStyle = fill; ctx.fill(); };
 function drawPitch3D(now) {
   // dusk sky down to the top of the far stand: deep blue, purple, then a warm band low down (dithered by the pixel pass)
-  const hy = clamp(proj(portrait ? cam.x + 40 : cam.x, portrait ? cam.y : cam.y - 40, 3.9)[1], VH * 0.08, VH * 0.9);
+  const hy = clamp(proj((portrait ? cam.x + 40 : cam.x) * FL, (portrait ? cam.y : cam.y - 40) * FL, 3.9)[1], VH * 0.08, VH * 0.9);
   const g = ctx.createLinearGradient(0, 0, 0, hy);
   g.addColorStop(0, '#0d0f2b'); g.addColorStop(0.4, '#33204f'); g.addColorStop(0.7, '#a35a8f'); g.addColorStop(0.88, '#e8853f'); g.addColorStop(1, '#f4d69a');
   ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
@@ -7357,7 +7419,7 @@ function drawPitch3D(now) {
   groundDisc(0, 0, 0.2, '#f4f2ea');
 }
 function drawWall(w) {
-  const { a, b } = w, near = portrait ? w.mx < -HL + 0.5 : w.my > HW - 0.5;
+  const { a, b } = w, near = portrait ? FL * w.mx < -HL + 0.5 : FL * w.my > HW - 0.5;
   path3([[a[0], a[1], 0], [b[0], b[1], 0], [b[0], b[1], BOARD_H], [a[0], a[1], BOARD_H]]);
   ctx.fillStyle = near ? 'rgba(69,72,94,.45)' : '#45485e'; ctx.fill();
   path3([[a[0], a[1], BOARD_H], [b[0], b[1], BOARD_H]], 0, false);
@@ -7479,15 +7541,23 @@ const buzz = n => { try { if (!muted && navigator.vibrate) navigator.vibrate(n);
 const headless = false;
 
 /* ---------- input ---------- */
-const input = { mx: 0, my: 0, sprint: false, charge: null, chargeT0: 0, chargeAng: 0, passDown: 0, buffer: null };
+/* Every person in the match has a controller: their stick and buttons, which player they run, a pass they are waiting
+ * on. The input functions act on the current controller (cur, input); withCtl() swaps another one in, which is how the
+ * host runs the other players' presses online. At rest cur is your own. */
+function newCtl(id, team, pid) {
+  return { id, team, pid, home: pid, keeper: pid % 3 === 0, pending: null, switchT: 0, swept: false,
+    input: { mx: 0, my: 0, sprint: false, charge: null, chargeT0: 0, chargeAng: 0, buffer: null } };
+}
+const me = newCtl(0, 0, 1);
+let cur = me, ctls = [me], input = me.input;
+function withCtl(c, fn) { if (c === cur) return fn(); const c0 = cur, i0 = input; cur = c; input = c.input; try { return fn(); } finally { cur = c0; input = i0; } }
 const keys = {};
-let humanIdx = 1, switchT = 0;
-const human = () => S.players[humanIdx];
+const human = () => S.players[cur.pid];
 const CHARGE_T = 0.55;                    // seconds to fill the kick bar
 let clock = 0;                            // game time (s): charging and buffered kicks follow the game, not the wall clock
 const chargeLevel = () => input.charge ? clamp((clock - input.chargeT0) / CHARGE_T, 0, 1) : 0;
 /** Stick direction in world space (screen up = attack direction in portrait). */
-function stickWorld(jx, jy) { return portrait ? [-jy, jx] : [jx, jy]; }
+function stickWorld(jx, jy) { return portrait ? [-jy * FL, jx * FL] : [jx * FL, jy * FL]; }
 function aimDir(p) {
   const m = hyp(input.mx, input.my);
   if (m > 0.25) return [input.mx / m, input.my / m];
@@ -7514,13 +7584,12 @@ function tackleDown() {
   slide(p, true);
 }
 /** The KICK button sweeps instead while the other team has the ball at their feet. */
-const sweepMode = () => { const o = S.owner; return !!o && !S.ball.held && o.team !== 0; };
-let kickSwept = false;
+const sweepMode = () => { const o = S.owner; return !!o && !S.ball.held && o.team !== cur.team; };
 function kickDown() {
-  kickSwept = sweepMode();
-  if (kickSwept) tackleDown(); else shootDown();
+  cur.swept = sweepMode();
+  if (cur.swept) tackleDown(); else shootDown();
 }
-function kickUp() { if (kickSwept) kickSwept = false; else shootUp(); }
+function kickUp() { if (cur.swept) cur.swept = false; else shootUp(); }
 /** What a kick in direction (ax, ay) would be: a shot if the line runs into the goal mouth (in range), otherwise a
  *  clearance / through ball (passing has its own button). Used for the kick and for the on-pitch preview. */
 function kickIntent(p, ax, ay) {
@@ -7549,7 +7618,7 @@ function passUp() {
     if (!tgt) { const [ax, ay] = aimDir(p); return kick(p, 'pass', ax, ay, 0.4, 0, 0.04, p.x + ax * 10, p.y + ay * 10); }
     const lob = held > 0.35 || laneBlock(p.x, p.y, tgt.x, tgt.y, p.team) >= 1 && held > 0.2;
     const ok = kick(p, lob ? 'lob' : 'pass', tgt.x - S.ball.x, tgt.y - S.ball.y, clamp(held / 0.85, 0, 1), 0, 0.025, tgt.x, tgt.y);
-    if (ok) { pendingSwitch = tgt.p; passTo(p, tgt.p); } return ok;
+    if (ok) { cur.pending = tgt.p; passTo(p, tgt.p); } return ok;
   };
   if (!go()) input.buffer = { fn: go, until: clock + 1 };
 }
@@ -7571,36 +7640,40 @@ function shootUp() {
   }
   if (!go()) input.buffer = { fn: go, until: clock + 1 };
 }
-let pendingSwitch = null;
 /** Switch to the field player best placed for the ball (or the receiver of your pass). */
+/** Players this controller may switch to: his team's outfield men that nobody else is running. */
+function freeMates() { const taken = new Set(ctls.filter(c => c !== cur).map(c => S.players[c.pid])); return S.players.filter(p => p.team === cur.team && p.role === 'fp' && !taken.has(p)); }
 function switchPlayer(manual) {
-  const mates = S.players.map((p, i) => [p, i]).filter(([p]) => p.team === 0 && p.role === 'fp');
-  const cur = human();
-  const best = mates.filter(([p]) => !manual || p !== cur).sort((a, c) => hyp(interceptPoint(a[0], MATE)[0] - a[0].x, interceptPoint(a[0], MATE)[1] - a[0].y) - hyp(interceptPoint(c[0], MATE)[0] - c[0].x, interceptPoint(c[0], MATE)[1] - c[0].y))[0];
-  if (best && best[1] !== humanIdx) { humanIdx = best[1]; switchT = 0.6; if (manual) tone(700, 0.05, 'square', 0.04); }
+  if (cur.keeper || NET.guest) return;
+  const free = freeMates(), mates = S.players.map((p, i) => [p, i]).filter(([p]) => free.includes(p));
+  const curP = human();
+  const best = mates.filter(([p]) => !manual || p !== curP).sort((a, c) => hyp(interceptPoint(a[0], MATE)[0] - a[0].x, interceptPoint(a[0], MATE)[1] - a[0].y) - hyp(interceptPoint(c[0], MATE)[0] - c[0].x, interceptPoint(c[0], MATE)[1] - c[0].y))[0];
+  if (best && best[1] !== cur.pid) { cur.pid = best[1]; cur.switchT = 0.6; if (manual) tone(700, 0.05, 'square', 0.04); }
 }
 function autoSwitch() {
-  switchT -= H;
-  if (pendingSwitch && S.last !== human()) {
-    const i = S.players.indexOf(pendingSwitch);
-    if (S.owner === pendingSwitch || (S.last && S.last !== human() && hyp(S.ball.x - pendingSwitch.x, S.ball.y - pendingSwitch.y) < 3)) {
-      humanIdx = i; pendingSwitch = null; switchT = 0.5;
+  cur.switchT -= H;
+  if (cur.pending && S.last !== human()) {
+    const i = S.players.indexOf(cur.pending);
+    if (!freeMates().includes(cur.pending)) { cur.pending = null; return; }
+    if (S.owner === cur.pending || (S.last && S.last !== human() && hyp(S.ball.x - cur.pending.x, S.ball.y - cur.pending.y) < 3)) {
+      cur.pid = i; cur.pending = null; cur.switchT = 0.5;
     }
   }
-  if (switchT > 0 || input.charge) return;
+  if (cur.switchT > 0 || input.charge) return;
   const p = human(); if (S.owner === p) return;
-  if (S.owner && S.owner.team === 0 && S.owner.role === 'fp') { humanIdx = S.players.indexOf(S.owner); pendingSwitch = null; return; }
+  const free = freeMates();
+  if (S.owner && free.includes(S.owner)) { cur.pid = S.players.indexOf(S.owner); cur.pending = null; return; }
   // the ball is theirs or loose: take the man who will get there first, if clearly better
-  const mates = S.players.filter(q => q.team === 0 && q.role === 'fp');
+  const mates = free.slice(); if (!mates.length) return;
   const tt = q => hyp(interceptPoint(q, MATE)[0] - q.x, interceptPoint(q, MATE)[1] - q.y);
   const best = mates.sort((a, c) => tt(a) - tt(c))[0];
-  if (best !== p && tt(best) + 2.5 < tt(p)) { humanIdx = S.players.indexOf(best); switchT = 0.7; }
+  if (best !== p && tt(best) + 2.5 < tt(p)) { cur.pid = S.players.indexOf(best); cur.switchT = 0.7; }
 }
 addEventListener('keydown', e => {
-  if (e.repeat) return; keys[e.code] = true; ac(); crowdHum();
-  if (e.code === 'KeyJ' || e.code === 'Space') { e.preventDefault(); kickDown(); }
-  else if (e.code === 'KeyK' || e.code === 'KeyQ') switchPlayer(true);
-  else if (e.code === 'KeyU' || e.code === 'KeyI') passDown();
+  if (e.repeat || e.target && e.target.tagName === 'INPUT') return; keys[e.code] = true; ac(); crowdHum();
+  if (e.code === 'KeyJ' || e.code === 'Space') { e.preventDefault(); act('kd'); }
+  else if (e.code === 'KeyK' || e.code === 'KeyQ') act('sw');
+  else if (e.code === 'KeyU' || e.code === 'KeyI') act('pd');
   else if (e.code === 'KeyE') toggleEmo();
   else if (e.code === 'Escape') toggleEmo(false);
   else if (emoOpen() && /^Digit[1-8]$/.test(e.code)) react(EMOTES[+e.code.slice(5) - 1]);
@@ -7609,8 +7682,8 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => {
   keys[e.code] = false;
-  if (e.code === 'KeyJ' || e.code === 'Space') kickUp();
-  else if (e.code === 'KeyU' || e.code === 'KeyI') passUp();
+  if (e.code === 'KeyJ' || e.code === 'Space') act('ku');
+  else if (e.code === 'KeyU' || e.code === 'KeyI') act('pu');
 });
 /* touch: a floating stick on the left half, buttons on the right */
 let touchMode = false, stickId = null, stickO = null;
@@ -7647,9 +7720,9 @@ function holdBtn(id, down, up) {
   const off = e => { if (!el.classList.contains('on')) return; el.classList.remove('on'); up(); };
   el.addEventListener('pointerup', off); el.addEventListener('pointercancel', off);
 }
-holdBtn('#bShoot', kickDown, kickUp);
-holdBtn('#bPass', passDown, passUp);
-holdBtn('#bSwitch', () => switchPlayer(true), () => {});
+holdBtn('#bShoot', () => act('kd'), () => act('ku'));
+holdBtn('#bPass', () => act('pd'), () => act('pu'));
+holdBtn('#bSwitch', () => act('sw'), () => {});
 holdBtn('#bEmo', () => toggleEmo(), () => {});
 addEventListener('touchstart', () => { if (!touchMode) setTouch(true); }, { passive: true });
 
@@ -7658,11 +7731,13 @@ let diff = 'normal', mins = 3, running = false, golden = false, stats = { w: 0, 
 try { stats = Object.assign(stats, JSON.parse(localStorage.getItem(STATS_KEY) || '{}')); } catch (e) {}
 function flashBan(text, color, sub, ms = 1800) { const el = $('#ban'); el.innerHTML = text + (sub ? `<small>${sub}</small>` : ''); el.style.color = color; el.classList.add('on'); clearTimeout(flashBan.t); flashBan.t = setTimeout(() => el.classList.remove('on'), ms); }
 function startMatch() {
-  setupMatch(); humanIdx = 1; golden = false; running = true; input.charge = null; pendingSwitch = null;
+  netClose(); NET.on = false; FL = 1; ctls = [me]; me.team = 0; me.home = 1; me.keeper = false;
+  setupMatch(); cur.pid = 1; golden = false; running = true; input.charge = null; cur.pending = null;
   $('#menu').style.display = $('#ov').style.display = 'none';
   whistle(1); flashBan(tr('kickoff'), '#fff', '', 1000); hud(); bubbles.length = 0; toggleEmo(false);
 }
 function endMatch() {
+  if (NET.on) return netEnd();
   running = false; whistle(3);
   const [a, b] = S.score, res = a > b ? 'win' : a < b ? 'lose' : 'draw';
   stats[res === 'win' ? 'w' : res === 'lose' ? 'l' : 'd']++; stats.gf += a; stats.ga += b;
@@ -7675,14 +7750,15 @@ function endMatch() {
 }
 function handleEvents() {
   for (const e of S.events) {
-    if (e.k === 'goal') {
-      const mine = e.team === 0;
+    if (e.k === 'golden') { whistle(2); flashBan(tr('golden'), '#ffcf3f', tr('goldenP'), 2200); crowdReact(true, 2); }
+    else if (e.k === 'goal') {
+      const mine = e.team === cur.team;
       flashBan(e.own ? tr('own') : tr('goal'), mine ? '#5be37d' : '#ff6b6b', '', 2000);
       noise(2.2, mine ? 0.24 : 0.14, 900, 0.5, 0, 0.12); noise(1.5, 0.1, 2200, 0.7, 0.1, 0.2); whistle(1); buzz(mine ? 80 : 30);
       crowdReact(mine, 3.2);
-      cpuReact(mine ? CPU_SAD : CPU_HAPPY, 0.6);
+      if (!NET.on) cpuReact(mine ? CPU_SAD : CPU_HAPPY, 0.6);
     } else if (e.k === 'bar') { flashBan('', '#fff', tr('bar'), 900); crowdReact(false, 1.2); }
-    else if (e.k === 'save') crowdReact(e.team === 0, 1.3);
+    else if (e.k === 'save') crowdReact(e.team === cur.team, 1.3);
     else if (e.k === 'swept') { flashBan('', '#c9a5ff', tr('swept'), 1000); buzz(25); crowdReact(true, 1.2); }
   }
   S.events.length = 0;
@@ -7690,22 +7766,20 @@ function handleEvents() {
 /* ---- reactions: pick an emoji in the panel and it pops up in a bubble over your player; the computer sometimes
  * answers. The first eight also work with keys 1-8 while the panel is open. */
 const EMOTES = ['👍', '👏', '😂', '😮', '😎', '😡', '🔥', '🤝',
-  '😀', '🤣', '😍', '🤩', '😜', '🤪', '😏', '😤',
-  '😭', '😱', '🤯', '🥶', '🥵', '😴', '🙄', '🤔',
-  '🙌', '💪', '👎', '👋', '🙏', '🫡', '🤌', '👀',
-  '⚡', '💯', '🎯', '⚽', '🥅', '🧤', '🐐', '💀'];
+  '😭', '😱', '🙌', '💪', '👎', '👋', '🐐', '💀'];
 const CPU_HAPPY = ['😎', '🤖', '😏', '💪', '🔥'], CPU_SAD = ['😤', '😡', '🙄', '😱', '🤖'], CPU_BACK = ['😤', '🙄', '😂', '🤖', '😏', '👋', '🤔', '😎'];
 let lastReact = 0;
 const emoOpen = () => $('#emo').classList.contains('on');
 function toggleEmo(on = !emoOpen()) { $('#emo').classList.toggle('on', on); $('#emoB').classList.toggle('on', on); $('#bEmo').classList.toggle('on', on); }
 function react(ch) {
   const p = human(), n = performance.now(); if (!p || !running || !ch || n - lastReact < 600) return;
-  lastReact = n; say(p, ch); toggleEmo(false); tone(880, 0.06, 'sine', 0.05); tone(1320, 0.06, 'sine', 0.04, 0, 0.07);
-  if (Math.random() < 0.6) cpuReact(CPU_BACK, 0.9);
+  lastReact = n; toggleEmo(false); tone(880, 0.06, 'sine', 0.05); tone(1320, 0.06, 'sine', 0.04, 0, 0.07);
+  if (NET.on) { netReact(ch); return; }
+  say(p, ch); if (Math.random() < 0.6) cpuReact(CPU_BACK, 0.9);
 }
 /** A computer player answers with one of list after a short pause. */
 function cpuReact(list, delay) {
-  setTimeout(() => { const q = pick(S.players.filter(o => o.team === 1 && o.role === 'fp')); if (q && running) say(q, pick(list)); }, delay * 1000);
+  setTimeout(() => { const q = pick(S.players.filter(o => o.team !== cur.team && o.role === 'fp')); if (q && running && !NET.on) say(q, pick(list)); }, delay * 1000);
 }
 $('#emo').innerHTML = EMOTES.map(e => `<button data-e="${e}">${e}</button>`).join('');
 $('#emo').addEventListener('pointerdown', e => e.stopPropagation());
@@ -7716,7 +7790,8 @@ function toggleView() {
 }
 function hud() {
   const T = S.t, left = Math.max(0, mins * 60 - T), m = Math.floor(left / 60), s = Math.floor(left % 60);
-  $('#top').innerHTML = `<i style="background:${TEAMC[0].hex}"></i><span>${tr('you')}</span><b>${S.score[0]}</b><span>-</span><b>${S.score[1]}</b><span>${tr('cpu')}</span><i style="background:${TEAMC[1].hex}"></i><em>${golden ? '⚡' : m + ':' + String(s).padStart(2, '0')}</em>`;
+  const nA = NET.on ? tr('red') : tr('you'), nB = NET.on ? tr('blue') : tr('cpu');
+  $('#top').innerHTML = `<i style="background:${TEAMC[0].hex}"></i><span>${nA}</span><b>${S.score[0]}</b><span>-</span><b>${S.score[1]}</b><span>${nB}</span><i style="background:${TEAMC[1].hex}"></i><em>${golden ? '⚡' : m + ':' + String(s).padStart(2, '0')}</em>`;
   btnLabels(true);
 }
 /** Touch button faces. KICK turns into SWEEP (purple) while the other team has the ball. */
@@ -7731,6 +7806,7 @@ function btnLabels(force) {
   $('#bEmo').innerHTML = '😀';
 }
 function showMenu() {
+  netClose(); NET.on = false; FL = 1; ctls = [me]; me.team = 0; cur.pid = 1; $('#lobby').style.display = $('#nameDlg').style.display = 'none';
   running = false; toggleEmo(false); $('#ov').style.display = 'none'; $('#menu').style.display = 'flex';
   if (!S.players.length) setupMatch();
   applyLang();
@@ -7746,6 +7822,9 @@ function applyLang() {
   $('#mHelp').innerHTML = (touchMode ? TXT[lang].helpT : TXT[lang].helpK).map(s => `<li>${s}</li>`).join('');
   $('#mRec').textContent = stats.w + stats.d + stats.l ? tr('record', stats) : '';
   $('#hint').textContent = tr('hint');
+  $('#mO').textContent = tr('online'); $('#mHost').textContent = tr('host'); $('#mJoin').textContent = tr('join'); $('#mCode').placeholder = tr('code');
+  $('#nOk').textContent = tr('ok'); $('#nCancel').textContent = tr('cancel');
+  if ($('#lobby').style.display === 'flex') renderLobby();
   if (S.players.length) hud();
 }
 $('#rD').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) { diff = b.dataset.d; applyLang(); } });
@@ -7758,39 +7837,389 @@ $('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStor
 $('#mute').onclick = () => { muted = !muted; if (crowdNode) crowdNode.g.gain.value = muted ? 0 : 0.02; applyLang(); };
 [$('#menuB'), $('#view'), $('#emoB'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
 
+/* ---------- online play ----------
+ * Same setup as Putt Peaks: PeerJS, a 4-letter room code reaches the host through a free public broker, then each
+ * guest has a direct link to the host only. Up to 6 people pick Red or Blue in the lobby (3 a side at most; the
+ * computer plays any empty place, and a team's third person goes in goal with automatic dives).
+ * The host runs the whole match: guests send their stick (about 30 times a second) and their button presses, and the
+ * host applies them to that person's player exactly as it does its own. About 20 times a second the host sends the
+ * state of the match (every player, the ball, the score, who runs which player, and events like goals); guests draw
+ * it smoothed between updates. Reactions go through the host to everyone. */
+const NET_PREFIX = 'ppitch-', CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', MAXP = 6, NAME_KEY = 'pocketPitchName';
+const NET = { on: false, host: false, guest: false };
+let peer = null, conn = null, hostCode = '', roomCode = '', roster = [], myId = 0, lastSnap = 0, lastIn = 0, roomT = 0, joinT = 0;
+let myName = ''; try { myName = localStorage.getItem(NAME_KEY) || ''; } catch (e) {}
+const guests = new Map();                 // host only: id -> connection
+const outbox = [];                        // host only: events to send with the next update
+const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const cleanName = v => String(v || '').replace(/[\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim().slice(0, 12);
+const num = (...v) => v.every(Number.isFinite);
+const netSend = m => { try { if (conn && conn.open) conn.send(m); } catch (e) {} };
+const sendTo = (c, m) => { try { if (c && c.open) c.send(m); } catch (e) {} };
+const broadcast = (m, except) => guests.forEach((c, id) => { if (id !== except) sendTo(c, m); });
+const netStatus = k => { $('#mNet').textContent = k ? tr(k) : ''; };
+const nameOf = id => { const r = roster.find(q => q.id === id); return r ? r.name || tr('player') : tr('player'); };
+function netClose() {
+  clearTimeout(roomT); clearTimeout(joinT);
+  guests.forEach(c => { try { c.removeAllListeners(); c.close(); } catch (e) {} }); guests.clear();
+  try { if (conn) { conn.removeAllListeners(); conn.close(); } } catch (e) {}
+  try { if (peer) { peer.removeAllListeners(); peer.destroy(); } } catch (e) {}
+  peer = conn = null; hostCode = roomCode = ''; NET.host = NET.guest = false; roster = []; outbox.length = 0; snapA = null;
+}
+
+/* -- one step of a person's control (also used offline for you) -- */
+function controlTick() {
+  const p = human(); if (!p) return;
+  p.ctrl.mx = input.mx; p.ctrl.my = input.my; p.ctrl.sprint = input.sprint;
+  // while charging, the player steps onto the ball by himself and the stick only aims
+  if (input.charge === 'shot' && input.chargeAng === null) { const [ax, ay] = aimDir(p); input.chargeAng = Math.atan2(ay, ax); }
+  if ((input.charge || input.buffer) && !S.ball.held && hyp(S.ball.x - p.x, S.ball.y - p.y) < 3.5) {
+    const [ax, ay] = aimDir(p), off = PR + BR + 0.15;
+    steer(p, S.ball.x - ax * off, S.ball.y - ay * off, false, 0.6); p.ctrl.sprint = hyp(S.ball.x - p.x, S.ball.y - p.y) > 1.6;
+  }
+  if (input.buffer) { if (input.buffer.fn()) input.buffer = null; else if (clock > input.buffer.until) input.buffer = null; }
+  if (!cur.keeper) autoSwitch();
+}
+/** After a goal: offline, the usual switch; online everyone goes back to the man they started with. */
+function resetControl() {
+  if (!NET.on) { switchPlayer(false); cur.pid = S.kickTeam === 0 ? 1 : cur.pid; return; }
+  for (const c of ctls) { c.pid = c.home; c.pending = null; c.input.charge = null; c.input.buffer = null; }
+}
+/** A button press or release on this device: kd/ku kick, pd/pu pass, sw switch. A guest also tells the host. */
+function act(a) {
+  if (NET.guest) {
+    if (!running) return;
+    netSend({ t: 'a', a });
+    if (a === 'kd') { if (!sweepMode()) { input.charge = 'shot'; input.chargeT0 = clock; input.chargeAng = null; } }
+    else if (a === 'pd') { input.charge = 'pass'; input.chargeT0 = clock; }
+    else if (a === 'ku' || a === 'pu') input.charge = null;
+    return;
+  }
+  ({ kd: kickDown, ku: kickUp, pd: passDown, pu: passUp, sw: () => switchPlayer(true) })[a]();
+}
+function netReact(ch) {
+  const i = EMOTES.indexOf(ch); if (i < 0) return;
+  if (NET.host) { const p = human(); if (p) { say(p, ch); broadcast({ t: 'r', p: S.players.indexOf(p), e: i }); } }
+  else netSend({ t: 'r', e: i });
+}
+
+/* -- names -- */
+let nameCb = null;
+function askName(cb) {
+  nameCb = cb; $('#nT').textContent = tr('nameT'); $('#nP').textContent = tr('nameP');
+  $('#nIn').value = myName; $('#nIn').placeholder = tr('namePh'); $('#nameDlg').style.display = 'flex';
+  setTimeout(() => { try { $('#nIn').focus(); $('#nIn').select(); } catch (e) {} }, 50);
+}
+function nameDone(ok) {
+  const cb = nameCb; nameCb = null; $('#nameDlg').style.display = 'none';
+  if (!ok || !cb) return;
+  myName = cleanName($('#nIn').value) || myName || tr('player');
+  try { localStorage.setItem(NAME_KEY, myName); } catch (e) {}
+  cb(myName);
+}
+$('#nOk').onclick = () => nameDone(true);
+$('#nCancel').onclick = () => nameDone(false);
+$('#nIn').addEventListener('keydown', e => { if (e.key === 'Enter') nameDone(true); if (e.key === 'Escape') nameDone(false); });
+
+/* -- lobby -- */
+function renderLobby() {
+  $('#lT').textContent = tr('lobby'); $('#lCode').textContent = NET.host ? hostCode : roomCode;
+  $('#lP').textContent = tr(NET.host ? 'lobbyHost' : 'lobbyGuest'); $('#lShare').textContent = tr('share');
+  $('#lFill').textContent = tr('fill'); $('#lTeam').textContent = tr('switchTeam');
+  const col = t => roster.filter(r => r.team === t).map(r => '<li>' + esc(r.name || tr('player')) + '<small>' + (r.id === 0 ? tr('hostTag') : '') + (r.id === myId ? (r.id === 0 ? ' · ' : '') + tr('youTag') : '') + '</small></li>').join('')
+    + Array.from({ length: Math.max(0, 3 - roster.filter(r => r.team === t).length) }, () => '<li class="cpu">' + tr('cpuTag') + '</li>').join('');
+  $('#lTeams').innerHTML = [0, 1].map(t => '<div><h4 style="color:' + TEAMC[t].hex + '">' + tr(t ? 'blue' : 'red') + '</h4><ul>' + col(t) + '</ul></div>').join('');
+  $('#lLenT').textContent = tr('len');
+  $('#lLen').innerHTML = [2, 3, 5].map(n => '<button data-l="' + n + '" class="' + (n === mins ? 'sel' : '') + '"' + (NET.host ? '' : ' disabled') + '>' + tr('min', n) + '</button>').join('');
+  $('#lStart').textContent = tr('start'); $('#lStart').style.display = NET.host ? '' : 'none'; $('#lStart').disabled = roster.length < 2;
+  $('#lLeave').textContent = tr('leave');
+  if (NET.host && roster.length < 2) $('#lNet').textContent = tr('needTwo');
+  else if ($('#lNet').dataset.k !== 'msg') $('#lNet').textContent = '';
+}
+function showLobby() {
+  const was = $('#lobby').style.display === 'flex';
+  running = false; toggleEmo(false);
+  $('#menu').style.display = 'none'; $('#ov').style.display = 'none'; $('#lobby').style.display = 'flex';
+  if (!was) $('#lNet').dataset.k = '';
+  renderLobby();
+}
+const lobbyMsg = k => { $('#lNet').textContent = tr(k); $('#lNet').dataset.k = 'msg'; };
+$('#lLen').addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (b && NET.host) { mins = +b.dataset.l; hostLobbyUpdate(); } });
+$('#lTeam').onclick = () => { if (NET.host) hostSwitchTeam(0); else netSend({ t: 'team' }); };
+$('#lStart').onclick = () => { if (NET.host) hostStart(); };
+$('#lLeave').onclick = () => showMenu();
+$('#lShare').onclick = shareInvite;
+$('#mHost').onclick = () => { ac(); askName(n => netHost(n)); };
+$('#mJoin').onclick = () => { const c = $('#mCode').value.trim().toUpperCase(); if (/^[A-Z0-9]{4}$/.test(c)) { ac(); askName(n => netJoin(c, n)); } };
+$('#mCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('#mJoin').onclick(); });
+[$('#lobby'), $('#nameDlg')].forEach(el => el.addEventListener('pointerdown', e => e.stopPropagation()));
+
+/* -- host -- */
+function netHost(name) {
+  netClose(); netStatus('');
+  if (typeof Peer === 'undefined') return netStatus('noLib');
+  NET.host = true; myId = 0; netStatus('connecting');
+  hostPeer(null, 0, name);
+}
+/* Phones cut the link to the PeerJS broker as soon as the page goes to the background (switching to a chat app to send
+ * the invite, for example). So once a room exists its code is kept: the host reconnects with the same id whenever the
+ * link drops and whenever the page comes back to the front. Guests already in the room are not affected. */
+function hostPeer(keep, n, name) {
+  const code = keep || Array.from({ length: 4 }, () => CODE_CHARS[Math.random() * CODE_CHARS.length | 0]).join('');
+  const pr = peer = new Peer(NET_PREFIX + code);
+  pr.on('open', () => {
+    if (pr !== peer || hostCode) return;
+    hostCode = code; NET.on = true; roster = [{ id: 0, name, team: 0 }];
+    showLobby();
+  });
+  pr.on('error', e => {
+    if (pr !== peer) return;
+    if (hostCode) { roomRetry(); return; }
+    if (e.type === 'unavailable-id' && n < 6) hostPeer(null, n + 1, name); else netStatus('netErr');
+  });
+  pr.on('disconnected', () => { if (pr === peer) roomRetry(); });
+  pr.on('connection', hostAccept);
+}
+function roomRetry(now) {
+  clearTimeout(roomT);
+  if (!NET.host || !hostCode || !peer) return;
+  roomT = setTimeout(() => {
+    if (!peer || !hostCode) return;
+    if (peer.destroyed) hostPeer(hostCode, 0);
+    else if (peer.disconnected) { try { peer.reconnect(); } catch (e) { roomRetry(); } }
+  }, now ? 0 : document.hidden ? 4000 : 1500);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden && peer && (peer.disconnected || peer.destroyed)) roomRetry(true); });
+function hostAccept(c) {
+  let id = -1;
+  c.on('data', m => {
+    if (!m || typeof m.t !== 'string') return;
+    if (m.t === 'hello' && id < 0) {
+      if (running) { sendTo(c, { t: 'busy' }); setTimeout(() => c.close(), 400); return; }
+      if (roster.length >= MAXP) { sendTo(c, { t: 'full' }); setTimeout(() => c.close(), 400); return; }
+      for (id = 1; roster.some(r => r.id === id); id++);
+      const reds = roster.filter(r => r.team === 0).length;
+      guests.set(id, c); roster.push({ id, name: cleanName(m.name), team: reds <= roster.length - reds ? 0 : 1 }); roster.sort((a, b) => a.id - b.id);
+      hostLobbyUpdate();
+    } else if (id >= 0) hostOnGuest(id, m);
+  });
+  const gone = () => {
+    if (id < 0 || !guests.has(id)) return;
+    guests.delete(id); roster = roster.filter(r => r.id !== id);
+    ctls = ctls.filter(k => k.id !== id);           // the computer takes his player over
+    hostLobbyUpdate();
+  };
+  c.on('close', gone); c.on('error', gone);
+}
+function hostLobbyUpdate() {
+  const list = roster.map(r => ({ id: r.id, name: r.name, team: r.team }));
+  guests.forEach((c, id) => sendTo(c, { t: 'lobby', list, you: id, code: hostCode, mins, run: running }));
+  if ($('#lobby').style.display === 'flex') renderLobby();
+}
+function hostSwitchTeam(id) {
+  const r = roster.find(q => q.id === id); if (!r || running) return;
+  const to = 1 - r.team;
+  if (roster.filter(q => q.team === to).length >= 3) { if (id === 0) lobbyMsg('teamFull'); else sendTo(guests.get(id), { t: 'teamFull' }); return; }
+  r.team = to; hostLobbyUpdate();
+}
+const ctlById = id => ctls.find(c => c.id === id);
+function hostOnGuest(id, m) {
+  if (m.t === 'in' && num(m.x, m.y)) {
+    const c = ctlById(id); if (!c) return;
+    c.input.mx = clamp(m.x, -1, 1); c.input.my = clamp(m.y, -1, 1); c.input.sprint = !!m.s;
+  } else if (m.t === 'a' && ['kd', 'ku', 'pd', 'pu', 'sw'].includes(m.a)) {
+    const c = ctlById(id); if (c && running && S.phase === 'play') withCtl(c, () => ({ kd: kickDown, ku: kickUp, pd: passDown, pu: passUp, sw: () => switchPlayer(true) })[m.a]());
+  } else if (m.t === 'r' && Number.isInteger(m.e) && EMOTES[m.e]) {
+    const c = ctlById(id), n = performance.now(); if (!c || n - (c.lastR || 0) < 600) return;
+    c.lastR = n; const p = S.players[c.pid]; if (p) { say(p, EMOTES[m.e]); broadcast({ t: 'r', p: c.pid, e: m.e }); }
+  } else if (m.t === 'team') hostSwitchTeam(id);
+}
+/** Start: each person gets a player on their team (first two outfield, a third in goal); the computer runs the rest. */
+function hostStart() {
+  if (roster.length < 2) return;
+  ctls = [];
+  for (const t of [0, 1]) roster.filter(r => r.team === t).forEach((r, k) => {
+    const pid = t * 3 + [1, 2, 0][k], c = r.id === 0 ? me : newCtl(r.id, t, pid);
+    Object.assign(c, { team: t, pid, home: pid, keeper: pid % 3 === 0, pending: null, switchT: 0, swept: false });
+    c.input.charge = null; c.input.buffer = null; ctls.push(c);
+  });
+  FL = me.team === 1 ? -1 : 1;
+  setupMatch(); golden = false; running = true; bubbles.length = 0; outbox.length = 0;
+  $('#lobby').style.display = 'none'; $('#ov').style.display = 'none';
+  broadcast({ t: 'start', mins });
+  whistle(1); flashBan(tr('kickoff'), '#fff', '', 1000); hud();
+}
+const r2 = v => Math.round(v * 100) / 100;
+function snapshot() {
+  const b = S.ball;
+  return { t: 's', tm: r2(S.t), sc: S.score, ph: S.phase, g: golden,
+    p: S.players.map(q => [r2(q.x), r2(q.y), r2(q.vx), r2(q.vy), r2(q.face), (q.slideT > 0 ? 1 : 0) | (q.downT > 0 ? 2 : 0) | (q.sprint ? 4 : 0) | (q.slowT > 0 ? 8 : 0), r2(q.stamina)]),
+    b: [r2(b.x), r2(b.y), r2(b.z), r2(b.vx), r2(b.vy), r2(b.vz), b.held ? S.players.indexOf(b.held) : -1, S.owner ? S.players.indexOf(S.owner) : -1],
+    c: ctls.map(c => [c.id, c.pid]), ev: outbox.splice(0) };
+}
+function netEnd() {
+  running = false; whistle(3);
+  if (NET.host) broadcast({ t: 'end', sc: S.score });
+  showResult();
+}
+function showResult() {
+  const [a, b] = S.score, mine = cur.team, res = a === b ? 'draw' : (a > b) === (mine === 0) ? 'win' : 'lose';
+  $('#oT').textContent = tr(res); crowdReact(res !== 'lose', 4); toggleEmo(false);
+  $('#oS').innerHTML = '<span style="color:' + TEAMC[0].hex + '">' + a + '</span> – <span style="color:' + TEAMC[1].hex + '">' + b + '</span>';
+  $('#oP').textContent = tr('full') + ' · ' + (a === b ? tr('draw') : tr(a > b ? 'redWins' : 'blueWins')) + (NET.host ? '' : ' ' + tr('waitHost'));
+  if (NET.host) { $('#oB').style.display = ''; $('#oB').textContent = tr('toLobby'); $('#oB').onclick = () => { $('#oB').onclick = null; hostLobbyUpdate(); showLobby(); }; }
+  else $('#oB').style.display = 'none';
+  $('#oB2').textContent = tr('toMenu'); $('#oB2').onclick = showMenu;
+  $('#ov').style.display = 'flex';
+}
+
+/* -- guest -- */
+/** Guests retry for a little while before giving up, in case the host is still switching back from another app. */
+function netJoin(code, name, tries = 0) {
+  netClose(); netStatus('');
+  if (typeof Peer === 'undefined') return netStatus('noLib');
+  NET.guest = true; netStatus('connecting'); roomCode = code;
+  const pr = peer = new Peer();
+  pr.on('open', () => {
+    const c = conn = pr.connect(NET_PREFIX + code, { reliable: true });
+    c.on('open', () => netSend({ t: 'hello', name }));
+    c.on('data', onNet);
+    c.on('close', onHostGone); c.on('error', onHostGone);
+  });
+  pr.on('error', e => {
+    if (pr !== peer) return;
+    if ((e.type === 'peer-unavailable' || e.type === 'network' || e.type === 'server-error') && tries < 6) {
+      netStatus('connecting'); joinT = setTimeout(() => { if (peer === pr) netJoin(code, name, tries + 1); }, 2500); return;
+    }
+    netStatus(e.type === 'peer-unavailable' ? 'notFound' : 'netErr');
+  });
+}
+let snapA = null, snapAt = 0;
+function onNet(m) {
+  if (!m || typeof m.t !== 'string') return;
+  if (m.t === 'full' || m.t === 'busy') { netStatus(m.t === 'full' ? 'fullRoom' : 'busy'); try { conn.removeAllListeners(); } catch (e) {} NET.guest = false; return; }
+  if (m.t === 'lobby' && Array.isArray(m.list) && Number.isInteger(m.you)) {
+    roster = m.list.filter(r => r && Number.isInteger(r.id) && r.id >= 0 && r.id < 16).map(r => ({ id: r.id, name: cleanName(r.name), team: r.team === 1 ? 1 : 0 }));
+    myId = m.you; NET.on = true; if ([2, 3, 5].includes(m.mins)) mins = m.mins;
+    const r = roster.find(q => q.id === myId); if (r) me.team = r.team;
+    if (!m.run && !running) showLobby(); else if (!running) showLobby();
+    return;
+  }
+  if (!NET.on) return;
+  if (m.t === 'teamFull') lobbyMsg('teamFull');
+  else if (m.t === 'start') {
+    if ([2, 3, 5].includes(m.mins)) mins = m.mins;
+    FL = me.team === 1 ? -1 : 1; ctls = [me]; me.keeper = false;
+    setupMatch(); golden = false; running = true; bubbles.length = 0; snapA = null;
+    $('#lobby').style.display = 'none'; $('#ov').style.display = 'none';
+    whistle(1); flashBan(tr('kickoff'), '#fff', '', 1000); hud();
+  } else if (m.t === 's' && Array.isArray(m.p) && m.p.length === S.players.length && Array.isArray(m.b)) {
+    const speed0 = snapA ? hyp(snapA.b[3], snapA.b[4]) : 0;
+    snapA = m; snapAt = performance.now();
+    if (num(m.tm)) S.t = m.tm; if (Array.isArray(m.sc)) S.score = [m.sc[0] | 0, m.sc[1] | 0];
+    S.phase = m.ph === 'goal' ? 'goal' : 'play'; golden = !!m.g;
+    const mine = Array.isArray(m.c) && m.c.find(e => e[0] === myId);
+    if (mine && Number.isInteger(mine[1]) && S.players[mine[1]]) { cur.pid = mine[1]; me.keeper = mine[1] % 3 === 0; }
+    S.ball.held = m.b[6] >= 0 ? S.players[m.b[6]] || null : null; S.owner = m.b[7] >= 0 ? S.players[m.b[7]] || null : null;
+    S.humans = new Set((m.c || []).map(e => S.players[e[1]]).filter(Boolean)); guestCtls = m.c || [];
+    if (hyp(m.b[3], m.b[4]) - speed0 > 6) fx('kick', 0.5);           // the host's ball just got struck
+    for (const e of m.ev || []) if (e && typeof e.k === 'string') S.events.push({ k: e.k, team: e.team, own: e.own });
+    handleEvents();
+  } else if (m.t === 'r' && Number.isInteger(m.p) && S.players[m.p] && EMOTES[m.e]) say(S.players[m.p], EMOTES[m.e]);
+  else if (m.t === 'end' && Array.isArray(m.sc)) { S.score = [m.sc[0] | 0, m.sc[1] | 0]; running = false; whistle(3); showResult(); }
+}
+let guestCtls = [];
+/** Guest frame: send the stick, and move everything smoothly towards where the host last said it is. */
+function guestFrame(now, dt) {
+  if (now - lastIn > 33) { lastIn = now; netSend({ t: 'in', x: r2(input.mx), y: r2(input.my), s: input.sprint ? 1 : 0 }); }
+  const m = snapA; if (!m) return;
+  const age = Math.min(0.12, (now - snapAt) / 1000 * GAME_SPEED), k = Math.min(1, dt * 14);
+  m.p.forEach((a, i) => {
+    const q = S.players[i]; if (!q || !num(a[0], a[1], a[2], a[3])) return;
+    const tx = a[0] + a[2] * age, ty = a[1] + a[3] * age;
+    if (hyp(tx - q.x, ty - q.y) > 3) { q.x = tx; q.y = ty; } else { q.x += (tx - q.x) * k; q.y += (ty - q.y) * k; }
+    q.vx = a[2]; q.vy = a[3]; q.face = a[4]; q.slideT = a[5] & 1 ? 0.1 : 0; q.downT = a[5] & 2 ? 0.1 : 0; q.sprint = !!(a[5] & 4); q.slowT = a[5] & 8 ? 1 : 0; q.stamina = a[6];
+  });
+  const b = S.ball, a = m.b;
+  if (num(a[0], a[1], a[2], a[3], a[4], a[5])) {
+    const tx = a[0] + a[3] * age, ty = a[1] + a[4] * age, tz = Math.max(0, a[2] + a[5] * age - 4.9 * age * age);
+    if (hyp(tx - b.x, ty - b.y) > 4) { b.x = tx; b.y = ty; b.z = tz; } else { b.x += (tx - b.x) * k; b.y += (ty - b.y) * k; b.z += (tz - b.z) * k; }
+    b.vx = a[3]; b.vy = a[4]; b.vz = a[5];
+  }
+}
+function onHostGone() {
+  if (!NET.on) { netStatus('netErr'); return; }
+  netClose(); NET.on = false; running = false;
+  $('#lobby').style.display = 'none'; toggleEmo(false);
+  $('#oT').textContent = tr('hostLeft'); $('#oS').innerHTML = ''; $('#oP').textContent = tr('hostLeftP');
+  $('#oB').style.display = ''; $('#oB').textContent = tr('toMenu'); $('#oB').onclick = showMenu; $('#oB2').textContent = tr('toMenu'); $('#oB2').onclick = showMenu;
+  $('#ov').style.display = 'flex';
+}
+
+/* -- invites -- */
+function inviteUrl(code) {
+  let base = ''; try { base = parent.location.href.split('#')[0]; } catch (e) { base = location.href.split('#')[0]; }
+  return base + '#/game/pocket-pitch?join=' + code;
+}
+async function shareInvite() {
+  const code = NET.host ? hostCode : roomCode; if (!code) return;
+  const url = inviteUrl(code);
+  try { if (navigator.share) { await navigator.share({ title: tr('title'), text: tr('shareText'), url }); return; } }
+  catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(url); lobbyMsg('copied'); }
+  catch (e) { $('#lNet').textContent = url; }
+}
+function autoJoin() {
+  let h = ''; try { h = parent.location.hash; } catch (e) {}
+  const m = h.match(/[?&]join=([A-Za-z0-9]{4})/); if (!m) return;
+  const code = m[1].toUpperCase();
+  try { parent.history.replaceState(null, '', parent.location.href.split('#')[0] + '#/game/pocket-pitch'); } catch (e) {}
+  $('#mCode').value = code; askName(n => netJoin(code, n));
+}
+
+/* -- name tags over the other people's players -- */
+function drawTags() {
+  const box = $('#tags');
+  const list = NET.on && running ? (NET.host ? ctls.map(c => [c.id, c.pid]) : guestCtls).filter(e => e[0] !== myId) : [];
+  while (box.children.length < list.length) box.appendChild(document.createElement('span'));
+  [...box.children].forEach((el, i) => {
+    const e = list[i], p = e && S.players[e[1]];
+    if (!p) { el.style.display = 'none'; return; }
+    let sx, sy;
+    if (view3d) { const r = proj(p.x, p.y, 2.3 * HS); [sx, sy] = r; } else { [sx, sy] = toS(p.x, p.y); sy -= PR * SC * 2.4; }
+    const t = (roster.find(r => r.id === e[0]) || {}).team ?? p.team;
+    el.style.display = ''; el.textContent = nameOf(e[0]); el.style.borderColor = TEAMC[t].hex;
+    el.style.left = sx + 'px'; el.style.top = sy + 'px';
+  });
+}
+
 /* ---------- main loop ---------- */
 const GAME_SPEED = 0.92;                  // the whole match runs a touch slower than real time
 let last = performance.now(), acc = 0, hudT = 0;
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = clamp((now - last) / 1000, 0, 0.05); last = Math.max(last, now);
-  if (running) {
+  if (running && NET.guest) { clock += dt * GAME_SPEED; readKeys(); guestFrame(now, dt); }
+  else if (running) {
     acc += dt * GAME_SPEED;
     while (acc >= H) {
       acc -= H; clock += H;
       readKeys();
-      const p = human();
       if (S.phase === 'play') {
-        p.ctrl.mx = input.mx; p.ctrl.my = input.my; p.ctrl.sprint = input.sprint;
-        // while charging, the player steps onto the ball by himself and the stick only aims
-        if (input.charge === 'shot' && input.chargeAng === null) { const [ax, ay] = aimDir(p); input.chargeAng = Math.atan2(ay, ax); }
-        if ((input.charge || input.buffer) && !S.ball.held && hyp(S.ball.x - p.x, S.ball.y - p.y) < 3.5) {
-          const [ax, ay] = aimDir(p), off = PR + BR + 0.15;
-          steer(p, S.ball.x - ax * off, S.ball.y - ay * off, false, 0.6); p.ctrl.sprint = hyp(S.ball.x - p.x, S.ball.y - p.y) > 1.6;
-        }
-        if (input.buffer) { if (input.buffer.fn()) input.buffer = null; else if (clock > input.buffer.until) input.buffer = null; }
-        autoSwitch();
-        step([MATE, DIFF[diff]], human());
+        for (const c of ctls) withCtl(c, controlTick);
+        step(NET.on ? [MATE, MATE] : [MATE, DIFF[diff]], new Set(ctls.map(c => S.players[c.pid]).filter(Boolean)));
+        if (NET.host) for (const e of S.events) outbox.push({ k: e.k, team: e.team, own: !!e.own });
         handleEvents();
         if (!golden && S.t >= mins * 60 && S.phase === 'play') {
           if (S.score[0] !== S.score[1]) { endMatch(); break; }
-          golden = true; whistle(2); flashBan(tr('golden'), '#ffcf3f', tr('goldenP'), 2200); crowdReact(true, 2);
+          golden = true; S.events.push({ k: 'golden' }); if (NET.host) outbox.push({ k: 'golden' }); handleEvents();
         }
       } else if (S.phase === 'goal') {
         S.goalT -= H; stepBall(S.ball); for (const q of S.players) { q.vx *= 0.97; q.vy *= 0.97; q.x += q.vx * H; q.y += q.vy * H; }
-        if (S.goalT <= 0) { if (golden) { endMatch(); break; } kickoff(1 - S.goalTeam); switchPlayer(false); humanIdx = S.kickTeam === 0 ? 1 : humanIdx; }
+        if (S.goalT <= 0) { if (golden) { endMatch(); break; } kickoff(1 - S.goalTeam); resetControl(); }
       }
     }
+    if (NET.host && now - lastSnap > 50) { lastSnap = now; broadcast(snapshot()); }
   }
   // camera: follow the ball, look a little ahead of it, stay over the pitch. On touch screens the ball is kept in the
   // open space above the buttons (not the true centre), and the view may run past the near end so nothing hides under them.
@@ -7798,7 +8227,7 @@ function frame(now) {
   if (b && view3d) {
     // 3D: the camera pans after the play; the ball sits a little high on touch screens so it stays above the buttons
     const k = Math.min(1, dt * 3.5);
-    cam.x += (b.x + b.vx * 0.3 - cam.x) * k; cam.y += (b.y + b.vy * 0.3 - cam.y) * k;
+    cam.x += (FL * (b.x + b.vx * 0.3) - cam.x) * k; cam.y += (FL * (b.y + b.vy * 0.3) - cam.y) * k;
     const halfU = VW / 2 / CAM3.sc;
     if (portrait) { cam.y = clamp(cam.y, -Math.max(0, HW + 1 - halfU), Math.max(0, HW + 1 - halfU)); cam.x = clamp(cam.x, -HL + 6, HL - 8); }
     else { cam.x = clamp(cam.x, -Math.max(0, HL + 2 - halfU), Math.max(0, HL + 2 - halfU)); cam.y = clamp(cam.y, -HW + 7, HW - 6); }
@@ -7806,7 +8235,7 @@ function frame(now) {
   } else if (b) {
     const reserve = touchMode ? (portrait ? 235 : 130) : 0, off = Math.max(0, (reserve - 56) / 2 / SC), past = reserve / SC;
     const lead = 0.35, k = Math.min(1, dt * 4);
-    const tx = b.x + b.vx * lead - (portrait ? off : 0), ty = b.y + b.vy * lead + (portrait ? 0 : off);
+    const tx = FL * (b.x + b.vx * lead) - (portrait ? off : 0), ty = FL * (b.y + b.vy * lead) + (portrait ? 0 : off);
     cam.x += (tx - cam.x) * k; cam.y += (ty - cam.y) * k;
     const halfA = (portrait ? VH : VW) / 2 / SC, halfC = (portrait ? VW : VH) / 2 / SC;
     cam.x = halfA * 2 > L + 3 ? 0 : clamp(cam.x, -HL - 1.5 + halfA - (portrait ? past : 0), HL + 1.5 - halfA);
@@ -7816,11 +8245,11 @@ function frame(now) {
   for (const q of S.players) q.gait = ((q.gait || 0) + hyp(q.vx, q.vy) * dt * (q.sprint ? 3.3 : 3.9)) % 6283.19;   // stride phase follows the ground covered
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.imageSmoothingEnabled = false;
   if (view3d) drawScene3D(now); else drawScene2D(now);
-  ctx.setTransform(1, 0, 0, 1, 0, 0); pixelate();
+  ctx.setTransform(1, 0, 0, 1, 0, 0); pixelate(); drawTags();
   if (S.players.length) { btnLabels(false); if (running && now - hudT > 150) { hudT = now; hud(); } }
 }
 
-resize(); buildCrowd(); setTouch(matchMedia('(pointer: coarse)').matches); applyLang(); showMenu();
+resize(); buildCrowd(); setTouch(matchMedia('(pointer: coarse)').matches); applyLang(); showMenu(); autoJoin();
 requestAnimationFrame(frame);
 <\/script>
 </body>
