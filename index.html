@@ -6270,6 +6270,13 @@ body.touch #acts{display:block}
 #bPass{right:100px;bottom:8px;width:68px;height:68px;background:#2a62d899;font-size:11px}
 #bSwitch{right:14px;bottom:102px;width:60px;height:60px;background:#2b9a8f99;font-size:10px}
 #bEmo{right:104px;bottom:96px;width:48px;height:48px;background:#e8a31799;font-size:22px}
+#emo{position:fixed;left:50%;bottom:calc(14px + var(--sb));transform:translateX(-50%);display:none;grid-template-columns:repeat(8,42px);gap:5px;padding:8px;background:#0b1020ee;border:2px solid #fff3;border-radius:16px;z-index:5;max-width:calc(100vw - 16px)}
+#emo.on{display:grid}
+#emo button{width:42px;height:42px;padding:0;font-size:23px;border-radius:10px;background:#1b2340;min-height:0;border:0}
+#emo button:hover{background:#3a4670}
+body.touch #emo{bottom:auto;top:calc(60px + var(--st))}
+@media (max-width:420px){#emo{grid-template-columns:repeat(8,36px);gap:4px;padding:6px}#emo button{width:36px;height:36px;font-size:20px}}
+.btns button.on{background:#3a6df0}
 .ab span{display:block;font-size:24px;line-height:1;text-shadow:none}
 .ab small{display:block;font-size:10px;letter-spacing:.04em;margin-top:1px}
 #bShoot span{font-size:32px}
@@ -6289,8 +6296,7 @@ body.touch #hint{display:none}
 .modal .r{display:flex;gap:8px;justify-content:center;margin:10px 0 4px;flex-wrap:wrap}
 .modal .sel{background:#3a6df0;border-color:#8fb0ff}
 .modal .main{background:#2fbf5b;font-size:16px;padding:11px 26px;font-weight:800}
-.modal ul{text-align:left;font-size:13px;color:#cdd5ea;line-height:1.5;padding-left:4px;margin:8px 0;list-style:none}
-.modal li{margin:3px 0}
+.modal ul{text-align:left;font-size:13px;color:#cdd5ea;line-height:1.5;padding-left:18px;margin:8px 0}
 .big{font-size:44px;font-weight:900;margin:2px 0}
 </style>
 </head>
@@ -6299,7 +6305,8 @@ body.touch #hint{display:none}
 <div id="pad"></div><div id="stick"><i></i></div>
 <div id="acts"><div class="ab" id="bEmo"></div><div class="ab" id="bSwitch"></div><div class="ab" id="bPass"></div><div class="ab" id="bShoot"></div></div>
 <div id="top"></div>
-<div class="btns"><button id="menuB"></button><button id="view"></button><button id="lang"></button><button id="mute"></button></div>
+<div class="btns"><button id="menuB"></button><button id="view"></button><button id="emoB"></button><button id="lang"></button><button id="mute"></button></div>
+<div id="emo"></div>
 <div id="ban"></div>
 <div id="hint"></div>
 <div class="ov" id="menu"><div class="modal">
@@ -6319,20 +6326,20 @@ const LANG_KEY = 'pocketPitchLang', STATS_KEY = 'pocketPitchStats';
 const TXT = {
   en: { title: 'Pocket Pitch', menuP: '3-a-side cage football. The ball flies, spins and bounces off the boards; your players have weight and stamina.',
     diff: 'Opponent', easy: 'Easy', normal: 'Normal', hard: 'Hard', len: 'Match length', min: '{n} min', play: 'Kick off!', how: 'How to play',
-    helpT: ["🕹️ Move with the stick (left side of the screen). Push it all the way to the edge to sprint 💨: it knocks the ball a little further ahead and uses stamina.","⚽ KICK: hold to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it or play it into space. Turn the stick while charging to curl it.","🦵 When the other team has the ball, KICK turns purple and becomes SWEEP: a long sliding sweep where you push the stick (or straight at the ball). Win it or trip the man and he is slowed down 🐢 for a few seconds.","🎯 PASS: tap for a ground pass to the teammate with the blue ring (aim with the stick to choose), hold for a lofted pass over defenders.","🔄 SWITCH changes player. 😜 sends an emoji taunt. 🎥 switches between the 2D and 3D view."],
-    helpK: ["🕹️ Move: WASD or arrow keys. Sprint 💨: hold L or Shift (knocks the ball a little further ahead and uses stamina).","⚽ Kick: hold J or Space to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it. Change direction while charging to curl it.","🦵 When the other team has the ball, J / Space is SWEEP: a long sliding sweep in the direction you move (or straight at the ball). Win it or trip the man and he is slowed down 🐢 for a few seconds.","🎯 Pass: U. Tap for a ground pass to the teammate with the blue ring, hold for a lofted pass.","🔄 K or Q switches player. 😜 E sends an emoji taunt. 🎥 V switches between the 2D and 3D view."],
+    helpT: ["Move with the stick (left side of the screen). Push it all the way to the edge to sprint: it knocks the ball a little further ahead and uses stamina.","KICK: hold to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it or play it into space. Turn the stick while charging to curl it.","When the other team has the ball, KICK turns purple and becomes SWEEP: a long sliding sweep where you push the stick (or straight at the ball). Win it or trip the man and he is slowed down for a few seconds.","PASS: tap for a ground pass to the teammate with the blue ring (aim with the stick to choose), hold for a lofted pass over defenders.","SWITCH changes player. The smiley button opens the reaction panel. The camera button switches between the 2D and 3D view."],
+    helpK: ["Move: WASD or arrow keys. Sprint: hold L or Shift (knocks the ball a little further ahead and uses stamina).","Kick: hold J or Space to charge, release to kick. Aim at the goal to shoot (a crosshair shows it), anywhere else to clear it. Change direction while charging to curl it.","When the other team has the ball, J / Space is SWEEP: a long sliding sweep in the direction you move (or straight at the ball). Win it or trip the man and he is slowed down for a few seconds.","Pass: U. Tap for a ground pass to the teammate with the blue ring, hold for a lofted pass.","K or Q switches player. E opens the reaction panel (1-8 pick the first row). V switches between the 2D and 3D view."],
     you: 'YOU', cpu: 'CPU', kick: 'KICK', shoot: 'SHOOT', tackle: 'SWEEP', pass: 'PASS', sw: 'SWITCH', sprint: 'SPRINT', menu: 'Menu', snd: 'Sound',
     goal: 'GOAL!', own: 'OWN GOAL!', post: 'Off the post', bar: 'Off the bar', save: 'Saved!', kickoff: 'Kick off', golden: 'GOLDEN GOAL', goldenP: 'Next goal wins',
     full: 'Full time', win: 'You win!', lose: 'You lose', draw: 'Draw', again: 'Play again', toMenu: 'Menu', record: 'Won {w} · Drawn {d} · Lost {l} · Goals {gf}-{ga}',
-    hint: "WASD move · J kick / sweep · U pass · L sprint · K switch · E 😜 · V 🎥 3D", swept: "Swept! 🐢 Slowed down" },
+    hint: "WASD move · J kick / sweep · U pass · L sprint · K switch · E react · V 3D", swept: "Swept! Slowed down", react: "React" },
   es: { title: 'Pocket Pitch', menuP: 'Fútbol de jaula 3 contra 3. El balón vuela, gira y rebota en las bandas; tus jugadores tienen peso y resistencia.',
     diff: 'Rival', easy: 'Fácil', normal: 'Normal', hard: 'Difícil', len: 'Duración', min: '{n} min', play: '¡Saque inicial!', how: 'Cómo jugar',
-    helpT: ["🕹️ Muévete con el joystick (lado izquierdo de la pantalla). Empújalo hasta el borde para esprintar 💨: adelanta un poco el balón y gasta resistencia.","⚽ PATEAR: mantén para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar o jugar al espacio. Gira el joystick mientras cargas para darle efecto.","🦵 Cuando el rival tiene el balón, PATEAR se vuelve morado y es BARRIDA: una barrida larga hacia donde empujas el joystick (o directa al balón). Si se lo quitas o lo derribas, va lento 🐢 unos segundos.","🎯 PASE: toca para un pase raso al compañero del anillo azul (apunta con el joystick para elegir), mantén para un pase por alto.","🔄 CAMBIO cambia de jugador. 😜 lanza un emoji. 🎥 cambia entre la vista 2D y 3D."],
-    helpK: ["🕹️ Moverse: WASD o flechas. Sprint 💨: mantén L o Shift (adelanta un poco el balón y gasta resistencia).","⚽ Patear: mantén J o Espacio para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar. Cambia de dirección mientras cargas para darle efecto.","🦵 Cuando el rival tiene el balón, J / Espacio es BARRIDA: una barrida larga hacia donde te mueves (o directa al balón). Si se lo quitas o lo derribas, va lento 🐢 unos segundos.","🎯 Pase: U. Toca para un pase raso al compañero del anillo azul, mantén para un pase por alto.","🔄 K o Q cambia de jugador. 😜 E lanza un emoji. 🎥 V cambia entre la vista 2D y 3D."],
+    helpT: ["Muévete con el joystick (lado izquierdo de la pantalla). Empújalo hasta el borde para esprintar: adelanta un poco el balón y gasta resistencia.","PATEAR: mantén para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar o jugar al espacio. Gira el joystick mientras cargas para darle efecto.","Cuando el rival tiene el balón, PATEAR se vuelve morado y es BARRIDA: una barrida larga hacia donde empujas el joystick (o directa al balón). Si se lo quitas o lo derribas, va lento unos segundos.","PASE: toca para un pase raso al compañero del anillo azul (apunta con el joystick para elegir), mantén para un pase por alto.","CAMBIO cambia de jugador. El botón de la carita abre el panel de reacciones. El botón de la cámara cambia entre la vista 2D y 3D."],
+    helpK: ["Moverse: WASD o flechas. Sprint: mantén L o Shift (adelanta un poco el balón y gasta resistencia).","Patear: mantén J o Espacio para cargar y suelta. Apunta a la portería para tirar (lo marca una mira) o a otro lado para despejar. Cambia de dirección mientras cargas para darle efecto.","Cuando el rival tiene el balón, J / Espacio es BARRIDA: una barrida larga hacia donde te mueves (o directa al balón). Si se lo quitas o lo derribas, va lento unos segundos.","Pase: U. Toca para un pase raso al compañero del anillo azul, mantén para un pase por alto.","K o Q cambia de jugador. E abre el panel de reacciones (1-8 eligen la primera fila). V cambia entre la vista 2D y 3D."],
     you: 'TÚ', cpu: 'CPU', kick: 'PATEAR', shoot: 'TIRO', tackle: 'BARRIDA', pass: 'PASE', sw: 'CAMBIO', sprint: 'SPRINT', menu: 'Menú', snd: 'Sonido',
     goal: '¡GOL!', own: '¡AUTOGOL!', post: 'Al palo', bar: 'Al larguero', save: '¡Parada!', kickoff: 'Saque', golden: 'GOL DE ORO', goldenP: 'El próximo gol gana',
     full: 'Final', win: '¡Ganas!', lose: 'Pierdes', draw: 'Empate', again: 'Jugar otra vez', toMenu: 'Menú', record: 'Ganados {w} · Empates {d} · Perdidos {l} · Goles {gf}-{ga}',
-    hint: "WASD moverse · J patear / barrida · U pase · L sprint · K cambio · E 😜 · V 🎥 3D", swept: "¡Barrido! 🐢 Va lento" },
+    hint: "WASD moverse · J patear / barrida · U pase · L sprint · K cambio · E reacción · V 3D", swept: "¡Barrido! Va lento", react: "Reacción" },
 };
 let lang = 'en';
 try { lang = localStorage.getItem(LANG_KEY) === 'es' ? 'es' : 'en'; } catch (e) {}
@@ -6860,55 +6867,41 @@ function drawEmo(ch, x, y, px, a = 1, rot = 0) {
   else ctx.drawImage(img, x - w / 2, y - w / 2, w, w);
 }
 const pick = a => a[Math.floor(Math.random() * a.length)];
-const pops = [], rain = [];
-/** Emoji burst in the world: n emojis (one of list, or that one emoji) at (x, y, z) that float up and fade. */
-function burst(list, x, y, z = 1, n = 1, o = {}) {
-  for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2, sp = (o.spread ?? 1.6) * (0.4 + Math.random() * 0.6);
-    pops.push({ ch: Array.isArray(list) ? pick(list) : list, x, y, z, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, vz: (o.up ?? 2.2) * (0.7 + Math.random() * 0.6),
-      t: 0, life: (o.life ?? 1.2) * (0.8 + Math.random() * 0.4), size: (o.size ?? 0.9) * (0.8 + Math.random() * 0.4), rot: (Math.random() - 0.5) * 0.6, g: o.g ?? 1.5 });
-  }
-  if (pops.length > 300) pops.splice(0, pops.length - 300);
+/* ---- reactions: an emoji in a speech bubble over a player, sent from the reaction panel ---- */
+const bubbles = [];
+function say(p, ch, life = 2.2) {
+  for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].p === p) bubbles.splice(i, 1);
+  bubbles.push({ p, ch, t: 0, life });
 }
-/** Emoji falling over the whole screen. */
-function emojiRain(list, n) {
-  for (let i = 0; i < n; i++) rain.push({ ch: pick(list), x: Math.random() * VW, y: -30 - Math.random() * VH * 0.7, vy: 140 + Math.random() * 220, vx: (Math.random() - 0.5) * 60, r: Math.random() * 6, vr: (Math.random() - 0.5) * 4, size: 22 + Math.random() * 28 });
-  if (rain.length > 240) rain.splice(0, rain.length - 240);
-}
-function stepPops(dt) {
-  for (let i = pops.length - 1; i >= 0; i--) {
-    const q = pops[i]; q.t += dt; if (q.t >= q.life) { pops.splice(i, 1); continue; }
-    q.x += q.vx * dt; q.y += q.vy * dt; q.z += q.vz * dt; q.vz -= q.g * dt; q.vx *= 1 - dt * 1.5; q.vy *= 1 - dt * 1.5;
-    if (q.z < 0.2) { q.z = 0.2; q.vz = Math.abs(q.vz) * 0.4; }
-  }
-  for (let i = rain.length - 1; i >= 0; i--) { const q = rain[i]; q.y += q.vy * dt; q.x += q.vx * dt; q.r += q.vr * dt; if (q.y > VH + 40) rain.splice(i, 1); }
-}
-function drawPops() {
-  for (const q of pops) {
-    let sx, sy, px;
-    if (view3d) { const r = proj(q.x, q.y, q.z); if (r[3] < 1.5) continue; [sx, sy] = r; px = q.size * r[2]; }
-    else { [sx, sy] = toS(q.x, q.y); sy -= q.z * SC * 0.6; px = q.size * SC; }
-    const k = q.t / q.life;
-    drawEmo(q.ch, sx, sy, px * (k < 0.15 ? 0.5 + k / 0.3 : 1), k > 0.7 ? (1 - k) / 0.3 : 1, q.rot);
+function stepBubbles(dt) { for (let i = bubbles.length - 1; i >= 0; i--) if ((bubbles[i].t += dt) >= bubbles[i].life) bubbles.splice(i, 1); }
+function drawBubbles() {
+  for (const q of bubbles) {
+    const p = q.p; let sx, sy;
+    if (view3d) { const r = proj(p.x, p.y, 2.55 * HS); if (r[3] < 1.5) continue; [sx, sy] = r; sy -= 16; }
+    else { [sx, sy] = toS(p.x, p.y); sy -= PR * SC * 2.6 + 14; }
+    const k = q.t / q.life, sc = k < 0.12 ? 0.6 + k / 0.12 * 0.4 : 1, a = k > 0.8 ? (1 - k) / 0.2 : 1, R = 21 * sc;
+    ctx.save(); ctx.globalAlpha = a;
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = TEAMC[p.team].body; ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.arc(sx, sy, R, 0, Math.PI * 2); ctx.moveTo(sx - 6 * sc, sy + R - 3); ctx.lineTo(sx, sy + R + 9 * sc); ctx.lineTo(sx + 6 * sc, sy + R - 3);
+    ctx.fill(); ctx.stroke(); ctx.restore();
+    drawEmo(q.ch, sx, sy, 26 * sc, a);
   }
 }
-function drawRain() { for (const q of rain) drawEmo(q.ch, q.x, q.y, q.size, 1, q.r); }
 
 /* ---- the crowd: rows of emoji fans round the cage; they jump up and swap faces when something happens ---- */
-const FANS = ['😀', '😃', '😄', '😁', '😆', '🤩', '😎', '🥳', '😍', '🤠', '🧐', '😺', '👽', '🤖', '🐸', '🐼', '🦊', '🐯', '🐵', '👻', '🤡', '😜', '🙂', '😮', '🐶', '🐻', '🦁', '🐨', '🐷', '🐰', '🥸', '🤓', '👵', '👴', '🧔', '👩', '🧑'];
-const CHEER = ['🙌', '👏', '📣', '🎉', '🥳', '🤩', '🔥', '🎺', '🧣', '⚽', '💪', '🙌'];
-const SAD = ['😭', '😱', '🤦', '😩', '💔', '😤', '😫'];
+const SHIRTS = ['#e2343f', '#e2343f', '#2f74e8', '#2f74e8', '#ffcf3f', '#f4f4ee', '#4fe08a', '#9b6cf0', '#ff8a3d', '#1b1b1b'];
+const SKINS = ['#f1c7a5', '#e0a77a', '#c68b5e', '#8d5a3b', '#5c3a24'];
 const crowd = [];
 function buildCrowd() {
   crowd.length = 0;
   for (let row = 0; row < 3; row++) {
     const off = 1.4 + row * 1.0, z = BOARD_H + 0.4 + row * 0.85, sh = (row % 2) * 0.55;
-    for (let x = -HL + 0.6; x <= HL - 0.6; x += 1.15) for (const s of [1, -1]) crowd.push({ x: x + sh, y: s * (HW + off), z, ch: pick(FANS), ph: Math.random() * 6, react: null });
-    for (let y = -HW + 1.6; y <= HW - 1.6; y += 1.15) for (const s of [1, -1]) crowd.push({ x: s * (HL + GD + 0.4 + off), y: y + sh, z, ch: pick(FANS), ph: Math.random() * 6, react: null });
+    for (let x = -HL + 0.6; x <= HL - 0.6; x += 1.15) for (const s of [1, -1]) crowd.push({ x: x + sh, y: s * (HW + off), z, shirt: pick(SHIRTS), skin: pick(SKINS), ph: Math.random() * 6 });
+    for (let y = -HW + 1.6; y <= HW - 1.6; y += 1.15) for (const s of [1, -1]) crowd.push({ x: s * (HL + GD + 0.4 + off), y: y + sh, z, shirt: pick(SHIRTS), skin: pick(SKINS), ph: Math.random() * 6 });
   }
 }
 let cheerT = 0, cheerSad = false;          // seconds left of a crowd reaction, and whether it is a sad one
-function crowdReact(happy, secs = 2.6) { cheerT = secs; cheerSad = !happy; for (const f of crowd) f.react = Math.random() < 0.5 ? pick(happy ? CHEER : SAD) : null; }
+function crowdReact(happy, secs = 2.6) { cheerT = secs; cheerSad = !happy; }
 /** mode: '2d', or in 3D 'far' (drawn before the pitch) / 'near' (the stand between you and the play, drawn last). */
 function drawCrowd(now, mode) {
   const t = now / 1000;
@@ -6916,28 +6909,19 @@ function drawCrowd(now, mode) {
   for (const f of crowd) {
     if (mode !== '2d' && (mode === 'near') !== (portrait ? f.x < -HL : f.y > HW)) continue;
     const jump = cheerT > 0 ? Math.abs(Math.sin(t * 9 + f.ph)) * (cheerSad ? 0.12 : 0.45) : Math.max(0, Math.sin(t * 1.3 + f.ph)) * 0.06;
-    const ch = cheerT > 0 && f.react ? f.react : f.ch;
     let sx, sy, px;
-    if (mode === '2d') { [sx, sy] = toS(f.x, f.y); px = SC * 0.95; sy -= jump * SC; }
-    else { const r = proj(f.x, f.y, f.z + jump); if (r[3] < 2) continue; [sx, sy] = r; px = r[2] * 0.95; }
+    if (mode === '2d') { [sx, sy] = toS(f.x, f.y); px = SC * 0.8; sy -= jump * SC; }
+    else { const r = proj(f.x, f.y, f.z + jump); if (r[3] < 2) continue; [sx, sy] = r; px = r[2] * 0.8; }
     if (sx < -px || sx > VW + px || sy < -px || sy > VH + px) continue;
-    drawEmo(ch, sx, sy, px);
+    // a fan: shoulders in a shirt and a head on top (arms up while they cheer)
+    ctx.fillStyle = f.shirt; ctx.beginPath(); ctx.ellipse(sx, sy + px * 0.3, px * 0.42, px * 0.32, 0, Math.PI, 0); ctx.fill();
+    if (cheerT > 0 && !cheerSad) {
+      ctx.strokeStyle = f.shirt; ctx.lineWidth = Math.max(1, px * 0.12); ctx.beginPath();
+      ctx.moveTo(sx - px * 0.32, sy + px * 0.15); ctx.lineTo(sx - px * 0.45, sy - px * 0.35); ctx.moveTo(sx + px * 0.32, sy + px * 0.15); ctx.lineTo(sx + px * 0.45, sy - px * 0.35); ctx.stroke();
+    }
+    ctx.fillStyle = f.skin; ctx.beginPath(); ctx.arc(sx, sy - px * 0.08, px * 0.22, 0, Math.PI * 2); ctx.fill();
   }
 }
-/** The face on a player's head, from what he is doing. */
-function faceOf(p) {
-  if (p.downT > 0 && p.slideT <= 0) return '😵';
-  if (p.slideT > 0) return '😤';
-  if (p.slowT > 0) return '😵‍💫';
-  if (S.phase === 'goal') return S.goalTeam === p.team ? (p.team === 0 ? '🤩' : '😈') : '😭';
-  if (S.ball.held === p) return '😎';
-  if (p === human() && input.charge) return '😠';
-  if (S.owner === p) return p.team === 0 ? '😏' : '👾';
-  if (p.stamina < 0.25) return '🥵';
-  if (p.sprint) return '😤';
-  return p.team === 0 ? '🙂' : '🤖';
-}
-
 /* ---- 2D: straight down on the pitch ---- */
 function drawPitch() {
   ctx.fillStyle = '#0f1b14'; ctx.fillRect(0, 0, VW, VH);
@@ -6994,20 +6978,20 @@ function drawPlayer(p, isHuman, now) {
     ctx.fillStyle = '#1b1b1b';                        // feet, swinging as he runs
     ctx.beginPath(); ctx.ellipse(sw + r * 0.15, -r * 0.45, r * 0.32, r * 0.2, 0, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.ellipse(-sw + r * 0.15, r * 0.45, r * 0.32, r * 0.2, 0, 0, Math.PI * 2); ctx.fill();
-    // shoulders across the facing direction, arms swinging; the head is an emoji face drawn after
+    // shoulders across the facing direction, arms swinging, head on top
     const arm = Math.sin(now / 70 + p.num) * Math.min(1, run / 4) * r * 0.3;
     ctx.fillStyle = p.role === 'gk' ? '#f4f4ee' : '#e0a77a';
     for (const s of [1, -1]) { ctx.beginPath(); ctx.arc(s * arm + r * 0.05, s * r * 1.02, r * 0.24, 0, Math.PI * 2); ctx.fill(); }
     ctx.fillStyle = T.dark; ctx.beginPath(); ctx.ellipse(0, 0, r * 0.62, r * 1.02, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, 0, r * 0.5, r * 0.9, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.beginPath(); ctx.ellipse(-r * 0.12, -r * 0.2, r * 0.22, r * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#e0a77a'; ctx.beginPath(); ctx.arc(r * 0.12, 0, r * 0.4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#2a1a10'; ctx.beginPath(); ctx.arc(r * 0.02, 0, r * 0.36, 0, Math.PI * 2); ctx.fill();    // hair, face forward
   }
   ctx.restore();
-  const hd = lying ? r * 1.05 : r * 0.12;
-  drawEmo(faceOf(p), sx + Math.cos(fang) * hd, sy + Math.sin(fang) * hd, r * 1.25);
   ctx.fillStyle = '#fff'; ctx.font = `800 ${Math.max(9, r * 0.75)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(p.num, sx, sy - r * 1.75);
-  if (p.slowT > 0) drawEmo('🐢', sx + Math.sin(now / 180) * r * 0.3, sy - r * 2.75, r * 1.25);
+  ctx.fillText(p.num, sx, sy - r * 1.55);
+  if (p.slowT > 0) drawEmo('🐢', sx + Math.sin(now / 180) * r * 0.3, sy - r * 2.5, r * 1.1);
 }
 function ballSprite(bx, by, R, b, lw) {
   ctx.fillStyle = '#fff'; ctx.strokeStyle = '#222'; ctx.lineWidth = lw; ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
@@ -7029,6 +7013,7 @@ function drawScene2D(now) {
   for (const p of order) drawPlayer(p, p === hp, now);
   if (S.ball.z >= 1) drawBall(now);
   if (hp && S.phase === 'play') { drawAim(hp); drawCharge(hp); }
+  drawBubbles();
 }
 
 /* ---- 3D: the broadcast camera ---- */
@@ -7124,6 +7109,10 @@ function goalItems(s, items) {
   for (const y of [y0, y1]) items.push({ d: depthOf(x0, y) - 0.02, f: bar([x0, y, 0], [x0, y, BAR]) });
   items.push({ d: depthOf(x0, 0) - 0.03, f: bar([x0, y0, BAR], [x0, y1, BAR]) });
 }
+const head3 = (x, y, R) => {             // skin, then hair over the top
+  ctx.fillStyle = '#e0a77a'; ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#2a1a10'; ctx.beginPath(); ctx.arc(x, y - R * 0.15, R * 1.02, Math.PI * 1.05, Math.PI * 1.95); ctx.fill();
+};
 function drawPlayer3D(p, isHuman, now) {
   const T = TEAMC[p.team], col = p.role === 'gk' ? T.gk : T.body, [sx, sy, f] = proj(p.x, p.y, 0);
   const Y = z => proj(p.x, p.y, z * HS)[1];      // screen height of a point on him (he is drawn as an upright card)
@@ -7136,7 +7125,7 @@ function drawPlayer3D(p, isHuman, now) {
     const [ax, ay, af] = proj(p.x - c * 0.6, p.y - s * 0.6, 0.2), [bx, by, bf] = proj(p.x + c * 0.5, p.y + s * 0.5, 0.3), m = (af + bf) / 2;
     ctx.strokeStyle = T.dark; ctx.lineWidth = 0.52 * m; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
     ctx.strokeStyle = col; ctx.lineWidth = 0.4 * m; ctx.stroke();
-    drawEmo(faceOf(p), bx, by - 0.12 * bf, 0.62 * bf);
+    head3(bx, by - 0.08 * bf, 0.17 * bf);
     top = by - 0.6 * bf;
   } else {
     const run = hyp(p.vx, p.vy), sw = Math.sin(now / 70 + p.num) * Math.min(1, run / 4), w = f * 0.3;
@@ -7160,9 +7149,9 @@ function drawPlayer3D(p, isHuman, now) {
     ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(sx - w, t0, w * 2, t1 - t0, w * 0.45); else ctx.rect(sx - w, t0, w * 2, t1 - t0); ctx.fill(); ctx.stroke();
     ctx.fillStyle = '#fff'; ctx.font = `900 ${Math.max(8, f * 0.36)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(p.num, sx, (t0 + t1) / 2);
-    if (p.role === 'gk') for (const [hx, hy] of hands) drawEmo('🧤', hx, hy, f * 0.3);
-    drawEmo(faceOf(p), sx, Y(1.8), f * 0.62);
-    top = Y(2.2);
+    if (p.role === 'gk') { ctx.fillStyle = '#f4f4ee'; for (const [hx, hy] of hands) { ctx.beginPath(); ctx.arc(hx, hy, f * 0.09, 0, Math.PI * 2); ctx.fill(); } }
+    head3(sx, Y(1.72), f * 0.17);
+    top = Y(2.05);
   }
   if (isHuman) {                                   // stamina bar over his head
     const bw = Math.max(26, f * 0.9);
@@ -7190,6 +7179,7 @@ function drawScene3D(now) {
   for (const it of items) it.f();
   drawCrowd(now, 'near');
   if (hp && S.phase === 'play') { drawAim(hp); drawCharge(hp); }
+  drawBubbles();
 }
 
 function drawCharge(p) {
@@ -7220,7 +7210,6 @@ function drawAim(p) {
   ctx.strokeStyle = passing ? '#7fc8ff' : 'rgba(127,200,255,.45)'; ctx.lineWidth = passing ? 3 : 2;
   if (passing) { ctx.setLineDash([6, 5]); ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(tx, ty); ctx.stroke(); ctx.setLineDash([]); }
   ctx.beginPath(); ctx.ellipse(tx, ty, rr, rr * flat, 0, 0, Math.PI * 2); ctx.stroke();
-  if (passing) drawEmo('🎯', tx, ty - rr * 2.2, 20);
 }
 
 /* ---------- sound ---------- */
@@ -7263,12 +7252,6 @@ fx = (k, v) => {
   else if (k === 'slide' && once('slide', 150)) noise(0.25, 0.1, 900, 0.6);
   else if (k === 'foul' && once('foul', 300)) { noise(0.1, 0.18, 400, 1); tone(90, 0.12, 'sine', 0.2); }
   else if ((k === 'catch' || k === 'parry') && once('catch', 200)) { noise(0.08, 0.28, 700, 0.9); tone(170, 0.1, 'sine', 0.18, -40); }
-  // emoji pops for the big moments
-  const b = S.ball; if (!b) return;
-  if (k === 'kick' && v > 0.75) burst(v > 0.92 ? ['🚀', '🔥', '💥', '⚡'] : ['🔥', '💥', '💨'], b.x, b.y, 0.6, v > 0.92 ? 5 : 3, { spread: 1.2, up: 1.6, life: 0.9, size: 0.8 });
-  else if ((k === 'post' || k === 'bar') && once('postE', 300)) burst(['🔔', '😬', '💢', '🥶'], b.x, b.y, 1.6, 4, { spread: 1.4, up: 2, size: 0.9 });
-  else if (k === 'board' && v > 9 && once('boardE', 400)) burst(['💥', '😵'], b.x, b.y, 0.8, 1, { spread: 0.6, size: 0.7, life: 0.7 });
-  else if (k === 'head' && once('headE', 300)) burst(['🤕', '💫'], b.x, b.y, 2, 1, { spread: 0.5, size: 0.7, life: 0.8 });
 };
 const buzz = n => { try { if (!muted && navigator.vibrate) navigator.vibrate(n); } catch (e) {} };
 const headless = false;
@@ -7377,7 +7360,6 @@ function autoSwitch() {
   if (pendingSwitch && S.last !== human()) {
     const i = S.players.indexOf(pendingSwitch);
     if (S.owner === pendingSwitch || (S.last && S.last !== human() && hyp(S.ball.x - pendingSwitch.x, S.ball.y - pendingSwitch.y) < 3)) {
-      if (S.owner === pendingSwitch) burst(['👌', '🎯', '👟', '🤝'], pendingSwitch.x, pendingSwitch.y, 2.2, 1, { spread: 0.3, up: 1, life: 1, size: 0.9 });
       humanIdx = i; pendingSwitch = null; switchT = 0.5;
     }
   }
@@ -7395,7 +7377,9 @@ addEventListener('keydown', e => {
   if (e.code === 'KeyJ' || e.code === 'Space') { e.preventDefault(); kickDown(); }
   else if (e.code === 'KeyK' || e.code === 'KeyQ') switchPlayer(true);
   else if (e.code === 'KeyU' || e.code === 'KeyI') passDown();
-  else if (e.code === 'KeyE') emote();
+  else if (e.code === 'KeyE') toggleEmo();
+  else if (e.code === 'Escape') toggleEmo(false);
+  else if (emoOpen() && /^Digit[1-8]$/.test(e.code)) react(EMOTES[+e.code.slice(5) - 1]);
   else if (e.code === 'KeyV') toggleView();
   if (e.code.startsWith('Arrow')) e.preventDefault();
 });
@@ -7442,7 +7426,7 @@ function holdBtn(id, down, up) {
 holdBtn('#bShoot', kickDown, kickUp);
 holdBtn('#bPass', passDown, passUp);
 holdBtn('#bSwitch', () => switchPlayer(true), () => {});
-holdBtn('#bEmo', emote, () => {});
+holdBtn('#bEmo', () => toggleEmo(), () => {});
 addEventListener('touchstart', () => { if (!touchMode) setTouch(true); }, { passive: true });
 
 /* ---------- match flow ---------- */
@@ -7452,62 +7436,63 @@ function flashBan(text, color, sub, ms = 1800) { const el = $('#ban'); el.innerH
 function startMatch() {
   setupMatch(); humanIdx = 1; golden = false; running = true; input.charge = null; pendingSwitch = null;
   $('#menu').style.display = $('#ov').style.display = 'none';
-  whistle(1); flashBan('📣 ' + tr('kickoff'), '#fff', '', 1000); hud();
-  emojiRain(['⚽', '🏁', '📣', '🎉', '👟'], 22); crowdReact(true, 1.6);
+  whistle(1); flashBan(tr('kickoff'), '#fff', '', 1000); hud(); bubbles.length = 0; toggleEmo(false);
 }
 function endMatch() {
   running = false; whistle(3);
   const [a, b] = S.score, res = a > b ? 'win' : a < b ? 'lose' : 'draw';
   stats[res === 'win' ? 'w' : res === 'lose' ? 'l' : 'd']++; stats.gf += a; stats.ga += b;
   try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
-  $('#oT').textContent = { win: '🏆 ', lose: '😢 ', draw: '🤝 ' }[res] + tr(res);
-  emojiRain(res === 'win' ? ['🏆', '🥇', '🎉', '🥳', '⭐', '👑', '🎊'] : res === 'lose' ? ['😢', '💧', '🤖', '👾', '😩'] : ['🤝', '😐', '⚖️', '🙃'], res === 'win' ? 90 : 35);
-  crowdReact(res !== 'lose', 4);
+  $('#oT').textContent = tr(res); crowdReact(res !== 'lose', 4); toggleEmo(false);
   $('#oS').innerHTML = `<span style="color:${TEAMC[0].hex}">${a}</span> – <span style="color:${TEAMC[1].hex}">${b}</span>`;
   $('#oP').textContent = tr('full') + ' · ' + tr('record', stats);
   $('#oB').textContent = tr('again'); $('#oB').onclick = startMatch; $('#oB2').textContent = tr('toMenu'); $('#oB2').onclick = showMenu;
   $('#ov').style.display = 'flex';
 }
-const GOAL_YAY = ['⚽', '🎉', '🔥', '🥳', '🙌', '🏆', '✨', '💥', '🤩', '🎊', '💪', '👑', '🚀'];
-const GOAL_BOO = ['😭', '💔', '😱', '🤦', '😩', '🤖', '👾', '😈'];
-const TAUNTS = ['😜', '😎', '🤪', '💪', '🔥', '😂', '🥶', '👋', '🫡', '🤙', '😏', '🤌', '👀', '💅', '🐐', '⚡'];
-const REPLIES = ['😤', '🙄', '😂', '🤖', '😡', '🥱', '😒', '🤨', '👎', '💢'];
 function handleEvents() {
   for (const e of S.events) {
     if (e.k === 'goal') {
-      const mine = e.team === 0, b = S.ball;
-      flashBan(e.own ? tr('own') + ' 🤦' : tr('goal') + (mine ? ' ⚽🔥' : ' 🤖'), mine ? '#5be37d' : '#ff6b6b', '', 2000);
+      const mine = e.team === 0;
+      flashBan(e.own ? tr('own') : tr('goal'), mine ? '#5be37d' : '#ff6b6b', '', 2000);
       noise(2.2, mine ? 0.24 : 0.14, 900, 0.5, 0, 0.12); noise(1.5, 0.1, 2200, 0.7, 0.1, 0.2); whistle(1); buzz(mine ? 80 : 30);
-      emojiRain(mine ? GOAL_YAY : GOAL_BOO, mine ? 70 : 30);
-      burst(mine ? GOAL_YAY : GOAL_BOO, b.x, b.y, 1.2, 14, { spread: 4, up: 4.5, life: 1.8, size: 1.2 });
       crowdReact(mine, 3.2);
-      if (e.by) burst(mine === (e.by.team === 0) ? ['🤩', '😎', '🥳'] : ['🤦', '😳'], e.by.x, e.by.y, 2.6, 1, { spread: 0.2, up: 1, life: 2, size: 1.3, g: 0.4 });
-    } else if (e.k === 'bar') { flashBan('', '#fff', tr('bar') + ' 🔔', 900); crowdReact(false, 1.2); }
-    else if (e.k === 'save') {
-      const b = S.ball; burst(['🧤', '✋', '😮', '🛡️', '🙅'], b.x, b.y, 1.4, 4, { spread: 1.5, up: 2.4, size: 0.95 });
-      crowdReact(e.team === 0, 1.3);
-    } else if (e.k === 'swept') {
-      burst(['💥', '🦵', '💢', '🧹'], e.p.x, e.p.y, 0.8, 5, { spread: 2, up: 2.2, size: 1 });
-      flashBan('', '#c9a5ff', tr('swept'), 1000); buzz(25); crowdReact(true, 1.2);
-    } else if (e.k === 'trip') burst(['💫', '⭐', '✨', '🌟'], e.p.x, e.p.y, 1.1, 4, { spread: 1, up: 1.2, size: 0.75, life: 1 });
+      cpuReact(mine ? CPU_SAD : CPU_HAPPY, 0.6);
+    } else if (e.k === 'bar') { flashBan('', '#fff', tr('bar'), 900); crowdReact(false, 1.2); }
+    else if (e.k === 'save') crowdReact(e.team === 0, 1.3);
+    else if (e.k === 'swept') { flashBan('', '#c9a5ff', tr('swept'), 1000); buzz(25); crowdReact(true, 1.2); }
   }
   S.events.length = 0;
 }
-/** Emoji taunt over your player; a CPU player answers a moment later. */
-let emoteAt = 0;
-function emote() {
-  const p = human(); if (!p || !running) return;
-  const now = performance.now(); if (now < emoteAt) return; emoteAt = now + 450;
-  burst(TAUNTS, p.x, p.y, 2.4, 1, { spread: 0.3, up: 1.2, life: 1.7, size: 1.5, g: 0.5 }); tone(880, 0.06, 'sine', 0.05); tone(1320, 0.06, 'sine', 0.04, 0, 0.07);
-  setTimeout(() => { const q = pick(S.players.filter(o => o.team === 1)); if (q) burst(REPLIES, q.x, q.y, 2.4, 1, { spread: 0.3, up: 1.2, life: 1.7, size: 1.4, g: 0.5 }); }, 650);
+/* ---- reactions: pick an emoji in the panel and it pops up in a bubble over your player; the computer sometimes
+ * answers. The first eight also work with keys 1-8 while the panel is open. */
+const EMOTES = ['👍', '👏', '😂', '😮', '😎', '😡', '🔥', '🤝',
+  '😀', '🤣', '😍', '🤩', '😜', '🤪', '😏', '😤',
+  '😭', '😱', '🤯', '🥶', '🥵', '😴', '🙄', '🤔',
+  '🙌', '💪', '👎', '👋', '🙏', '🫡', '🤌', '👀',
+  '⚡', '💯', '🎯', '⚽', '🥅', '🧤', '🐐', '💀'];
+const CPU_HAPPY = ['😎', '🤖', '😏', '💪', '🔥'], CPU_SAD = ['😤', '😡', '🙄', '😱', '🤖'], CPU_BACK = ['😤', '🙄', '😂', '🤖', '😏', '👋', '🤔', '😎'];
+let lastReact = 0;
+const emoOpen = () => $('#emo').classList.contains('on');
+function toggleEmo(on = !emoOpen()) { $('#emo').classList.toggle('on', on); $('#emoB').classList.toggle('on', on); $('#bEmo').classList.toggle('on', on); }
+function react(ch) {
+  const p = human(), n = performance.now(); if (!p || !running || !ch || n - lastReact < 600) return;
+  lastReact = n; say(p, ch); toggleEmo(false); tone(880, 0.06, 'sine', 0.05); tone(1320, 0.06, 'sine', 0.04, 0, 0.07);
+  if (Math.random() < 0.6) cpuReact(CPU_BACK, 0.9);
 }
+/** A computer player answers with one of list after a short pause. */
+function cpuReact(list, delay) {
+  setTimeout(() => { const q = pick(S.players.filter(o => o.team === 1 && o.role === 'fp')); if (q && running) say(q, pick(list)); }, delay * 1000);
+}
+$('#emo').innerHTML = EMOTES.map(e => `<button data-e="${e}">${e}</button>`).join('');
+$('#emo').addEventListener('pointerdown', e => e.stopPropagation());
+$('#emo').addEventListener('click', e => { const b = e.target.closest('button'); if (b) react(b.dataset.e); });
 function toggleView() {
   view3d = !view3d; try { localStorage.setItem(VIEW_KEY, view3d ? '3d' : '2d'); } catch (e) {}
   tone(view3d ? 660 : 520, 0.07, 'sine', 0.05); applyLang();
 }
 function hud() {
   const T = S.t, left = Math.max(0, mins * 60 - T), m = Math.floor(left / 60), s = Math.floor(left % 60);
-  $('#top').innerHTML = `<i style="background:${TEAMC[0].hex}"></i><span>${tr('you')}</span><b>${S.score[0]}</b><span>-</span><b>${S.score[1]}</b><span>${tr('cpu')}</span><i style="background:${TEAMC[1].hex}"></i><em>${golden ? '⚡👑' : '⏱️ ' + m + ':' + String(s).padStart(2, '0')}</em>`;
+  $('#top').innerHTML = `<i style="background:${TEAMC[0].hex}"></i><span>${tr('you')}</span><b>${S.score[0]}</b><span>-</span><b>${S.score[1]}</b><span>${tr('cpu')}</span><i style="background:${TEAMC[1].hex}"></i><em>${golden ? '⚡' : m + ':' + String(s).padStart(2, '0')}</em>`;
   btnLabels(true);
 }
 /** Touch button faces. KICK turns into SWEEP (purple) while the other team has the ball. */
@@ -7519,23 +7504,23 @@ function btnLabels(force) {
   $('#bShoot').classList.toggle('sweep', sw);
   $('#bPass').innerHTML = `<span>🎯</span><small>${tr('pass')}</small>`;
   $('#bSwitch').innerHTML = `<span>🔄</span><small>${tr('sw')}</small>`;
-  $('#bEmo').innerHTML = '😜';
+  $('#bEmo').innerHTML = '😀';
 }
 function showMenu() {
-  running = false; $('#ov').style.display = 'none'; $('#menu').style.display = 'flex';
+  running = false; toggleEmo(false); $('#ov').style.display = 'none'; $('#menu').style.display = 'flex';
   if (!S.players.length) setupMatch();
   applyLang();
 }
 function applyLang() {
   document.documentElement.lang = lang;
   const btn = (id, icon, label) => { $(id).innerHTML = `<span>${icon}</span><small>${label}</small>`; };
-  btn('#menuB', '☰', tr('menu')); btn('#view', '🎥', view3d ? '2D' : '3D'); btn('#lang', '🌐', lang.toUpperCase()); btn('#mute', muted ? '🔇' : '🔊', tr('snd'));
+  btn('#menuB', '☰', tr('menu')); btn('#view', '🎥', view3d ? '2D' : '3D'); btn('#emoB', '😀', tr('react')); btn('#lang', '🌐', lang.toUpperCase()); btn('#mute', muted ? '🔇' : '🔊', tr('snd'));
   $('#mute').classList.toggle('off', muted);
-  $('#mT').textContent = '⚽ ' + tr('title') + ' 🥅'; $('#mP').textContent = tr('menuP'); $('#mD').textContent = '🤖 ' + tr('diff'); $('#mL').textContent = '⏱️ ' + tr('len'); $('#mGo').textContent = '🏁 ' + tr('play'); $('#mH').textContent = '📖 ' + tr('how');
-  $('#rD').innerHTML = ['easy', 'normal', 'hard'].map((d, i) => `<button data-d="${d}" class="${d === diff ? 'sel' : ''}">${['🐣', '⚽', '🔥'][i]} ${tr(d)}</button>`).join('');
-  $('#rL').innerHTML = [2, 3, 5].map((n, i) => `<button data-l="${n}" class="${n === mins ? 'sel' : ''}">${['⚡', '⏱️', '🏟️'][i]} ${tr('min', n)}</button>`).join('');
+  $('#mT').textContent = tr('title'); $('#mP').textContent = tr('menuP'); $('#mD').textContent = tr('diff'); $('#mL').textContent = tr('len'); $('#mGo').textContent = tr('play'); $('#mH').textContent = tr('how');
+  $('#rD').innerHTML = ['easy', 'normal', 'hard'].map((d, i) => `<button data-d="${d}" class="${d === diff ? 'sel' : ''}">${tr(d)}</button>`).join('');
+  $('#rL').innerHTML = [2, 3, 5].map((n, i) => `<button data-l="${n}" class="${n === mins ? 'sel' : ''}">${tr('min', n)}</button>`).join('');
   $('#mHelp').innerHTML = (touchMode ? TXT[lang].helpT : TXT[lang].helpK).map(s => `<li>${s}</li>`).join('');
-  $('#mRec').textContent = stats.w + stats.d + stats.l ? '📊 ' + tr('record', stats) : '';
+  $('#mRec').textContent = stats.w + stats.d + stats.l ? tr('record', stats) : '';
   $('#hint').textContent = tr('hint');
   if (S.players.length) hud();
 }
@@ -7544,9 +7529,10 @@ $('#rL').addEventListener('click', e => { const b = e.target.closest('[data-l]')
 $('#mGo').onclick = () => { ac(); crowdHum(); startMatch(); };
 $('#menuB').onclick = showMenu;
 $('#view').onclick = toggleView;
+$('#emoB').onclick = () => toggleEmo();
 $('#lang').onclick = () => { lang = lang === 'en' ? 'es' : 'en'; try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} applyLang(); };
 $('#mute').onclick = () => { muted = !muted; if (crowdNode) crowdNode.g.gain.value = muted ? 0 : 0.02; applyLang(); };
-[$('#menuB'), $('#view'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
+[$('#menuB'), $('#view'), $('#emoB'), $('#lang'), $('#mute')].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
 
 /* ---------- main loop ---------- */
 const GAME_SPEED = 0.92;                  // the whole match runs a touch slower than real time
@@ -7574,7 +7560,7 @@ function frame(now) {
         handleEvents();
         if (!golden && S.t >= mins * 60 && S.phase === 'play') {
           if (S.score[0] !== S.score[1]) { endMatch(); break; }
-          golden = true; whistle(2); flashBan('⚡ ' + tr('golden') + ' 👑', '#ffcf3f', tr('goldenP'), 2200); emojiRain(['⚡', '👑', '😬', '🔥'], 30); crowdReact(true, 2);
+          golden = true; whistle(2); flashBan(tr('golden'), '#ffcf3f', tr('goldenP'), 2200); crowdReact(true, 2);
         }
       } else if (S.phase === 'goal') {
         S.goalT -= H; stepBall(S.ball); for (const q of S.players) { q.vx *= 0.97; q.vy *= 0.97; q.x += q.vx * H; q.y += q.vy * H; }
@@ -7602,22 +7588,11 @@ function frame(now) {
     cam.x = halfA * 2 > L + 3 ? 0 : clamp(cam.x, -HL - 1.5 + halfA - (portrait ? past : 0), HL + 1.5 - halfA);
     cam.y = halfC * 2 > W + 3 ? 0 : clamp(cam.y, -HW - 1.5 + halfC, HW + 1.5 - halfC + (portrait ? 0 : past));
   }
-  // emoji life: sprint puffs, sweat when you are tired, a fire trail behind a rocket of a shot
-  cheerT -= dt; stepPops(dt);
-  if (running && S.phase === 'play' && b) {
-    for (const q of S.players) if (q.sprint && hyp(q.vx, q.vy) > 5.5 && (q.puffT = (q.puffT || 0) - dt) <= 0) {
-      q.puffT = 0.17; burst('💨', q.x - q.vx * 0.09, q.y - q.vy * 0.09, 0.35, 1, { spread: 0.25, up: 0.5, life: 0.5, size: 0.55, g: 0 });
-    }
-    const hp = human();
-    if (hp && hp.stamina < 0.25 && (sweatT -= dt) <= 0) { sweatT = 0.7; burst(['💦', '😮‍💨'], hp.x, hp.y, 2.1, 1, { spread: 0.5, up: 0.6, life: 0.8, size: 0.6 }); }
-    if (!b.held && hyp(b.vx, b.vy) > 20 && (trailT -= dt) <= 0) { trailT = 0.04; burst('🔥', b.x, b.y, b.z + 0.2, 1, { spread: 0.15, up: 0.3, life: 0.35, size: 0.5, g: 0 }); }
-  }
+  cheerT -= dt; stepBubbles(dt);
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (view3d) drawScene3D(now); else drawScene2D(now);
-  drawPops(); drawRain();
   if (S.players.length) { btnLabels(false); if (running && now - hudT > 150) { hudT = now; hud(); } }
 }
-let sweatT = 0, trailT = 0;
 
 resize(); buildCrowd(); setTouch(matchMedia('(pointer: coarse)').matches); applyLang(); showMenu();
 requestAnimationFrame(frame);
