@@ -6312,7 +6312,7 @@ const LANG_KEY = 'pocketPitchLang', STATS_KEY = 'pocketPitchStats';
 const TXT = {
   en: { title: 'Pocket Pitch', menuP: '3-a-side cage football. The ball flies, spins and bounces off the boards; your players have weight and stamina.',
     diff: 'Opponent', easy: 'Easy', normal: 'Normal', hard: 'Hard', len: 'Match length', min: '{n} min', play: 'Kick off!', how: 'How to play',
-    helpT: ['Move with the stick (left side of the screen) or WASD / arrows.', 'KICK: hold to charge, release to kick. Aim at the goal to shoot, at a teammate to pass (hold longer for a lofted pass), anywhere else to clear it. A crosshair or a ring shows which it will be.', 'Turn the stick while charging to curl it. Kick works on a loose ball too: release and your player hits it first time.', 'You keep the ball at your feet while you dribble. Double-tap the stick and hold to sprint: it knocks the ball a little further ahead and uses stamina.', 'SWEEP: a long sliding sweep where you push the stick (or straight at the ball). It knocks the ball away or trips the man on it, and you are quickly back up. SWITCH changes player.'],
+    helpT: ['Move with the stick (left side of the screen) or WASD / arrows.', 'KICK: hold to charge, release to kick. Aim at the goal to shoot, at a teammate to pass (hold longer for a lofted pass), anywhere else to clear it. A crosshair or a ring shows which it will be.', 'Turn the stick while charging to curl it. Kick works on a loose ball too: release and your player hits it first time.', 'You keep the ball at your feet while you dribble. Push the stick all the way to the edge to sprint: it knocks the ball a little further ahead and uses stamina.', 'SWEEP: a long sliding sweep where you push the stick (or straight at the ball). It knocks the ball away or trips the man on it, and you are quickly back up. SWITCH changes player.'],
     helpK: ['Move: WASD or arrow keys.', 'Kick: hold J or Space to charge, release to kick. Aim at the goal to shoot, at a teammate to pass (hold longer for a lofted pass), anywhere else to clear it. A crosshair or a ring shows which it will be.', 'Change direction while charging to curl it. Kick works on a loose ball too: release and your player hits it first time.', 'You keep the ball at your feet while you dribble; sprint (hold L or Shift) knocks it further ahead and uses stamina.', 'Sweep: U. A long sliding sweep in the direction you move (or straight at the ball). It knocks the ball away or trips the man on it, and you are quickly back up. K or Q switches player.'],
     you: 'YOU', cpu: 'CPU', kick: 'KICK', shoot: 'SHOOT', tackle: 'SWEEP', pass: 'PASS', sw: 'SWITCH', sprint: 'SPRINT', menu: 'Menu', snd: 'Sound',
     goal: 'GOAL!', own: 'OWN GOAL!', post: 'Off the post', bar: 'Off the bar', save: 'Saved!', kickoff: 'Kick off', golden: 'GOLDEN GOAL', goldenP: 'Next goal wins',
@@ -6320,7 +6320,7 @@ const TXT = {
     hint: 'WASD move · J kick (shoot / pass) · U sweep · L sprint · K switch' },
   es: { title: 'Pocket Pitch', menuP: 'Fútbol de jaula 3 contra 3. El balón vuela, gira y rebota en las bandas; tus jugadores tienen peso y resistencia.',
     diff: 'Rival', easy: 'Fácil', normal: 'Normal', hard: 'Difícil', len: 'Duración', min: '{n} min', play: '¡Saque inicial!', how: 'Cómo jugar',
-    helpT: ['Muévete con el joystick (lado izquierdo de la pantalla) o WASD / flechas.', 'PATEAR: mantén para cargar y suelta. Apunta a la portería para tirar, a un compañero para pasar (mantén más para un pase por alto) o a otro lado para despejar. Una mira o un anillo te muestra qué hará.', 'Gira el joystick mientras cargas para darle efecto. También funciona con el balón suelto: suelta y tu jugador le pega de primera.', 'Al conducir, el balón se queda pegado a tus pies. Toca dos veces el joystick y mantén para esprintar: adelanta un poco el balón y gasta resistencia.', 'BARRIDA: una barrida larga hacia donde empujas el joystick (o directa al balón). Despeja el balón o derriba al que lo lleva, y te levantas enseguida. CAMBIO cambia de jugador.'],
+    helpT: ['Muévete con el joystick (lado izquierdo de la pantalla) o WASD / flechas.', 'PATEAR: mantén para cargar y suelta. Apunta a la portería para tirar, a un compañero para pasar (mantén más para un pase por alto) o a otro lado para despejar. Una mira o un anillo te muestra qué hará.', 'Gira el joystick mientras cargas para darle efecto. También funciona con el balón suelto: suelta y tu jugador le pega de primera.', 'Al conducir, el balón se queda pegado a tus pies. Empuja el joystick hasta el borde para esprintar: adelanta un poco el balón y gasta resistencia.', 'BARRIDA: una barrida larga hacia donde empujas el joystick (o directa al balón). Despeja el balón o derriba al que lo lleva, y te levantas enseguida. CAMBIO cambia de jugador.'],
     helpK: ['Moverse: WASD o flechas.', 'Patear: mantén J o Espacio para cargar y suelta. Apunta a la portería para tirar, a un compañero para pasar (mantén más para un pase por alto) o a otro lado para despejar. Una mira o un anillo te muestra qué hará.', 'Cambia de dirección mientras cargas para darle efecto. También funciona con el balón suelto: suelta y tu jugador le pega de primera.', 'Al conducir, el balón se queda pegado a tus pies; el sprint (mantén L o Shift) lo adelanta más y gasta resistencia.', 'Barrida: U. Una barrida larga hacia donde te mueves (o directa al balón). Despeja el balón o derriba al que lo lleva, y te levantas enseguida. K o Q cambia de jugador.'],
     you: 'TÚ', cpu: 'CPU', kick: 'PATEAR', shoot: 'TIRO', tackle: 'BARRIDA', pass: 'PASE', sw: 'CAMBIO', sprint: 'SPRINT', menu: 'Menú', snd: 'Sonido',
     goal: '¡GOL!', own: '¡AUTOGOL!', post: 'Al palo', bar: 'Al larguero', save: '¡Parada!', kickoff: 'Saque', golden: 'GOL DE ORO', goldenP: 'El próximo gol gana',
@@ -7044,17 +7044,12 @@ addEventListener('keydown', e => {
 addEventListener('keyup', e => { keys[e.code] = false; if (e.code === 'KeyJ' || e.code === 'Space') shootUp(); });
 /* touch: a floating stick on the left half, buttons on the right */
 let touchMode = false, stickId = null, stickO = null;
-// double-tap the stick to sprint: a quick tap, then touch again nearby and hold; sprinting lasts until you let go
-let stickDownT = 0, tapEndT = -1, tapXY = [0, 0];
 function setTouch(on) { touchMode = on; document.body.classList.toggle('touch', on); }
 $('#pad').addEventListener('pointerdown', e => {
   if (e.pointerType === 'mouse' && !touchMode) return;
   if (e.clientX > VW * 0.55 || stickId !== null) return;
-  ac(); crowdHum(); stickId = e.pointerId; stickO = [e.clientX, e.clientY];
-  const now = performance.now();
-  input.sprint = tapEndT > 0 && now - tapEndT < 320 && hyp(e.clientX - tapXY[0], e.clientY - tapXY[1]) < 80;
-  stickDownT = now; tapEndT = -1;
-  const s = $('#stick'); s.classList.toggle('run', input.sprint); s.style.display = 'block'; s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; s.firstChild.style.transform = '';
+  ac(); crowdHum(); stickId = e.pointerId; stickO = [e.clientX, e.clientY]; input.sprint = false;
+  const s = $('#stick'); s.classList.remove('run'); s.style.display = 'block'; s.style.left = e.clientX + 'px'; s.style.top = e.clientY + 'px'; s.firstChild.style.transform = '';
   try { $('#pad').setPointerCapture(e.pointerId); } catch (er) {}
 });
 $('#pad').addEventListener('pointermove', e => {
@@ -7067,10 +7062,12 @@ $('#pad').addEventListener('pointermove', e => {
   $('#stick').firstChild.style.transform = `translate(${dx}px,${dy}px)`;
   const k = d < 6 ? 0 : Math.min(1, (d - 6) / 22);  // small dead zone, full speed after a short push
   [input.mx, input.my] = stickWorld(d ? dx / d * k : 0, d ? dy / d * k : 0);
+  // push the stick all the way to the rim to sprint (the stick glows); ease off a little to go back to running
+  const run = d >= R - (input.sprint ? 8 : 3);
+  if (run !== input.sprint) { input.sprint = run; $('#stick').classList.toggle('run', run); }
 });
 const stickEnd = e => {
   if (e.pointerId !== stickId) return;
-  const now = performance.now(); tapEndT = !input.sprint && now - stickDownT < 250 ? now : -1; tapXY = [e.clientX, e.clientY];
   stickId = null; input.mx = input.my = 0; input.sprint = false; $('#stick').style.display = 'none';
 };
 $('#pad').addEventListener('pointerup', stickEnd); $('#pad').addEventListener('pointercancel', stickEnd);
