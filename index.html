@@ -6366,7 +6366,7 @@ const S = { ball: null, players: [], score: [0, 0], t: 0, phase: 'play', freeze:
 function newBall() { return { x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, spin: 0, held: null }; }
 function newPlayer(team, role, num) {
   return { team, role, num, x: 0, y: 0, vx: 0, vy: 0, face: team ? Math.PI : 0, stamina: 1, sprint: false,
-    slideT: 0, slideDx: 0, slideDy: 0, downT: 0, slowT: 0, pokeT: 0, pokeCD: 0, kickCD: 0, touchCD: 0, diveT: 0, holdT: 0, think: 0, plan: null, ctrl: { mx: 0, my: 0, sprint: false } };
+    slideT: 0, slideDx: 0, slideDy: 0, downT: 0, slowT: 0, pokeT: 0, pokeCD: 0, kickCD: 0, touchCD: 0, diveT: 0, holdT: 0, think: 0, plan: null, goTo: null, goT: 0, ctrl: { mx: 0, my: 0, sprint: false } };
 }
 const attackDir = team => team === 0 ? 1 : -1;
 /** Lay out a kickoff: keepers in goal, two outfield players each, the kicking team's forward on the ball. */
@@ -6376,9 +6376,9 @@ function kickoff(team) {
     const d = attackDir(p.team), k = p.role === 'gk' ? 0 : p.num === 2 ? 1 : 2;
     const spots = [[-HL + 1.2, 0], [-7, 5], [-7, -5]], kickSpots = [[-HL + 1.2, 0], [-0.75, 0.3], [-6, -6]];
     const [x, y] = (p.team === team ? kickSpots : spots)[k];
-    Object.assign(p, { x: x * d, y: y * d, vx: 0, vy: 0, face: d > 0 ? 0 : Math.PI, slideT: 0, downT: 0, slowT: 0, kickCD: 0, touchCD: 0, diveT: 0, holdT: 0, plan: null, think: 0 });
+    Object.assign(p, { x: x * d, y: y * d, vx: 0, vy: 0, face: d > 0 ? 0 : Math.PI, slideT: 0, downT: 0, slowT: 0, kickCD: 0, touchCD: 0, diveT: 0, holdT: 0, plan: null, think: 0, goTo: null, goT: 0 });
   });
-  S.kickTeam = team; S.last = null; S.owner = null; S.freeze = 1.1; S.phase = 'play';
+  S.kickTeam = team; S.last = null; S.owner = null; S.pass = null; S.freeze = 1.1; S.phase = 'play';
 }
 function setupMatch() {
   S.players = [newPlayer(0, 'gk', 1), newPlayer(0, 'fp', 2), newPlayer(0, 'fp', 3), newPlayer(1, 'gk', 1), newPlayer(1, 'fp', 2), newPlayer(1, 'fp', 3)];
@@ -6611,7 +6611,7 @@ function updateOwner() {
 /* ---- actions ---- */
 const canKick = p => { const b = S.ball; return !b.held && p.kickCD <= 0 && p.downT <= 0 && p.slideT <= 0 && b.z < 0.95 && hyp(b.x - p.x, b.y - p.y) < PR + BR + 0.75; };
 /** Ground speed needed for a pass to cover dist and still arrive at ve (rolling resistance model). */
-function passSpeed(dist, ve = 3.5) {
+function passSpeed(dist, ve = 5.5) {      // ve: pace it still has when it arrives (firm, so it is hard to cut out)
   const c = 1.25, k = 0.32;
   const travel = v0 => { const t = Math.log((v0 + c / k) / (ve + c / k)) / k; return (v0 - ve) / k - c * t / k; };
   let lo = ve, hi = 30; for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (travel(m) < dist) lo = m; else hi = m; }
@@ -6621,13 +6621,16 @@ function passSpeed(dist, ve = 3.5) {
 function kick(p, kind, dx, dy, power, curl, err, tx, ty) {
   if (!canKick(p)) return false;
   const b = S.ball, l = hyp(dx, dy) || 1; let a = Math.atan2(dy / l, dx / l);
-  const tired = 1 + (1 - p.stamina) * 0.8, running = 1 + hyp(p.vx, p.vy) / 12;
-  a += (rnd() - 0.5) * 2 * err * tired * running * (kind === 'shot' ? 0.6 + power : 1);
+  if (tx !== undefined) a = Math.atan2(ty - b.y, tx - b.x);   // aimed at a point: aim from where the ball is, not the man
+  const tired = 1 + (1 - p.stamina) * 0.6, running = 1 + hyp(p.vx, p.vy) / 20;
+  a += (rnd() - 0.5) * 2 * err * tired * running * (kind === 'shot' ? 0.5 + 0.7 * power : 0.6);
   let sp, vz;
   if (kind === 'shot') { sp = 9 + 22 * power; vz = 0.4 + 3.6 * power * power + rnd() * 0.6 * power; b.spin = curl * (6 + 9 * power); }
-  else if (kind === 'pass') { const dist = tx === undefined ? 10 : hyp(tx - b.x, ty - b.y); sp = clamp(passSpeed(dist), 5, 24); vz = 0; b.spin = curl * 3; }
-  else { const dist = tx === undefined ? 14 : hyp(tx - b.x, ty - b.y); vz = 5 + 2.2 * power; const tf = 2 * vz / G; sp = clamp(dist / tf * 0.78, 4, 17); b.spin = curl * 4; }
-  b.vx = Math.cos(a) * sp + p.vx * 0.25; b.vy = Math.sin(a) * sp + p.vy * 0.25; b.vz = vz;
+  else if (kind === 'pass') { const dist = tx === undefined ? 10 : hyp(tx - b.x, ty - b.y); sp = clamp(passSpeed(dist), 6, 26); vz = 0; b.spin = curl * 3; }
+  else { const dist = tx === undefined ? 14 : hyp(tx - b.x, ty - b.y); vz = 5 + 2.2 * power; const tf = 2 * vz / G; sp = clamp(dist / tf * 0.85, 4, 18); b.spin = curl * 4; }
+  // running onto a shot adds pace along it, never a sideways drift; passes go exactly at the pace worked out above
+  const carry = kind === 'shot' ? Math.max(0, p.vx * Math.cos(a) + p.vy * Math.sin(a)) * 0.25 : 0;
+  b.vx = Math.cos(a) * (sp + carry); b.vy = Math.sin(a) * (sp + carry); b.vz = vz;
   b.z = Math.max(b.z, 0.01);
   p.face = a; p.kickCD = 0.35; p.touchCD = 0.28; touch(p);
   fx('kick', kind === 'shot' ? power : 0.3);
@@ -6698,7 +6701,7 @@ function aiKeeper(p, prof) {
       const mates = S.players.filter(q => q.team === p.team && q !== p).sort((a, c) => laneBlock(p.x, p.y, a.x, a.y, p.team) - laneBlock(p.x, p.y, c.x, c.y, p.team));
       b.held = null; p.kickCD = 0; p.touchCD = 0; b.x = p.x + Math.cos(p.face) * (PR + BR + 0.1); b.y = p.y + Math.sin(p.face) * (PR + BR + 0.1); b.z = 0.3;
       const q = mates[0];
-      if (q && laneBlock(p.x, p.y, q.x, q.y, p.team) < 1) kick(p, 'pass', q.x - p.x, q.y - p.y, 0, 0, 0.04, q.x, q.y);
+      if (q && laneBlock(p.x, p.y, q.x, q.y, p.team) < 1) { if (kick(p, 'pass', q.x - p.x, q.y - p.y, 0, 0, 0.04, q.x, q.y)) passTo(p, q); }
       else kick(p, 'lob', d, (rnd() - 0.5) * 0.6, 0.8, 0, 0.1, d * 6, (rnd() - 0.5) * 10);
       p.touchCD = 0.6;
     }
@@ -6726,68 +6729,164 @@ function aiKeeper(p, prof) {
   steer(p, gx + Math.cos(ang) * r, clamp(Math.sin(ang) * r, -GW / 2 + 0.3, GW / 2 - 0.3), false, 0.8);
   p.ctrl.mx *= 1; p.face = Math.atan2(b.y - p.y, b.x - p.x);
 }
-/** Outfield brain: the nearest player (by time) chases; the other finds space (attacking) or covers (defending). */
+/** Tell the receiver a pass is coming his way (he goes to meet it for up to 3 s). */
+function passTo(from, to) { if (to && to.role === 'fp') S.pass = { from, to, until: S.t + 3 }; }
+/** Outfield brain. Nobody tracks the ball step by step: each player re-plans only every few tenths of a second
+ *  (sooner on harder levels) and keeps to that plan in between, so they read the play instead of copying it.
+ *  One player goes for the ball (pressing the man on it, or collecting it); the other marks your free man when you
+ *  have it, or runs into open space when his team has it. */
 function aiTeam(team, prof, humanP) {
   const b = S.ball, d = attackDir(team), mine = S.players.filter(p => p.team === team);
   const fps = mine.filter(p => p.role === 'fp');
-  const owner = S.owner, attacking = owner && owner.team === team, oppHas = owner && owner.team !== team, theirKeeperHas = b.held && b.held.team !== team;
-  const tt = p => hyp(interceptPoint(p, prof)[0] - p.x, interceptPoint(p, prof)[1] - p.y);
-  const chaser = fps.slice().sort((a, c) => (a === owner ? -99 : tt(a)) - (c === owner ? -99 : tt(c)))[0];
+  const owner = S.owner, attacking = !!owner && owner.team === team;
+  const ownKeeperHas = !!b.held && b.held.team === team, theirKeeperHas = !!b.held && b.held.team !== team;
+  const oppHas = !!owner && owner.team !== team && !b.held;
+  S.chase = S.chase || [null, null];
+  const prev = S.chase[team];
+  // a pass on its way: the man it is meant for comes to meet it (until someone else touches it or it dies). This
+  // holds even once control has switched to him, so the ball is never left rolling past your own receiver.
+  if (S.pass && (S.last !== S.pass.from || S.t > S.pass.until || b.held)) S.pass = null;
+  const recv = S.pass && S.pass.to.team === team ? S.pass.to : null;
+  if (recv) {
+    recv.prof = prof; const [ix, iy] = interceptPoint(recv, prof);
+    steer(recv, ix, iy, hyp(ix - recv.x, iy - recv.y) > 2.5, 0.3);
+  }
+  // who goes for the ball: the man on it, or whoever gets there first (the current one keeps the job unless clearly beaten)
+  const tt = p => { const [ix, iy] = interceptPoint(p, prof); return hyp(ix - p.x, iy - p.y) - (p === prev ? 1.5 : 0); };
+  const chaser = ownKeeperHas || theirKeeperHas ? null : attacking && owner.role === 'fp' ? owner : fps.slice().sort((a, c) => tt(a) - tt(c))[0];
+  S.chase[team] = chaser;
   for (const p of mine) {
     p.prof = prof;
     if (p.role === 'gk') { aiKeeper(p, prof); continue; }
-    if (p === humanP) continue;
-    if (p === chaser && !theirKeeperHas) aiChaser(p, prof, d);
-    else if (attacking) {                          // make a run into space ahead of the ball, on the other side
-      const tx = clamp(b.x + d * 7, -HL + 4, HL - 4), ty = clamp(-Math.sign(b.y || 1) * 5.5, -HW + 2, HW - 2);
-      steer(p, tx, ty, hyp(tx - p.x, ty - p.y) > 6);
-    } else {                                      // drop between the ball and our goal, a bit wide of it
-      const gx = -d * HL, k = oppHas ? 0.5 : 0.62;
-      const tx = gx + (b.x - gx) * k, ty = b.y * k + (b.y > 0 ? -2.5 : 2.5);
-      steer(p, tx, clamp(ty, -HW + 1.5, HW - 1.5), oppHas);
+    if (p === humanP || p === recv) continue;
+    p.goT -= H;
+    if (p === chaser) { if (oppHas) aiPress(p, prof, d); else aiChaser(p, prof, d); continue; }
+    // possession changed: drop the old plan after a moment's reaction instead of finishing a run the wrong way
+    const mode = attacking || ownKeeperHas ? 'att' : 'def';
+    if (p.goMode !== mode) { p.goMode = mode; p.goT = Math.min(p.goT, prof.react * (0.6 + rnd() * 0.6)); }
+    if (p.goT <= 0 || !p.goTo) {                    // time to re-plan (blocking a shooter needs quicker updates)
+      p.goTo = mode === 'att' ? findSpace(p, d) : coverSpot(p, d);
+      p.goT = (attacking || ownKeeperHas ? 0.75 : p.goTo.block ? prof.react + 0.1 : prof.react * 2 + 0.2) * (0.75 + rnd() * 0.5);
     }
+    const g = p.goTo;
+    steer(p, g.x, g.y, hyp(g.x - p.x, g.y - p.y) > 5 && p.stamina > 0.35, 1.2);
   }
 }
+/** Defending off the ball: goal-side of the most dangerous opponent who hasn't got it, shaded towards the ball so a
+ *  pass to him can be cut out. If nobody is worth marking, hold a spot between the ball and our goal. */
+function coverSpot(p, d) {
+  const b = S.ball, gx = -d * HL, carrier = S.owner || b.held;
+  const threats = S.players.filter(o => o.team !== p.team && o.role === 'fp' && o !== carrier).sort((a, c) => hyp(a.x - gx, a.y) - hyp(c.x - gx, c.y));
+  const m = threats[0];
+  // their man on the ball within shooting range: block his lane to goal, unless his mate is unmarked right in front of it
+  if (carrier && carrier.team !== p.team && carrier.role === 'fp' && hyp(carrier.x - gx, carrier.y) < 18 && !(m && hyp(m.x - gx, m.y) < 7)) {
+    const cx = carrier.x + carrier.vx * 0.3, cy = carrier.y + carrier.vy * 0.3;
+    return { x: clamp(cx + (gx - cx) * 0.45, -HL + 1, HL - 1), y: clamp(cy * 0.55, -HW + 1, HW - 1), block: true };
+  }
+  if (m && hyp(m.x - gx, m.y) < HL * 1.35) {
+    const mx = m.x + m.vx * 0.35, my = m.y + m.vy * 0.35, gdx = gx - mx, gdy = -my, gl = hyp(gdx, gdy) || 1;
+    let tx = mx + gdx / gl * 1.8, ty = my + gdy / gl * 1.8;
+    tx += (b.x - tx) * 0.2; ty += (b.y - ty) * 0.2;
+    return { x: clamp(tx, -HL + 1, HL - 1), y: clamp(ty, -HW + 1, HW - 1) };
+  }
+  return { x: gx + (b.x - gx) * 0.5, y: clamp(b.y * 0.4, -HW + 1.5, HW - 1.5) };
+}
+/** Attacking off the ball: open grass ahead of the ball that a pass can reach — away from defenders, a clear lane
+ *  from the ball, closer to goal is better. The spot he is already running to gets a bonus, so runs are finished. */
+function findSpace(p, d) {
+  const b = S.ball, opp = S.players.filter(o => o.team !== p.team), gx = d * HL, cands = [];
+  if (p.goTo) cands.push([p.goTo.x, p.goTo.y, 1.2]);
+  for (let i = 0; i < 16; i++) cands.push([b.x + d * (2 + rnd() * 13), (rnd() * 2 - 1) * (HW - 2.5), 0]);
+  let best = null, bs = -1e9;
+  for (const [x0, y0, bonus] of cands) {
+    const x = clamp(x0, -HL + 2.5, HL - 2.5), y = clamp(y0, -HW + 2, HW - 2), dBall = hyp(x - b.x, y - b.y);
+    if (dBall < 4.5 || dBall > 17) continue;
+    const free = Math.min(6, ...opp.map(o => hyp(o.x - x, o.y - y)));
+    const s = free * 1.1 - laneBlock(b.x, b.y, x, y, p.team) * 3 - hyp(gx - x, y) * 0.32 - hyp(x - p.x, y - p.y) * 0.05 + bonus;
+    if (s > bs) { bs = s; best = { x, y }; }
+  }
+  return best || { x: clamp(b.x + d * 6, -HL + 3, HL - 3), y: clamp(-b.y * 0.5, -HW + 2, HW - 2) };
+}
+/** Pressing the man on the ball: close him down from the goal side and step in to challenge, stabbing at it most
+ *  eagerly after a loose touch or when he turns his back. His direction is only re-read every reaction time, so a
+ *  sharp turn can still beat the defender. */
+function aiPress(p, prof, d) {
+  const b = S.ball, o = S.owner, gx = -d * HL, dist = hyp(b.x - p.x, b.y - p.y);
+  if (p.goT <= 0 || !p.goTo) {
+    p.goT = prof.react * (dist < 3 ? 0.6 : 1) * (0.8 + rnd() * 0.6);
+    // from the goal side: a step goal-side of where he is heading when far, right onto the ball when close
+    const lead = clamp(dist / 8, 0.12, 0.6), bx = b.x + o.vx * lead, by = b.y + o.vy * lead;
+    const gdx = gx - bx, gdy = -by, gl = hyp(gdx, gdy) || 1, off = dist > 4 ? 0.9 : dist > 2 ? 0.45 : 0.1;
+    p.goTo = { x: bx + gdx / gl * off, y: by + gdy / gl * off };
+  }
+  steer(p, p.goTo.x, p.goTo.y, dist > 3 && p.stamina > 0.2, 0.4);
+  if (p.slideT > 0 || p.downT > 0) return;
+  const dx = b.x - p.x, dy = b.y - p.y, facing = (Math.cos(p.face) * dx + Math.sin(p.face) * dy) / (dist || 1);
+  const loose = hyp(b.x - o.x, b.y - o.y) > PR + BR + 0.3;
+  const back = Math.cos(o.face) * (p.x - o.x) + Math.sin(o.face) * (p.y - o.y) < 0;   // he is facing away from us
+  if (dist < 1.5 && facing > 0.3) { if (rnd() < prof.tackle * H * (loose ? 7 : back ? 4 : 2.4)) poke(p); }
+  else if (dist > 1.6 && dist < 2.5 && facing > 0.85 && (loose || back) && rnd() < prof.tackle * H * 1.2) slide(p);
+}
+/** The man for the ball when it is ours or loose: collect it, and on the ball choose between a shot, a pass and a
+ *  dribble into the most open direction. */
 function aiChaser(p, prof, d) {
   const b = S.ball, owner = S.owner;
   p.think -= H;
   if (owner === p && canKick(p)) {
+    const opp = S.players.filter(o => o.team !== p.team), freeAt = (x, y) => Math.min(...opp.map(o => hyp(o.x - x, o.y - y)));
+    if (p.think > 0.08 && freeAt(p.x, p.y) < 2.2) p.think = 0.08;   // a defender closing in: decide again right now
     if (p.think <= 0) {
       p.think = prof.think * (0.7 + rnd() * 0.6);
-      const gx = d * HL, toGoal = hyp(gx - p.x, p.y), press = S.players.filter(o => o.team !== p.team && o.role === 'fp' && hyp(o.x - p.x, o.y - p.y) < 2.6).length;
-      const gk = S.players.find(o => o.team !== p.team && o.role === 'gk');
-      // shoot: in range with a lane; aim for the side away from the keeper
-      if (toGoal < 15 && Math.abs(p.y) < 11 && d * p.x > 0) {
-        const side = gk && gk.y > 0 ? -1 : 1, ty = side * (GW / 2 - 0.45 - rnd() * 0.6);
-        if (laneBlock(p.x, p.y, gx, ty, p.team) < 1 || toGoal < 7) {
+      const gx = d * HL, toGoal = hyp(gx - p.x, p.y), press = opp.filter(o => o.role === 'fp' && hyp(o.x - p.x, o.y - p.y) < 2.6).length;
+      const gk = opp.find(o => o.role === 'gk');
+      // shoot: in range, at the corner further from the keeper with the clearer lane
+      if (toGoal < 16 && Math.abs(p.y) < 11 && d * p.x > 0) {
+        let ty = 0, best = -1e9;
+        for (const s of [-1, 1]) {
+          const y = s * (GW / 2 - 0.45 - rnd() * 0.5), sc = (gk ? Math.abs(gk.y - y) : 3) - laneBlock(p.x, p.y, gx, y, p.team) * 2;
+          if (sc > best) { best = sc; ty = y; }
+        }
+        if (laneBlock(p.x, p.y, gx, ty, p.team) < 1 || toGoal < 6 || (toGoal < 11 && rnd() < 0.25)) {
           const pw = clamp(0.45 + toGoal / 22 + rnd() * 0.25, 0.4, 1);
           kick(p, 'shot', gx - p.x, ty - p.y, pw, (rnd() - 0.5) * 0.6, prof.err); return;
         }
+      } else if (toGoal < 20 && d * p.x > -2 && press === 0 && laneBlock(p.x, p.y, gx, 0, p.team) < 0.5 && rnd() < 0.3) {
+        kick(p, 'shot', gx - p.x, (rnd() - 0.5) * (GW - 1.2) - p.y, 0.95, (rnd() - 0.5) * 0.8, prof.err * 1.3); return;   // a long one
       }
-      // pass when pressed and a mate is better placed
+      // pass: when pressed and the mate is free, or when he is free and clearly better placed
       const mate = S.players.find(q => q.team === p.team && q.role === 'fp' && q !== p);
-      if (mate && (press > 0 || d * (mate.x - p.x) > 5) && laneBlock(p.x, p.y, mate.x, mate.y, p.team) < 1 && rnd() < 0.75) {
-        const t = hyp(mate.x - p.x, mate.y - p.y) / 12, mx = mate.x + mate.vx * t, my = mate.y + mate.vy * t;
-        if (hyp(mx - gx, my) < toGoal + 1.5 || press > 1) { kick(p, hyp(mx - p.x, my - p.y) > 15 ? 'lob' : 'pass', mx - p.x, my - p.y, 0.6, 0, prof.err * 0.6, mx, my); return; }
+      if (mate) {
+        const t = hyp(mate.x - p.x, mate.y - p.y) / 12, mx = clamp(mate.x + mate.vx * t, -HL + 1, HL - 1), my = clamp(mate.y + mate.vy * t, -HW + 1, HW - 1);
+        const mFree = freeAt(mx, my), mGoal = hyp(gx - mx, my), better = mGoal < toGoal - 2, notWorse = mGoal < toGoal + 3;
+        if (laneBlock(p.x, p.y, mx, my, p.team) < 1 && mFree > 2.2 && (press > 0 && (notWorse || press > 1) && rnd() < 0.8 || better && mFree > 3 && rnd() < 0.6)) {
+          if (kick(p, hyp(mx - p.x, my - p.y) > 15 ? 'lob' : 'pass', mx - p.x, my - p.y, 0.6, 0, prof.err * 0.6, mx, my)) passTo(p, mate); return;
+        }
       }
-      // dribble: towards goal, bending away from the nearest defender
-      let ax = gx - p.x, ay = -p.y * 0.4; const al = hyp(ax, ay) || 1; ax /= al; ay /= al;
-      const near = S.players.filter(o => o.team !== p.team).sort((a, c) => hyp(a.x - p.x, a.y - p.y) - hyp(c.x - p.x, c.y - p.y))[0];
-      if (near) { const ox = p.x - near.x, oy = p.y - near.y, od = hyp(ox, oy) || 1; if (od < 4) { ax += ox / od * (4 - od) * 0.35; ay += oy / od * (4 - od) * 0.45; } }
-      if (Math.abs(p.y) > HW - 2.5) ay -= Math.sign(p.y) * 0.6;
-      p.plan = [ax, ay];
+      // pressed deep in our own third: no risks, clear it high up the wing
+      if (d * p.x < -HL / 3 && opp.some(o => o.role === 'fp' && hyp(o.x - p.x, o.y - p.y) < 3.2)) {
+        const ty = (p.y >= 0 ? 1 : -1) * (HW - 4) * (0.5 + rnd() * 0.5), tx = p.x + d * (14 + rnd() * 6);
+        kick(p, 'lob', tx - p.x, ty - p.y, 0.8, 0, prof.err, tx, ty); return;
+      }
+      // dribble: the direction with the most room that still gains ground (a sharp cut past a close defender)
+      const base = Math.atan2(-p.y * 0.35, gx - p.x), was = p.plan ? Math.atan2(p.plan[1], p.plan[0]) : base;
+      let bestA = base, bsc = -1e9;
+      for (let i = -5; i <= 5; i++) {
+        const a = base + i * 0.36, c = Math.cos(a), s = Math.sin(a), px2 = p.x + c * 3, py2 = p.y + s * 3;
+        if (Math.abs(py2) > HW - 1.2 || Math.abs(px2) > HL - 0.8) continue;
+        // room right in front matters most (that is where a defender takes it), then room further on, then ground gained
+        const sc = Math.min(2, freeAt(p.x + c * 0.9, p.y + s * 0.9)) * 2.5 + Math.min(2.5, freeAt(p.x + c * 1.8, p.y + s * 1.8)) * 1.5 + Math.min(4, freeAt(px2, py2)) * 0.6
+          + (toGoal - hyp(gx - px2, py2)) * 0.9 - Math.abs(i) * 0.05 + (Math.cos(a - was) > 0.9 ? 0.3 : 0);
+        if (sc > bsc) { bsc = sc; bestA = a; }
+      }
+      p.plan = [Math.cos(bestA), Math.sin(bestA)];
     }
-    const pl = p.plan || [d, 0]; p.ctrl.mx = pl[0]; p.ctrl.my = pl[1]; p.ctrl.sprint = p.stamina > 0.5 && rnd() < 0.02 ? true : p.ctrl.sprint && p.stamina > 0.2;
+    const pl = p.plan || [d, 0]; p.ctrl.mx = pl[0]; p.ctrl.my = pl[1];
+    p.ctrl.sprint = p.stamina > 0.4 && freeAt(p.x + pl[0] * 3, p.y + pl[1] * 3) > 4.5;   // burst only into real open space
     return;
   }
-  // win it back / get to it
+  // loose (or a teammate's touch away): get to where it will be
   const [ix, iy] = interceptPoint(p, prof);
   steer(p, ix, iy, true, 0.4);
-  if (owner && owner.team !== p.team && p.slideT <= 0 && p.downT <= 0) {
-    const dx = b.x - p.x, dy = b.y - p.y, dist = hyp(dx, dy), facing = (Math.cos(p.face) * dx + Math.sin(p.face) * dy) / (dist || 1);
-    if (dist < 1.5 && facing > 0.5 && rnd() < prof.tackle * H * 3) poke(p);
-    else if (dist < 2.3 && dist > 1.5 && facing > 0.85 && rnd() < prof.tackle * H * 0.8) slide(p);
-  }
 }
 
 /** One fixed step of the whole match. ai(team) gives the brain profile, humanP is the player steered by input. */
@@ -6958,40 +7057,148 @@ function drawPitch() {
   ctx.restore();
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
+/* ---- players: a slim figure with a real run cycle ----
+ * The stride phase moves with the distance covered (p.gait, advanced every frame), so the feet keep pace with the
+ * ground instead of paddling on a timer. Walking is a small stride; a jog adds knee lift; a sprint adds a long
+ * stride, a high back kick, a forward lean and a pumping arm swing. Arms swing against the legs. */
+const SKIN = '#e0a77a', HAIR = '#2a1a10', BOOT = '#141414';
+function gaitOf(p) {
+  const v = hyp(p.vx, p.vy);
+  return { ph: p.gait || 0, v, amp: Math.min(1, v / 3), run: clamp((v - 3) / 4.5, 0, 1) };
+}
+/** Joint positions of the run cycle in his own side view: u forward, z up (metres). k = +1 / -1 for each side. */
+function pose(g, k) {
+  const ph = g.ph + (k > 0 ? 0 : Math.PI), A = (0.32 + 0.38 * g.run) * g.amp;
+  const bob = (Math.abs(Math.cos(g.ph)) - 0.5) * 0.06 * g.amp, hipZ = 0.9 + bob, lean = 0.06 * g.amp + 0.2 * g.run;
+  // leg: the thigh swings, the knee folds while the leg swings through (most when sprinting)
+  const th = Math.sin(ph) * A, bend = 0.12 + (0.5 + 1.4 * g.run) * g.amp * Math.max(0, Math.cos(ph));
+  const ku = Math.sin(th) * 0.45, kz = hipZ - Math.cos(th) * 0.45, sa = th - bend;
+  const fu = ku + Math.sin(sa) * 0.45, fz = Math.max(0.04, kz - Math.cos(sa) * 0.45);
+  // arm: swings against the same-side leg, elbow bent more the faster he goes
+  const sz = hipZ + 0.52, su = Math.sin(lean) * 0.52, aa = -Math.sin(ph) * A * 1.15, eb = 0.35 + 1.05 * g.amp;
+  const eu = su + Math.sin(aa) * 0.28, ez = sz - Math.cos(aa) * 0.28, hu = eu + Math.sin(aa + eb) * 0.25, hz = ez - Math.cos(aa + eb) * 0.25;
+  return { hipZ, lean, ku, kz, fu, fz, su, sz, eu, ez, hu, hz };
+}
+
+/* -- 2D: seen from straight above -- */
 function drawPlayer(p, isHuman, now) {
   const [sx, sy] = toS(p.x, p.y), r = PR * SC, T = TEAMC[p.team], col = p.role === 'gk' ? T.gk : T.body;
   const fang = portrait ? Math.atan2(-Math.cos(p.face), Math.sin(p.face)) : p.face;
-  const lying = p.downT > 0 && p.slideT <= 0 || p.slideT > 0;
   ctx.save(); ctx.translate(sx, sy);
-  // shadow
-  ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(r * 0.25, r * 0.3, r * 1.05, r * 0.85, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,.26)'; ctx.beginPath(); ctx.ellipse(r * 0.22, r * 0.28, r * 0.75, r * 0.55, 0, 0, Math.PI * 2); ctx.fill();
   if (isHuman) {                                   // ring + stamina arc
     ctx.strokeStyle = '#ffe14f'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(0, 0, r * 1.55, 0, Math.PI * 2); ctx.stroke();
     ctx.strokeStyle = p.stamina > 0.3 ? '#5be37d' : '#ff6b6b'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, r * 1.95, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * p.stamina); ctx.stroke();
   }
-  ctx.rotate(fang);
-  if (lying) {                                     // on the ground: stretched out
-    ctx.fillStyle = T.dark; ctx.beginPath(); ctx.ellipse(0, 0, r * 1.5, r * 0.75, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, 0, r * 1.3, r * 0.62, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.rotate(fang); ctx.lineCap = 'round';
+  const L = (x0, y0, x1, y1, w, c) => { ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); };
+  const head = (x, y) => { ctx.fillStyle = SKIN; ctx.beginPath(); ctx.arc(x, y, r * 0.23, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = HAIR; ctx.beginPath(); ctx.arc(x - r * 0.05, y, r * 0.2, 0, Math.PI * 2); ctx.fill(); };
+  if (p.slideT > 0) {                              // sliding in feet first, leaning back on one arm
+    L(0, -r * 0.12, r * 1.25, -r * 0.18, r * 0.2, T.dark); L(r * 1.15, -r * 0.18, r * 1.4, -r * 0.2, r * 0.22, BOOT);
+    L(0, r * 0.12, r * 0.6, r * 0.35, r * 0.2, T.dark);
+    L(-r * 0.2, r * 0.3, -r * 0.75, r * 0.55, r * 0.14, SKIN);
+    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(-r * 0.3, 0, r * 0.45, r * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+    head(-r * 0.85, 0);
+  } else if (p.downT > 0) {                        // tripped: flat on his front, arms out ahead
+    L(-r * 0.2, -r * 0.12, -r * 1.2, -r * 0.22, r * 0.2, T.dark); L(-r * 0.2, r * 0.12, -r * 1.2, r * 0.25, r * 0.2, T.dark);
+    L(r * 0.4, -r * 0.3, r * 1.15, -r * 0.5, r * 0.14, SKIN); L(r * 0.4, r * 0.3, r * 1.15, r * 0.5, r * 0.14, SKIN);
+    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(r * 0.15, 0, r * 0.5, r * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+    head(r * 0.85, 0);
   } else {
-    const run = hyp(p.vx, p.vy), sw = Math.sin(now / 70 + p.num) * Math.min(1, run / 4) * r * 0.45;
-    ctx.fillStyle = '#1b1b1b';                        // feet, swinging as he runs
-    ctx.beginPath(); ctx.ellipse(sw + r * 0.15, -r * 0.45, r * 0.32, r * 0.2, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(-sw + r * 0.15, r * 0.45, r * 0.32, r * 0.2, 0, 0, Math.PI * 2); ctx.fill();
-    // shoulders across the facing direction, arms swinging, head on top
-    const arm = Math.sin(now / 70 + p.num) * Math.min(1, run / 4) * r * 0.3;
-    ctx.fillStyle = p.role === 'gk' ? '#f4f4ee' : '#e0a77a';
-    for (const s of [1, -1]) { ctx.beginPath(); ctx.arc(s * arm + r * 0.05, s * r * 1.02, r * 0.24, 0, Math.PI * 2); ctx.fill(); }
-    ctx.fillStyle = T.dark; ctx.beginPath(); ctx.ellipse(0, 0, r * 0.62, r * 1.02, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(0, 0, r * 0.5, r * 0.9, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,.22)'; ctx.beginPath(); ctx.ellipse(-r * 0.12, -r * 0.2, r * 0.22, r * 0.5, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#e0a77a'; ctx.beginPath(); ctx.arc(r * 0.12, 0, r * 0.4, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#2a1a10'; ctx.beginPath(); ctx.arc(r * 0.02, 0, r * 0.36, 0, Math.PI * 2); ctx.fill();    // hair, face forward
+    const g = gaitOf(p), st = Math.sin(g.ph), stride = r * (0.5 + 0.45 * g.run) * g.amp, lean = r * 0.18 * g.run;
+    for (const k of [1, -1]) {                     // legs reach out ahead and behind, one each way
+      const fwd = st * k * stride;
+      L(0, k * r * 0.13, fwd, k * r * 0.16, r * 0.17, T.dark);
+      ctx.fillStyle = BOOT; ctx.beginPath(); ctx.ellipse(fwd + r * 0.07, k * r * 0.16, r * 0.15, r * 0.09, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    for (const k of [1, -1]) {                     // arms swing against the legs, hands close to the body
+      const fwd = -st * k * stride * 0.75;
+      L(lean, k * r * 0.36, lean + fwd, k * r * 0.44, r * 0.13, p.role === 'gk' ? '#f4f4ee' : SKIN);
+    }
+    ctx.fillStyle = col; ctx.strokeStyle = T.dark; ctx.lineWidth = Math.max(1, r * 0.06);   // narrow shoulders across
+    ctx.beginPath(); ctx.ellipse(lean * 0.6, 0, r * 0.24, r * 0.42, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    head(lean + r * 0.05, 0);
   }
   ctx.restore();
   ctx.fillStyle = '#fff'; ctx.font = `800 ${Math.max(9, r * 0.75)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(p.num, sx, sy - r * 1.55);
-  if (p.slowT > 0) drawEmo('🐢', sx + Math.sin(now / 180) * r * 0.3, sy - r * 2.5, r * 1.1);
+  ctx.fillText(p.num, sx, sy - r * 1.45);
+  if (p.slowT > 0) drawEmo('🐢', sx + Math.sin(now / 180) * r * 0.3, sy - r * 2.4, r * 1.1);
+}
+
+/* -- 3D: an upright jointed figure, side-on when he runs across the screen and face-on when he runs towards or away
+ * from the camera -- */
+function drawPlayer3D(p, isHuman, now) {
+  const T = TEAMC[p.team], col = p.role === 'gk' ? T.gk : T.body, [sx, sy, f] = proj(p.x, p.y, 0);
+  groundDisc(p.x + 0.04, p.y + 0.04, PR * 0.7, 'rgba(0,0,0,.3)');
+  if (isHuman) { path3(circlePts(p.x, p.y, PR * 1.75, 28), 0, false); ctx.strokeStyle = '#ffe14f'; ctx.lineWidth = 2.5; ctx.stroke(); }
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const L = (a, b, w, c) => { ctx.strokeStyle = c; ctx.lineWidth = Math.max(1, w * f); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); };
+  const head = (h, R) => {
+    ctx.fillStyle = SKIN; ctx.beginPath(); ctx.arc(h[0], h[1], R * f, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = HAIR; ctx.beginPath(); ctx.arc(h[0], h[1] - R * f * 0.12, R * f * 1.03, Math.PI * 1.02, Math.PI * 1.98); ctx.fill();
+  };
+  let top;
+  if (p.downT > 0 || p.slideT > 0) {
+    // on the ground: points along his facing (u forward, v across, z up) projected properly into the scene
+    const c = Math.cos(p.face), s = Math.sin(p.face);
+    const W = (u, v, z) => proj(p.x + c * u - s * v, p.y + s * u + c * v, z * HS);
+    if (p.slideT > 0) {                            // feet first, leaning back
+      L(W(0, -0.1, 0.18), W(0.85, -0.12, 0.1), 0.12, T.dark); L(W(0.85, -0.12, 0.1), W(1.0, -0.12, 0.1), 0.1, BOOT);
+      L(W(0, 0.1, 0.18), W(0.35, 0.15, 0.4), 0.12, T.dark); L(W(0.35, 0.15, 0.4), W(0.6, 0.15, 0.08), 0.1, T.dark);
+      L(W(-0.45, 0.15, 0.5), W(-0.75, 0.22, 0.05), 0.08, SKIN);
+      L(W(0, 0, 0.2), W(-0.45, 0, 0.5), 0.26, col);
+      head(W(-0.62, 0, 0.62), 0.12); top = W(-0.6, 0, 1.1)[1];
+    } else {                                       // flat on his front
+      L(W(-0.1, -0.1, 0.12), W(-0.95, -0.15, 0.08), 0.12, T.dark); L(W(-0.1, 0.1, 0.12), W(-0.95, 0.18, 0.08), 0.12, T.dark);
+      L(W(0.45, -0.18, 0.15), W(0.95, -0.35, 0.08), 0.08, SKIN); L(W(0.45, 0.18, 0.15), W(0.95, 0.35, 0.08), 0.08, SKIN);
+      L(W(-0.1, 0, 0.15), W(0.5, 0, 0.15), 0.28, col);
+      head(W(0.72, 0, 0.16), 0.12); top = W(0.3, 0, 0.9)[1];
+    }
+  } else {
+    const g = gaitOf(p), mv = g.v > 0.5 ? Math.atan2(p.vy, p.vx) : p.face;
+    // which way he heads on screen: s = +1 to the right, -1 to the left, 0 towards or away from the camera
+    const [ex, ey] = proj(p.x + Math.cos(mv), p.y + Math.sin(mv), 0), dxs = ex - sx, dys = (ey - sy) / Math.sin(CAM3.th);
+    const sv = dxs / (hyp(dxs, dys) || 1), cv = Math.sqrt(Math.max(0, 1 - sv * sv)), up = sy - proj(p.x, p.y, HS)[1];
+    // screen point of a body point: u forward along his run, v across his body, z up
+    const P = (u, v, z) => [sx + (u * sv + v * cv) * f, sy - z * up];
+    const back = pose(g, -1), near = pose(g, 1), o = near;
+    const vHip = 0.09, vSh = 0.17 + 0.03 * cv, shade = 'rgba(0,0,0,.28)';
+    const limbs = (q, k, behind) => {
+      const v1 = k * vHip, v2 = k * vSh;
+      // leg: thigh in shorts colour at the top, sock below the knee, boot
+      L(P(0, v1, q.hipZ), P(q.ku, v1, q.kz), 0.13, SKIN); L(P(0, v1, q.hipZ), P(q.ku * 0.45, v1, q.hipZ - (q.hipZ - q.kz) * 0.45), 0.15, T.dark);
+      L(P(q.ku, v1, q.kz), P(q.fu, v1, q.fz), 0.11, T.dark);
+      L(P(q.fu - 0.02, v1, q.fz), P(q.fu + 0.13, v1, q.fz - 0.02), 0.09, BOOT);
+      // arm
+      const arm = p.role === 'gk' ? '#f4f4ee' : SKIN;
+      L(P(q.su, v2, q.sz), P(q.eu, v2, q.ez), 0.085, arm); L(P(q.eu, v2, q.ez), P(q.hu, v2, q.hz), 0.075, arm);
+      if (p.role === 'gk') { ctx.fillStyle = '#f4f4ee'; const h = P(q.hu, v2, q.hz); ctx.beginPath(); ctx.arc(h[0], h[1], 0.06 * f, 0, Math.PI * 2); ctx.fill(); }
+      if (behind) {                                // the far side sits in shadow
+        L(P(0, v1, q.hipZ), P(q.ku, v1, q.kz), 0.13, shade); L(P(q.ku, v1, q.kz), P(q.fu, v1, q.fz), 0.11, shade);
+        L(P(q.su, v2, q.sz), P(q.eu, v2, q.ez), 0.085, shade); L(P(q.eu, v2, q.ez), P(q.hu, v2, q.hz), 0.075, shade);
+      }
+    };
+    limbs(back, -1, true);
+    // body: shorts, then a slim shirt from the waist to the shoulders, leaning into the run
+    const hip = P(0, 0, o.hipZ), waist = P(Math.sin(o.lean) * 0.1, 0, o.hipZ + 0.1), neck = P(Math.sin(o.lean) * 0.55, 0, o.hipZ + 0.55);
+    L(P(0, 0, o.hipZ - 0.12), hip, 0.22 + 0.06 * cv, T.dark);
+    L(waist, neck, 0.2 + 0.12 * cv, col);
+    if (cv > 0.45) {                               // shirt number when we see his front or back
+      ctx.fillStyle = '#fff'; ctx.font = `900 ${Math.max(7, f * 0.2)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(p.num, (waist[0] + neck[0]) / 2, (waist[1] + neck[1]) / 2);
+    }
+    limbs(near, 1, false);
+    const hd = P(Math.sin(o.lean) * 0.72, 0, o.hipZ + 0.74);
+    L(neck, hd, 0.07, SKIN); head(hd, 0.115);
+    top = P(0, 0, 2.0)[1];
+  }
+  if (isHuman) {                                   // stamina bar over his head
+    const bw = Math.max(26, f * 0.9);
+    ctx.fillStyle = '#000a'; ctx.fillRect(sx - bw / 2 - 2, top - 6, bw + 4, 7);
+    ctx.fillStyle = p.stamina > 0.3 ? '#5be37d' : '#ff6b6b'; ctx.fillRect(sx - bw / 2, top - 4, bw * p.stamina, 3);
+    top -= 8;
+  }
+  if (p.slowT > 0) drawEmo('🐢', sx + Math.sin(now / 180) * f * 0.12, top - f * 0.3, f * 0.55);
 }
 function ballSprite(bx, by, R, b, lw) {
   ctx.fillStyle = '#fff'; ctx.strokeStyle = '#222'; ctx.lineWidth = lw; ctx.beginPath(); ctx.arc(bx, by, R, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
@@ -7109,58 +7316,6 @@ function goalItems(s, items) {
   for (const y of [y0, y1]) items.push({ d: depthOf(x0, y) - 0.02, f: bar([x0, y, 0], [x0, y, BAR]) });
   items.push({ d: depthOf(x0, 0) - 0.03, f: bar([x0, y0, BAR], [x0, y1, BAR]) });
 }
-const head3 = (x, y, R) => {             // skin, then hair over the top
-  ctx.fillStyle = '#e0a77a'; ctx.beginPath(); ctx.arc(x, y, R, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#2a1a10'; ctx.beginPath(); ctx.arc(x, y - R * 0.15, R * 1.02, Math.PI * 1.05, Math.PI * 1.95); ctx.fill();
-};
-function drawPlayer3D(p, isHuman, now) {
-  const T = TEAMC[p.team], col = p.role === 'gk' ? T.gk : T.body, [sx, sy, f] = proj(p.x, p.y, 0);
-  const Y = z => proj(p.x, p.y, z * HS)[1];      // screen height of a point on him (he is drawn as an upright card)
-  groundDisc(p.x + 0.15, p.y + 0.15, PR * 1.05, 'rgba(0,0,0,.3)');
-  if (isHuman) { path3(circlePts(p.x, p.y, PR * 1.75, 28), 0, false); ctx.strokeStyle = '#ffe14f'; ctx.lineWidth = 2.5; ctx.stroke(); }
-  ctx.lineCap = 'round';
-  let top;
-  if (p.downT > 0 && p.slideT <= 0 || p.slideT > 0) {    // on the ground, stretched out along his facing
-    const c = Math.cos(p.face), s = Math.sin(p.face);
-    const [ax, ay, af] = proj(p.x - c * 0.6, p.y - s * 0.6, 0.2), [bx, by, bf] = proj(p.x + c * 0.5, p.y + s * 0.5, 0.3), m = (af + bf) / 2;
-    ctx.strokeStyle = T.dark; ctx.lineWidth = 0.52 * m; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
-    ctx.strokeStyle = col; ctx.lineWidth = 0.4 * m; ctx.stroke();
-    head3(bx, by - 0.08 * bf, 0.17 * bf);
-    top = by - 0.6 * bf;
-  } else {
-    const run = hyp(p.vx, p.vy), sw = Math.sin(now / 70 + p.num) * Math.min(1, run / 4), w = f * 0.3;
-    // legs, swinging as he runs
-    ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = f * 0.15;
-    for (const k of [-1, 1]) {
-      const fx0 = sx + k * w * 0.42 + sw * k * w * 0.55, fy0 = Y(0) - Math.max(0, sw * k) * f * 0.14;
-      ctx.beginPath(); ctx.moveTo(sx + k * w * 0.42, Y(0.85)); ctx.lineTo(fx0, fy0); ctx.stroke();
-    }
-    // arms
-    ctx.strokeStyle = p.role === 'gk' ? '#f4f4ee' : '#e0a77a'; ctx.lineWidth = f * 0.12;
-    const hands = [];
-    for (const k of [-1, 1]) {
-      const hx = sx + k * w * 1.25 - sw * k * w * 0.5, hy = Y(0.98);
-      ctx.beginPath(); ctx.moveTo(sx + k * w * 0.95, Y(1.42)); ctx.lineTo(hx, hy); ctx.stroke(); hands.push([hx, hy]);
-    }
-    // shorts and shirt
-    ctx.fillStyle = T.dark; ctx.fillRect(sx - w * 0.92, Y(0.98), w * 1.84, Y(0.72) - Y(0.98));
-    const t0 = Y(1.52), t1 = Y(0.9);
-    ctx.fillStyle = col; ctx.strokeStyle = T.dark; ctx.lineWidth = Math.max(1, f * 0.04);
-    ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(sx - w, t0, w * 2, t1 - t0, w * 0.45); else ctx.rect(sx - w, t0, w * 2, t1 - t0); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#fff'; ctx.font = `900 ${Math.max(8, f * 0.36)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(p.num, sx, (t0 + t1) / 2);
-    if (p.role === 'gk') { ctx.fillStyle = '#f4f4ee'; for (const [hx, hy] of hands) { ctx.beginPath(); ctx.arc(hx, hy, f * 0.09, 0, Math.PI * 2); ctx.fill(); } }
-    head3(sx, Y(1.72), f * 0.17);
-    top = Y(2.05);
-  }
-  if (isHuman) {                                   // stamina bar over his head
-    const bw = Math.max(26, f * 0.9);
-    ctx.fillStyle = '#000a'; ctx.fillRect(sx - bw / 2 - 2, top - 6, bw + 4, 7);
-    ctx.fillStyle = p.stamina > 0.3 ? '#5be37d' : '#ff6b6b'; ctx.fillRect(sx - bw / 2, top - 4, bw * p.stamina, 3);
-    top -= 8;
-  }
-  if (p.slowT > 0) drawEmo('🐢', sx + Math.sin(now / 180) * f * 0.12, top - f * 0.3, f * 0.55);
-}
 function drawBall3D() {
   const b = S.ball;
   groundDisc(b.x + b.z * 0.22, b.y + b.z * 0.22, BR * 1.15, 'rgba(0,0,0,.35)');
@@ -7261,7 +7416,7 @@ const input = { mx: 0, my: 0, sprint: false, charge: null, chargeT0: 0, chargeAn
 const keys = {};
 let humanIdx = 1, switchT = 0;
 const human = () => S.players[humanIdx];
-const CHARGE_T = 0.85;
+const CHARGE_T = 0.55;                    // seconds to fill the kick bar
 let clock = 0;                            // game time (s): charging and buffered kicks follow the game, not the wall clock
 const chargeLevel = () => input.charge ? clamp((clock - input.chargeT0) / CHARGE_T, 0, 1) : 0;
 /** Stick direction in world space (screen up = attack direction in portrait). */
@@ -7326,26 +7481,28 @@ function passUp() {
     const tgt = passPick(p);
     if (!tgt) { const [ax, ay] = aimDir(p); return kick(p, 'pass', ax, ay, 0.4, 0, 0.04, p.x + ax * 10, p.y + ay * 10); }
     const lob = held > 0.35 || laneBlock(p.x, p.y, tgt.x, tgt.y, p.team) >= 1 && held > 0.2;
-    const ok = kick(p, lob ? 'lob' : 'pass', tgt.x - p.x, tgt.y - p.y, clamp(held / CHARGE_T, 0, 1), 0, 0.03, tgt.x, tgt.y);
-    if (ok) pendingSwitch = tgt.p; return ok;
+    const ok = kick(p, lob ? 'lob' : 'pass', tgt.x - S.ball.x, tgt.y - S.ball.y, clamp(held / 0.85, 0, 1), 0, 0.025, tgt.x, tgt.y);
+    if (ok) { pendingSwitch = tgt.p; passTo(p, tgt.p); } return ok;
   };
-  if (!go()) input.buffer = { fn: go, until: clock + 0.8 };
+  if (!go()) input.buffer = { fn: go, until: clock + 1 };
 }
 /** Release of the kick button. Charge = power for shots and clearances (a high one when charged hard). */
 function shootUp() {
   if (input.charge !== 'shot') return;
   const p = human(), pw = chargeLevel(), [ax, ay] = aimDir(p);
   let dAng = Math.atan2(ay, ax) - (input.chargeAng ?? Math.atan2(ay, ax)); dAng = Math.atan2(Math.sin(dAng), Math.cos(dAng));
-  const curl = clamp(dAng / 0.9, -1, 1);
+  // curl only from a deliberate turn of the stick, so a small wobble while aiming doesn't bend a shot wide
+  const curl = Math.abs(dAng) < 0.3 ? 0 : clamp((dAng - Math.sign(dAng) * 0.3) / 0.7, -1, 1);
   input.charge = null;
   const it = kickIntent(p, ax, ay);
   let go;
-  if (it.k === 'shot') go = () => kick(p, 'shot', ax, ay, Math.max(0.2, pw), curl, 0.05);
+  // a shot goes from the ball to the crosshair (the curl bends it away from there, so start it a little the other way)
+  if (it.k === 'shot') go = () => { const ty = it.y - curl * 0.9; return kick(p, 'shot', it.x - S.ball.x, ty - S.ball.y, Math.max(0.2, pw), curl, 0.03, it.x, ty); };
   else {
     const lob = pw > 0.6, dist = lob ? 10 + 14 * pw : 6 + 18 * pw;
-    go = () => kick(p, lob ? 'lob' : 'pass', ax, ay, pw, curl * 0.5, 0.05, p.x + ax * dist, p.y + ay * dist);
+    go = () => kick(p, lob ? 'lob' : 'pass', ax, ay, pw, curl * 0.5, 0.04, p.x + ax * dist, p.y + ay * dist);
   }
-  if (!go()) input.buffer = { fn: go, until: clock + 0.8 };
+  if (!go()) input.buffer = { fn: go, until: clock + 1 };
 }
 let pendingSwitch = null;
 /** Switch to the field player best placed for the ball (or the receiver of your pass). */
@@ -7589,6 +7746,7 @@ function frame(now) {
     cam.y = halfC * 2 > W + 3 ? 0 : clamp(cam.y, -HW - 1.5 + halfC, HW + 1.5 - halfC + (portrait ? 0 : past));
   }
   cheerT -= dt; stepBubbles(dt);
+  for (const q of S.players) q.gait = ((q.gait || 0) + hyp(q.vx, q.vy) * dt * (q.sprint ? 3.3 : 3.9)) % 6283.19;   // stride phase follows the ground covered
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (view3d) drawScene3D(now); else drawScene2D(now);
   if (S.players.length) { btnLabels(false); if (running && now - hudT > 150) { hudT = now; hud(); } }
