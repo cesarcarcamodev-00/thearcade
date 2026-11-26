@@ -7892,11 +7892,18 @@ function netClose() {
 function controlTick() {
   const p = human(); if (!p) return;
   p.ctrl.mx = input.mx; p.ctrl.my = input.my; p.ctrl.sprint = input.sprint;
-  // while charging, the player steps onto the ball by himself and the stick only aims
+  // while charging, the player lines up behind the ball by himself. With the stick held he keeps running
+  // (the stick drives and aims, the assist only slides him onto the line behind the ball); stick let go: he steps onto it
   if (input.charge === 'shot' && input.chargeAng === null) { const [ax, ay] = aimDir(p); input.chargeAng = Math.atan2(ay, ax); }
   if ((input.charge || input.buffer) && !S.ball.held && hyp(S.ball.x - p.x, S.ball.y - p.y) < 3.5) {
-    const [ax, ay] = aimDir(p), off = PR + BR + 0.15;
-    steer(p, S.ball.x - ax * off, S.ball.y - ay * off, false, 0.6); p.ctrl.sprint = hyp(S.ball.x - p.x, S.ball.y - p.y) > 1.6;
+    const [ax, ay] = aimDir(p), off = PR + BR + 0.15, m = Math.min(1, hyp(input.mx, input.my));
+    const bx = S.ball.x + S.ball.vx * 0.12, by = S.ball.y + S.ball.vy * 0.12;   // where the ball is going, not where it was
+    if (m > 0.25) {
+      const dx = bx - ax * off - p.x, dy = by - ay * off - p.y, along = dx * ax + dy * ay;
+      const fwd = clamp(m + along * 0.6, 0.45, 1), lx = clamp((dx - along * ax) * 2.5, -0.8, 0.8), ly = clamp((dy - along * ay) * 2.5, -0.8, 0.8);
+      let cx = ax * fwd + lx, cy = ay * fwd + ly; const cl = hyp(cx, cy); if (cl > 1) { cx /= cl; cy /= cl; }
+      p.ctrl.mx = cx; p.ctrl.my = cy; p.ctrl.sprint = input.sprint || along > 1.6;
+    } else { steer(p, bx - ax * off, by - ay * off, false, 0.6); p.ctrl.sprint = hyp(S.ball.x - p.x, S.ball.y - p.y) > 1.6; }
     p.faceTo = Math.atan2(ay, ax);
   }
   if (input.buffer) { if (input.buffer.fn()) input.buffer = null; else if (clock > input.buffer.until) input.buffer = null; }
