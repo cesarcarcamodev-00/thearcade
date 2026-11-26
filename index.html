@@ -6984,9 +6984,10 @@ try { view3d = localStorage.getItem(VIEW_KEY) === '3d'; } catch (e) {}
 const CAM3 = { th: 0.9, D: 26, sc: 20, cx: 0, cy: 0 };
 const HS = 1.15;                          // 3D figures are drawn a touch tall so they read from up in the stand
 function resize() {
-  // every art pixel is the same whole number of device pixels (no uneven, smeared pixels), about 260 across the short side
+  // every art pixel is the same whole number of device pixels (no uneven, smeared pixels), about 260 across the short side;
+  // a device that can't keep up gets bigger art pixels (quality steps), still whole and sharp
   VW = innerWidth; VH = innerHeight;
-  const dev = devicePixelRatio || 1, P = Math.max(1, Math.round(Math.min(VW, VH) * dev / 260));
+  const dev = devicePixelRatio || 1, P = Math.max(1, Math.round(Math.min(VW, VH) * dev / 260)) + quality;
   const cw = Math.ceil(VW * dev / P), ch = Math.ceil(VH * dev / P);
   canvas.width = cw; canvas.height = ch; canvas.style.width = cw * P / dev + 'px'; canvas.style.height = ch * P / dev + 'px';
   PX = P / dev; DPR = 1 / PX;
@@ -7033,22 +7034,15 @@ for (let c = 0; c < 32768; c++) {
   for (let i = 0; i < PAL.length; i++) { const dr = R - PAL[i][0], dg = G - PAL[i][1], db = B - PAL[i][2], d = dr * dr * 3 + dg * dg * 4 + db * db * 2; if (d < bd) { bd = d; best = i; } }
   LUT[c] = best;
 }
-const EXACT = new Map(PAL.map((c, i) => [c[0] << 16 | c[1] << 8 | c[2], i]));
-const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(() => 0);   // no dither: every colour snaps cleanly to the palette, gradients become solid bands
+// the snap as one lookup per pixel: 5-bit colour -> finished opaque RGBA word. A palette colour's own bucket maps to
+// exactly that colour, so flat palette colours never shift (no dither: gradients become solid bands)
+const LUT32 = new Uint32Array(32768), PAL32 = PAL.map(c => (255 << 24 | c[2] << 16 | c[1] << 8 | c[0]) >>> 0);
+for (let c = 0; c < 32768; c++) LUT32[c] = PAL32[LUT[c]];
+PAL.forEach((c, i) => { LUT32[(c[0] >> 3) << 10 | (c[1] >> 3) << 5 | c[2] >> 3] = PAL32[i]; });
 function pixelate() {
   const w = canvas.width, h = canvas.height; if (!w || !h) return;
-  const img = ctx.getImageData(0, 0, w, h), d = img.data;
-  for (let y = 0, i = 0; y < h; y++) {
-    const row = (y & 3) * 4;
-    for (let x = 0; x < w; x++, i += 4) {
-      const ex = EXACT.get(d[i] << 16 | d[i + 1] << 8 | d[i + 2]); if (ex !== undefined) { d[i + 3] = 255; continue; }
-      const t = BAYER[row + (x & 3)];
-      let rr = d[i] + t, gg = d[i + 1] + t, bb = d[i + 2] + t;
-      rr = rr < 0 ? 0 : rr > 255 ? 255 : rr; gg = gg < 0 ? 0 : gg > 255 ? 255 : gg; bb = bb < 0 ? 0 : bb > 255 ? 255 : bb;
-      const q = PAL[LUT[(rr >> 3) << 10 | (gg >> 3) << 5 | (bb >> 3)]];
-      d[i] = q[0]; d[i + 1] = q[1]; d[i + 2] = q[2]; d[i + 3] = 255;
-    }
-  }
+  const img = ctx.getImageData(0, 0, w, h), u = new Uint32Array(img.data.buffer);   // RGBA bytes read as little-endian words
+  for (let i = 0, n = u.length; i < n; i++) { const v = u[i]; u[i] = LUT32[(v & 0xf8) << 7 | (v >> 6 & 0x3e0) | (v >> 19 & 0x1f)]; }
   ctx.putImageData(img, 0, 0);
 }
 /** Shirt numbers in a tiny 3x5 pixel font, one art pixel per dot, so they stay crisp at the low resolution. */
@@ -7121,8 +7115,9 @@ let cheerT = 0, cheerSad = false;          // seconds left of a crowd reaction, 
 function crowdReact(happy, secs = 2.6) { cheerT = secs; cheerSad = !happy; }
 /** mode: '2d', or in 3D 'far' (drawn before the pitch) / 'near' (the stand between you and the play, drawn last). */
 function drawCrowd(now, mode) {
-  const t = now / 1000;
-  if (mode === 'far') crowd.sort((a, c) => depthOf(c.x, c.y) - depthOf(a.x, a.y));
+  const t = now / 1000, side = FL + (portrait ? 'p' : 'l');
+  // far to near; the camera's pan shifts every fan's depth alike, so the order only changes when the view turns
+  if (mode === 'far' && crowdSide !== side) { crowdSide = side; crowd.sort((a, c) => depthOf(c.x, c.y) - depthOf(a.x, a.y)); }
   for (const f of crowd) {
     if (mode !== '2d' && (mode === 'near') !== (portrait ? FL * f.x < -HL : FL * f.y > HW)) continue;
     const jump = cheerT > 0 ? Math.abs(Math.sin(t * 9 + f.ph)) * (cheerSad ? 0.12 : 0.45) : Math.max(0, Math.sin(t * 1.3 + f.ph)) * 0.06;
@@ -7130,15 +7125,16 @@ function drawCrowd(now, mode) {
     if (mode === '2d') { [sx, sy] = toS(f.x, f.y); px = SC * 0.8; sy -= jump * SC; }
     else { const r = proj(f.x, f.y, f.z + jump); if (r[3] < 2) continue; [sx, sy] = r; px = r[2] * 0.8; }
     if (sx < -px || sx > VW + px || sy < -px || sy > VH + px) continue;
-    // a fan: shoulders in a shirt and a head on top (arms up while they cheer)
-    ctx.fillStyle = f.shirt; ctx.beginPath(); ctx.ellipse(sx, sy + px * 0.3, px * 0.42, px * 0.32, 0, Math.PI, 0); ctx.fill();
+    // a fan, a few art pixels big: blocky shoulders in a shirt and a head on top (arms up while they cheer)
+    ctx.fillStyle = f.shirt; ctx.fillRect(sx - px * 0.4, sy + px * 0.02, px * 0.8, px * 0.3);
     if (cheerT > 0 && !cheerSad) {
       ctx.strokeStyle = f.shirt; ctx.lineWidth = Math.max(1, px * 0.12); ctx.beginPath();
       ctx.moveTo(sx - px * 0.32, sy + px * 0.15); ctx.lineTo(sx - px * 0.45, sy - px * 0.35); ctx.moveTo(sx + px * 0.32, sy + px * 0.15); ctx.lineTo(sx + px * 0.45, sy - px * 0.35); ctx.stroke();
     }
-    ctx.fillStyle = f.skin; ctx.beginPath(); ctx.arc(sx, sy - px * 0.08, px * 0.22, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = f.skin; ctx.fillRect(sx - px * 0.2, sy - px * 0.3, px * 0.4, px * 0.42);
   }
 }
+let crowdSide = '';
 /* ---- 2D: straight down on the pitch ---- */
 function drawPitch() {
   ctx.fillStyle = '#1e1236'; ctx.fillRect(0, 0, VW, VH);
@@ -8227,6 +8223,7 @@ const GAME_SPEED = 0.92;                  // the whole match runs a touch slower
 let last = performance.now(), acc = 0, hudT = 0;
 function frame(now) {
   requestAnimationFrame(frame);
+  const w0 = performance.now();
   const dt = clamp((now - last) / 1000, 0, 0.05); last = Math.max(last, now);
   if (running && NET.guest) { clock += dt * GAME_SPEED; readKeys(); guestFrame(now, dt); }
   else if (running) {
@@ -8276,7 +8273,14 @@ function frame(now) {
   if (view3d) drawScene3D(now); else drawScene2D(now);
   ctx.setTransform(1, 0, 0, 1, 0, 0); pixelate(); drawTags();
   if (S.players.length) { btnLabels(false); if (running && now - hudT > 150) { hudT = now; hud(); } }
+  // too slow for smooth play (over ~9 ms of work a frame, for a couple of seconds): one step bigger art pixels
+  const work = performance.now() - w0;
+  if (running && document.visibilityState === 'visible') {
+    workAvg += (Math.min(work, 40) - workAvg) * 0.03;
+    if (workAvg > 9 && quality < 2 && now - qualityT > 2500) { quality++; qualityT = now; workAvg = 5; resize(); }
+  }
 }
+let workAvg = 5, quality = 0, qualityT = 0;   // average frame work (ms) and the quality step it chose
 
 resize(); buildCrowd(); setTouch(matchMedia('(pointer: coarse)').matches); applyLang(); showMenu(); autoJoin();
 requestAnimationFrame(frame);
