@@ -6546,7 +6546,9 @@ function stepPlayer(p, prof) {
     const a = (braking ? BRAKE : canSprint ? ACC * 1.1 : ACC) * H;
     if (dl > a) { dx *= a / dl; dy *= a / dl; }
     p.vx += dx; p.vy += dy;
-    if (m > 0.15) { const want = Math.atan2(c.my, c.mx); let d = want - p.face; d = Math.atan2(Math.sin(d), Math.cos(d)); p.face += d * Math.min(1, 18 * H); }
+    // facing follows the stick, except while lining up a kick: then he keeps facing the aim and sidesteps into place
+    if (p.faceTo != null || m > 0.15) { const want = p.faceTo != null ? p.faceTo : Math.atan2(c.my, c.mx); let d = want - p.face; d = Math.atan2(Math.sin(d), Math.cos(d)); p.face += d * Math.min(1, 18 * H); }
+    p.faceTo = null;
   }
   p.stamina = clamp(p.stamina + (p.sprint && p.slideT <= 0 ? -0.09 : 0.13) * H, 0, 1);   // a full bar = about 11 s of sprinting
   p.x += p.vx * H; p.y += p.vy * H;
@@ -7558,11 +7560,16 @@ let clock = 0;                            // game time (s): charging and buffere
 const chargeLevel = () => input.charge ? clamp((clock - input.chargeT0) / CHARGE_T, 0, 1) : 0;
 /** Stick direction in world space (screen up = attack direction in portrait). */
 function stickWorld(jx, jy) { return portrait ? [-jy * FL, jx * FL] : [jx * FL, jy * FL]; }
+/** Where you aim: the stick; with the stick let go while charging, the direction you faced when you pressed
+ *  (so the aim does not drift as he steps round the ball); otherwise the way he faces. */
 function aimDir(p) {
   const m = hyp(input.mx, input.my);
   if (m > 0.25) return [input.mx / m, input.my / m];
+  if ((input.charge || input.buffer) && input.lockAng != null) return [Math.cos(input.lockAng), Math.sin(input.lockAng)];
   return [Math.cos(p.face), Math.sin(p.face)];
 }
+/** Remember the aim at the moment a kick or pass is pressed. */
+function lockAim(p) { input.lockAng = null; const [ax, ay] = aimDir(p); input.lockAng = Math.atan2(ay, ax); }
 function readKeys() {
   if (touchMode) return;
   let x = 0, y = 0;
@@ -7574,7 +7581,7 @@ function readKeys() {
 function shootDown() {
   const p = human(); if (!p || S.phase !== 'play') return;
   if (S.ball.held) return;
-  input.charge = 'shot'; input.chargeT0 = clock; input.chargeAng = null;   // the start angle is taken on the next step, once the stick has been read
+  lockAim(p); input.charge = 'shot'; input.chargeT0 = clock; input.chargeAng = null;   // the start angle is taken on the next step, once the stick has been read
 }
 /** Sweep: a long slide in the direction you push the stick, or straight at the ball if you are not pushing. */
 function tackleDown() {
@@ -7607,7 +7614,7 @@ function passPick(p) {
 }
 function passDown() {
   const p = human(); if (!p || S.phase !== 'play' || S.ball.held) return;
-  input.charge = 'pass'; input.chargeT0 = clock;
+  lockAim(p); input.charge = 'pass'; input.chargeT0 = clock;
 }
 /** Release of PASS: a ground pass, or a lofted one when held (or when the lane is blocked and you held a little). */
 function passUp() {
@@ -7876,6 +7883,7 @@ function controlTick() {
   if ((input.charge || input.buffer) && !S.ball.held && hyp(S.ball.x - p.x, S.ball.y - p.y) < 3.5) {
     const [ax, ay] = aimDir(p), off = PR + BR + 0.15;
     steer(p, S.ball.x - ax * off, S.ball.y - ay * off, false, 0.6); p.ctrl.sprint = hyp(S.ball.x - p.x, S.ball.y - p.y) > 1.6;
+    p.faceTo = Math.atan2(ay, ax);
   }
   if (input.buffer) { if (input.buffer.fn()) input.buffer = null; else if (clock > input.buffer.until) input.buffer = null; }
   if (!cur.keeper) autoSwitch();
@@ -7890,8 +7898,8 @@ function act(a) {
   if (NET.guest) {
     if (!running) return;
     netSend({ t: 'a', a });
-    if (a === 'kd') { if (!sweepMode()) { input.charge = 'shot'; input.chargeT0 = clock; input.chargeAng = null; } }
-    else if (a === 'pd') { input.charge = 'pass'; input.chargeT0 = clock; }
+    if (a === 'kd') { if (!sweepMode() && human()) { lockAim(human()); input.charge = 'shot'; input.chargeT0 = clock; input.chargeAng = null; } }
+    else if (a === 'pd') { if (human()) lockAim(human()); input.charge = 'pass'; input.chargeT0 = clock; }
     else if (a === 'ku' || a === 'pu') input.charge = null;
     return;
   }
